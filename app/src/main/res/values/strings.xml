@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name">渔趣</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="menu_add_friends">添加朋友</string>
+    <string name="buzuolanhaoren">不做烂好人</string>
+    <string name="message">消息</string>
+    <string name="friend">联系人</string>
+    <string name="map">位置</string>
+    <string name="news">新闻</string>
+    <string name="Adminator">用户名</string>
+    <string name="testpwd">pwd</string>
+    <string name="errorPwd">密码错误</string>
+    <string name="login">登录</string>
+    <string name="register">注册</string>
+    <string name="set">个人设置</string>
+    <string name="menu_code">我的二维码</string>
+    <string name="exit">退出登录</string>
+    <string name="phone">电话号码</string>
+    <string name="editPhone">请输入您的电话号码</string>
+    <string name="editname">请输入您的用户名</string>
+    <string name="name">用户名</string>
+    <string name="editconfirmNum">请再次输入您的密码</string>
+    <string name="confirm">确认密码</string>
+    <string name="editNum">请输入您的密码</string>
+    <string name="pwd">密码</string>
+    <string name="about">关于</string>
+    <string name="register_now">立即注册</string>
+    <string name="location_service">位置服务</string>
+    <string name="camera">相机</string>
+    <string name="album">相册</string>
+    <string name="cancle">取消</string>
+    <string name="location">位置</string>
+    <string name="location_manager">发现渔场</string>
+    <string name="fishing_book">预约</string>
+</resources>
