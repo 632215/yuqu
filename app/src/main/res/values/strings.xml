@@ -35,4 +35,9 @@
     <string name="location">位置</string>
     <string name="location_manager">发现渔场</string>
     <string name="fishing_book">预约</string>
+    <string name="title">标题</string>
+    <string name="content">内容</string>
+    <string name="sure">确定</string>
+    <string name="my_report">我的上报</string>
+    <string name="my_mybook">我的订单</string>
 </resources>

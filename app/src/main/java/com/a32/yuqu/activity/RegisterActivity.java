@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.a32.yuqu.R;
 import com.a32.yuqu.base.BaseActivity;
 import com.a32.yuqu.utils.PhoneUtils;
+import com.a32.yuqu.view.MyDialog;
 import com.a32.yuqu.view.TopTitleBar;
 import com.jph.takephoto.app.TakePhoto;
 
@@ -73,7 +74,7 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
                     showToast("请输入手机号码！");
                     return;
                 }
-                if (!PhoneUtils.isMobileNO(pwd.getText().toString().trim())){
+                if (!PhoneUtils.isMobileNO(phone.getText().toString().trim())){
                     showToast("输入手机号不合法！");
                     return;
                 }
@@ -97,7 +98,17 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
                 }
                 //post请求，如果成功怎保存用户信息到shareperference，转到登录界面
                 //如果失败怎显示错误
-                startActivity(new Intent(this,LoginActivity.class));
+                final MyDialog myDialog=new MyDialog(RegisterActivity.this,R.style.MyDialog, new MyDialog.sureListener() {
+                    @Override
+                    public void onClick() {
+                        startActivity(new Intent(RegisterActivity.this,LoginActivity.class));
+                    }
+                });
+                myDialog.setmTitle("提示");
+                myDialog.setmContent("123456");
+                myDialog.setmSure("确定");
+                myDialog.show();
+
                 break;
             case R.id.img_register_head:
 

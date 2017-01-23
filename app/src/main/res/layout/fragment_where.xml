@@ -2,70 +2,110 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/colorBackground">
+    android:background="@color/colorBackground"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
         android:background="@drawable/shape_toolbar_background"
-        android:layout_marginTop="10dp">
+        android:orientation="horizontal">
 
         <RelativeLayout
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
-            >
+            android:layout_weight="1">
+
             <TextView
-                android:id="@+id/where_location"
+                android:id="@+id/tv_where_location"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_margin="20dp"
                 android:drawablePadding="10dp"
-                android:textSize="14sp"
-                android:text="@string/location"
                 android:drawableTop="@mipmap/locationserver"
-                />
+                android:text="@string/location"
+                android:textSize="14sp" />
         </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
 
             >
+
             <TextView
-                android:id="@+id/where_manager"
+                android:id="@+id/tv_where_myreport"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_margin="20dp"
                 android:drawablePadding="10dp"
-                android:textSize="14sp"
-                android:text="@string/location_manager"
                 android:drawableTop="@mipmap/manage"
-                />
+                android:text="@string/my_report"
+                android:textSize="14sp" />
         </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
 
             >
+
             <TextView
-                android:id="@+id/where_book"
+                android:id="@+id/tv_where_book"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_margin="20dp"
                 android:drawablePadding="10dp"
-                android:textSize="14sp"
+                android:drawableTop="@mipmap/manage"
                 android:text="@string/fishing_book"
-                android:drawableTop="@mipmap/manage"
-                />
+                android:textSize="14sp" />
         </RelativeLayout>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:background="@color/colorLineGray" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ll_where_mybook"
+        android:background="@color/colorWhite"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:text="@string/my_mybook"
+                android:textColor="@color/colorTextBlack"
+                android:textSize="14sp" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:paddingRight="15dp"
+                android:src="@mipmap/choose" />
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorLineGray" />
+
     </LinearLayout>
 </LinearLayout>

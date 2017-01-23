@@ -10,6 +10,7 @@ import android.widget.Button;
 
 import com.a32.yuqu.R;
 import com.a32.yuqu.base.BaseActivity;
+import com.a32.yuqu.view.MyDialog;
 
 import butterknife.Bind;
 
