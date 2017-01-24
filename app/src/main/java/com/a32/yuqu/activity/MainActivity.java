@@ -2,6 +2,7 @@ package com.a32.yuqu.activity;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -9,11 +10,13 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.a32.yuqu.R;
 import com.a32.yuqu.fragment.DynamicFragment;
@@ -29,6 +32,7 @@ public class MainActivity extends AppCompatActivity
     private FriendFragment friendFragment;
     private WhereFragment whereFragment;
     private DynamicFragment dynamicFragment;
+    private long exitTime = 0;
     FragmentTransaction transaction;
 
     private RadioGroup radioGroup;
@@ -103,6 +107,7 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    //侧边栏按钮监听事件
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -112,9 +117,10 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_setting) {
 
         } else if (id == R.id.nav_exit) {
+            startActivity(new Intent(this,LoginActivity.class));
 
         } else if (id == R.id.nav_about) {
-
+            startActivity(new Intent(this,VersionActivity.class));
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -154,5 +160,25 @@ public class MainActivity extends AppCompatActivity
                 break;
         }
         transaction.commit();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            exit();
+            return false;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    public void exit() {
+        if ((System.currentTimeMillis() - exitTime) > 2000) {
+            Toast.makeText(getApplicationContext(), "再按一次退出程序",
+                    Toast.LENGTH_SHORT).show();
+            exitTime = System.currentTimeMillis();
+        } else {
+            finish();
+            System.exit(0);
+        }
     }
 }

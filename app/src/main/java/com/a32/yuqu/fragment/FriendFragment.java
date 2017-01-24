@@ -23,4 +23,6 @@ public class FriendFragment extends Fragment {
                 false);
         return view;
     }
+
+
 }

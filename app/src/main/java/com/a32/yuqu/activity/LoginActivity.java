@@ -27,7 +27,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     Button register;
 
     @Override
-    protected int getContentView() {
+    protected int getContentViewId() {
         return R.layout.activity_login;
     }
 

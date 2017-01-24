@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.view.Window;
 
+import com.a32.yuqu.utils.NetWorksUtils;
 import com.a32.yuqu.utils.ToastUtils;
 
 import butterknife.ButterKnife;
@@ -13,14 +14,19 @@ import butterknife.ButterKnife;
  * Created by 32 on 2017/1/3.
  */
 
-public abstract class BaseActivity extends FragmentActivity{
-    protected abstract int getContentView();
+public abstract class BaseActivity extends FragmentActivity {
+
+    //布局文件ID
+    protected abstract int getContentViewId();
+
     protected abstract void initView();
+    public boolean isConnected = false;
+
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState){
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(getContentView());
+        isConnected = NetWorksUtils.isConnected(this);
+        setContentView(getContentViewId());
         ButterKnife.bind(this);
         initView();
     }
@@ -40,6 +46,7 @@ public abstract class BaseActivity extends FragmentActivity{
     protected void onPause() {
         super.onPause();
     }
+
 
     public void showToast(String msg) {
         ToastUtils.showShort(BaseActivity.this, msg);

@@ -40,4 +40,15 @@
     <string name="sure">确定</string>
     <string name="my_report">我的上报</string>
     <string name="my_mybook">我的订单</string>
+    <string name="versioninfo">版本信息</string>
+    <string name="latestversion">已是最新版本</string>
+    <string name="system">系统信息</string>
+    <string name="versionNow">当前版本</string>
+    <string name="version">v1.0</string>
+    <string name="managerphone">制作人：**</string>
+    <string name="havenewversion">有新版本，点击更新</string>
+    <string name="mylocation">我的位置</string>
+    <string name="mark">标记这里</string>
+    <string name="nearby">附近钓场</string>
+
 </resources>

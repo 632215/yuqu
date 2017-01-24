@@ -46,8 +46,9 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
     @Bind(R.id.img_register_head)
     ImageView head;
 
+
     @Override
-    protected int getContentView() {
+    protected int getContentViewId() {
         return R.layout.activity_register;
     }
 

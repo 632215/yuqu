@@ -1,18 +1,16 @@
 package com.a32.yuqu.fragment;
 
-import android.app.Activity;
-import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import com.a32.yuqu.R;
+import com.a32.yuqu.activity.BaiduMap;
+import com.a32.yuqu.activity.MainActivity;
 import com.a32.yuqu.base.BaseFragment;
+
+import java.util.Map;
 
 import butterknife.Bind;
 
@@ -48,9 +46,11 @@ public class WhereFragment extends BaseFragment implements View.OnClickListener 
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.ll_where_mybook:
-//                startActivity(new Intent());
+                startActivity(new Intent(this.getActivity(), MainActivity.class));
                 break;
             case R.id.tv_where_location:
+                startActivity(new Intent(this.getActivity(), BaiduMap.class));
+
                 break;
             case R.id.tv_where_myreport:
                 break;
