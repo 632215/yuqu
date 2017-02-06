@@ -13,4 +13,5 @@
     <color name="colorBackground">#F5F5F6</color>
     <color name="colorTextBlack">#414141</color>
     <color name="colorBlack">#242424</color>
+    <color name="window_background">#00000000</color>
 </resources>

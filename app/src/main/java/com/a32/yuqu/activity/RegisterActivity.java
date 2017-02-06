@@ -1,21 +1,24 @@
 package com.a32.yuqu.activity;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.a32.yuqu.R;
 import com.a32.yuqu.base.BaseActivity;
+import com.a32.yuqu.utils.KeyBoardUtils;
 import com.a32.yuqu.utils.PhoneUtils;
 import com.a32.yuqu.view.MyDialog;
 import com.a32.yuqu.view.TopTitleBar;
-import com.jph.takephoto.app.TakePhoto;
+import com.hyphenate.chat.EMClient;
+import com.hyphenate.exceptions.HyphenateException;
 
 import butterknife.Bind;
 
@@ -24,7 +27,7 @@ import butterknife.Bind;
  */
 
 public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopTitleBarCallback
-    ,View.OnClickListener{
+        , View.OnClickListener {
     @Bind(R.id.et_register_phone)
     EditText phone;
 
@@ -36,6 +39,12 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
 
     @Bind(R.id.et_register_name)
     EditText name;
+
+    @Bind(R.id.tv_register_errortips)
+    TextView errorTips;
+
+    @Bind(R.id.register)
+    LinearLayout linearLayout;
 
     @Bind(R.id.btn_registerNow)
     Button register;
@@ -58,6 +67,11 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
         titleBar.setOnTopTitleBarCallback(this);
         register.setOnClickListener(this);
         head.setOnClickListener(this);
+        linearLayout.setOnClickListener(this);
+        phone.setOnClickListener(this);
+        pwd.setOnClickListener(this);
+        confirmpwd.setOnClickListener(this);
+        name.setOnClickListener(this);
     }
 
     @Override
@@ -68,52 +82,98 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             //用户注册
             case R.id.btn_registerNow:
-                if(phone.getText().toString().trim().isEmpty()){
+                if (phone.getText().toString().trim().isEmpty()) {
                     showToast("请输入手机号码！");
                     return;
                 }
-                if (!PhoneUtils.isMobileNO(phone.getText().toString().trim())){
+                if (!PhoneUtils.isMobileNO(phone.getText().toString().trim())) {
                     showToast("输入手机号不合法！");
                     return;
                 }
-                if (pwd.getText().toString().trim().isEmpty()){
+                if (pwd.getText().toString().trim().isEmpty()) {
                     showToast("请输入密码！");
                 }
-                if (pwd.getText().toString().trim().length()<6){
+                if (pwd.getText().toString().trim().length() < 6) {
                     showToast("请设置大于6位的密码！");
                 }
-                if (confirmpwd.getText().toString().trim().isEmpty()){
+                if (confirmpwd.getText().toString().trim().isEmpty()) {
                     showToast("请再次输入密码！");
                 }
-                if (!confirmpwd.getText().toString().trim().equals(pwd.getText().toString().trim())){
+                if (!confirmpwd.getText().toString().trim().equals(pwd.getText().toString().trim())) {
                     showToast("两次输入密码不一致！");
                     pwd.setText("");
                     confirmpwd.setText("");
                     name.setText("");
                 }
-                if (name.getText().toString().trim().isEmpty()){
+                if (name.getText().toString().trim().isEmpty()) {
                     showToast("请设置用户名！");
                 }
                 //post请求，如果成功怎保存用户信息到shareperference，转到登录界面
                 //如果失败怎显示错误
-                final MyDialog myDialog=new MyDialog(RegisterActivity.this,R.style.MyDialog, new MyDialog.sureListener() {
-                    @Override
-                    public void onClick() {
-                        startActivity(new Intent(RegisterActivity.this,LoginActivity.class));
-                    }
-                });
-                myDialog.setmTitle("提示");
-                myDialog.setmContent("123456");
-                myDialog.setmSure("确定");
-                myDialog.show();
-
+                registAccount(phone.getText().toString().trim(), pwd.getText().toString().trim());
                 break;
             case R.id.img_register_head:
-
                 break;
+            case R.id.register:
+                //关闭键盘
+                KeyBoardUtils.closeKeybord(phone, RegisterActivity.this);
+                KeyBoardUtils.closeKeybord(pwd, RegisterActivity.this);
+                KeyBoardUtils.closeKeybord(confirmpwd, RegisterActivity.this);
+                KeyBoardUtils.closeKeybord(name, RegisterActivity.this);
+                break;
+            case R.id.et_register_phone:
+            case R.id.et_register_pwd:
+            case R.id.et_register_confirmpwd:
+            case R.id.et_register_name:
+                errorTips.setVisibility(View.INVISIBLE);
+                break;
+
         }
     }
+
+    private void registAccount(final String phone, final String pwd) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    EMClient.getInstance().createAccount(phone, pwd);
+                    Looper.prepare();
+                    final MyDialog myDialog = new MyDialog(RegisterActivity.this, R.style.MyDialog, new MyDialog.sureListener() {
+                        @Override
+                        public void onClick() {
+                            startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+                        }
+                    });
+                    myDialog.setmTitle("提示");
+                    myDialog.setmContent("注册成功");
+                    myDialog.setmSure("确定");
+                    myDialog.show();
+                    Looper.loop();
+
+                } catch (HyphenateException e) {
+                    e.printStackTrace();
+                    int err = e.getErrorCode();
+                    Message message = new Message();
+                    message.what = err;
+                    registerHandler.sendMessage(message);
+                }
+            }
+        }).start();
+    }
+
+    private Handler registerHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == 203) {
+                errorTips.setText("错误提示：该手机号码已注册！");
+                errorTips.setVisibility(View.VISIBLE);
+            } else {
+                errorTips.setText("错误提示：网络错误！");
+                errorTips.setVisibility(View.VISIBLE);
+            }
+        }
+    };
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/register"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -181,13 +182,25 @@
         </LinearLayout>
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/tv_register_errortips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="5dp"
+        android:text="@string/errortips"
+        android:textColor="@color/colorErrTips"
+        android:textSize="14sp"
+        android:visibility="invisible" />
+
     <Button
         android:id="@+id/btn_registerNow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:layout_marginTop="150dp"
+        android:layout_marginTop="120dp"
+        android:layout_marginBottom="20dp"
         android:background="@drawable/shape_login_button_background"
         android:text="@string/register_now"
         android:textColor="@color/colorWhite"

@@ -23,10 +23,13 @@ import com.a32.yuqu.fragment.DynamicFragment;
 import com.a32.yuqu.fragment.FriendFragment;
 import com.a32.yuqu.fragment.NewsFragment;
 import com.a32.yuqu.fragment.WhereFragment;
+import com.a32.yuqu.view.MaterialDialog;
+import com.hyphenate.EMCallBack;
+import com.hyphenate.chat.EMClient;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, RadioGroup.OnCheckedChangeListener {
-
+    MaterialDialog materialDialog;
     private FragmentManager mfragmentManager;
     private NewsFragment newsFragment;
     private FriendFragment friendFragment;
@@ -60,16 +63,16 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
 
-        mfragmentManager=getFragmentManager();
-        transaction =mfragmentManager.beginTransaction();
+        mfragmentManager = getFragmentManager();
+        transaction = mfragmentManager.beginTransaction();
         setDefaultRadio();
         radioGroup.setOnCheckedChangeListener(this);
     }
 
     //设置默认的Radiogroup选择为第一项
     private void setDefaultRadio() {
-        newsFragment =new NewsFragment();
-        transaction.replace(R.id.framelayout,newsFragment);
+        newsFragment = new NewsFragment();
+        transaction.replace(R.id.framelayout, newsFragment);
         transaction.commit();
         radioGroup.check(R.id.rb_news);
     }
@@ -117,50 +120,49 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_setting) {
 
         } else if (id == R.id.nav_exit) {
-            startActivity(new Intent(this,LoginActivity.class));
-
+            accountExit();
         } else if (id == R.id.nav_about) {
-            startActivity(new Intent(this,VersionActivity.class));
+            startActivity(new Intent(this, VersionActivity.class));
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
-
     //设置主页Radiogroup的选择监听
     @Override
     public void onCheckedChanged(RadioGroup radioGroup, int i) {
-        mfragmentManager=getFragmentManager();
-        transaction =mfragmentManager.beginTransaction();
-        switch (i){
+        mfragmentManager = getFragmentManager();
+        transaction = mfragmentManager.beginTransaction();
+        switch (i) {
             case R.id.rb_news:
-                if (newsFragment==null){
-                    newsFragment =new NewsFragment();
+                if (newsFragment == null) {
+                    newsFragment = new NewsFragment();
                 }
-                transaction.replace(R.id.framelayout,newsFragment);
+                transaction.replace(R.id.framelayout, newsFragment);
                 break;
             case R.id.rb_frined:
-                if (friendFragment==null){
-                    friendFragment =new FriendFragment();
+                if (friendFragment == null) {
+                    friendFragment = new FriendFragment();
                 }
-                transaction.replace(R.id.framelayout,friendFragment);
+                transaction.replace(R.id.framelayout, friendFragment);
                 break;
             case R.id.rb_where:
-                if (whereFragment==null){
-                    whereFragment =new WhereFragment();
+                if (whereFragment == null) {
+                    whereFragment = new WhereFragment();
                 }
-                transaction.replace(R.id.framelayout,whereFragment);
+                transaction.replace(R.id.framelayout, whereFragment);
                 break;
             case R.id.rb_dynamic:
-                if (dynamicFragment==null){
-                    dynamicFragment =new DynamicFragment();
+                if (dynamicFragment == null) {
+                    dynamicFragment = new DynamicFragment();
                 }
-                transaction.replace(R.id.framelayout,dynamicFragment);
+                transaction.replace(R.id.framelayout, dynamicFragment);
                 break;
         }
         transaction.commit();
     }
+
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -180,5 +182,43 @@ public class MainActivity extends AppCompatActivity
             finish();
             System.exit(0);
         }
+    }
+
+    private void accountExit() {
+         materialDialog = new MaterialDialog(this);
+        materialDialog.setTitle("退出登录");
+        materialDialog.setMessage("请确认是否退出登录");
+        materialDialog.setPositiveButton("确定", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EMClient.getInstance().logout(false, new EMCallBack() {
+                    @Override
+                    public void onSuccess() {
+                        // TODO Auto-generated method stub
+                        startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                        finish();
+                    }
+
+                    @Override
+                    public void onProgress(int progress, String status) {
+                        // TODO Auto-generated method stub
+
+                    }
+
+                    @Override
+                    public void onError(int code, String message) {
+                        // TODO Auto-generated method stub
+
+                    }
+                });
+            }
+        });
+        materialDialog.setNegativeButton("取消", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                materialDialog.dismiss();
+            }
+        });
+        materialDialog.show();
     }
 }

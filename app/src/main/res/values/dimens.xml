@@ -8,4 +8,10 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="toolbarhight">50dp</dimen>
 
+
+    <dimen name="action_button_height">32dp</dimen>
+    <dimen name="action_button_text_size">14sp</dimen>
+    <dimen name="action_button_min_width">56dp</dimen>
+    <dimen name="action_button_padding_horizontal">4dp</dimen>
+    <dimen name="title_marge_left">15dp</dimen>
 </resources>
