@@ -3,6 +3,7 @@ package com.a32.yuqu.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.percent.PercentRelativeLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -52,7 +53,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         percentRelativeLayout.setOnClickListener(this);
     }
 
-
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -94,7 +94,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             public void onSuccess() {
                 EMClient.getInstance().groupManager().loadAllGroups();
                 EMClient.getInstance().chatManager().loadAllConversations();
-                Log.d("main", "登录聊天服务器成功！");
+//                Log.d("main", "登录聊天服务器成功！");
                 startActivity(new Intent(LoginActivity.this,MainActivity.class));
             }
 
@@ -105,7 +105,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
             @Override
             public void onError(int code, String message) {
-                showToast(message);
+                Looper.prepare();
+                showToast("用户名或密码错误！");
+                Looper.loop();
+
             }
         });
     }
