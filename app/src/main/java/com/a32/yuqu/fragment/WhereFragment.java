@@ -6,11 +6,9 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.a32.yuqu.R;
-import com.a32.yuqu.activity.BaiduMap;
+import com.a32.yuqu.activity.BaiduMapActivity;
 import com.a32.yuqu.activity.MainActivity;
 import com.a32.yuqu.base.BaseFragment;
-
-import java.util.Map;
 
 import butterknife.Bind;
 
@@ -49,7 +47,7 @@ public class WhereFragment extends BaseFragment implements View.OnClickListener 
                 startActivity(new Intent(this.getActivity(), MainActivity.class));
                 break;
             case R.id.tv_where_location:
-                startActivity(new Intent(this.getActivity(), BaiduMap.class));
+                startActivity(new Intent(this.getActivity(), BaiduMapActivity.class));
 
                 break;
             case R.id.tv_where_myreport:

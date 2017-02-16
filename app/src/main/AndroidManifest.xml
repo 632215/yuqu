@@ -71,7 +71,6 @@
             </intent-filter>
         </activity>
 
-
         <activity
             android:name=".activity.RegisterActivity"
             android:screenOrientation="portrait"></activity>
@@ -79,6 +78,15 @@
         <activity
             android:name=".activity.VersionActivity"
             android:screenOrientation="portrait"></activity>
+
+        <activity
+            android:name=".activity.AddFriendsActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <activity
+            android:name="com.hyphenate.easeui.ui.EaseShowBigImageActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/horizontal_slide" />
     </application>
 
 </manifest>

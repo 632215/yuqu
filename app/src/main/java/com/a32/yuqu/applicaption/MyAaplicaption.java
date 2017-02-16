@@ -19,8 +19,8 @@ public class MyAaplicaption extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-//        EMOptions options=new EMOptions();//
-//        options.setAcceptInvitationAlways(false);//
+        EMOptions options=new EMOptions();
+        options.setAcceptInvitationAlways(false);
 //        application = this;
         EaseUI.getInstance().init(this,null);
 //        EMClient.getInstance().init(this,options);//

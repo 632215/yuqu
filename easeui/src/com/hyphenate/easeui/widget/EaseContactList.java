@@ -98,7 +98,6 @@ public class EaseContactList extends RelativeLayout {
         adapter.setPrimaryColor(primaryColor).setPrimarySize(primarySize).setInitialLetterBg(initialLetterBg)
             .setInitialLetterColor(initialLetterColor);
         listView.setAdapter(adapter);
-        
         if(showSiderBar){
             sidebar.setListView(listView);
         }

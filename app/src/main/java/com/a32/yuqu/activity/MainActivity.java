@@ -4,6 +4,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -14,7 +15,6 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
@@ -27,6 +27,8 @@ import com.a32.yuqu.view.MaterialDialog;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
 
+import butterknife.Bind;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, RadioGroup.OnCheckedChangeListener {
     MaterialDialog materialDialog;
@@ -35,10 +37,15 @@ public class MainActivity extends AppCompatActivity
     private FriendFragment friendFragment;
     private WhereFragment whereFragment;
     private DynamicFragment dynamicFragment;
+    //两次点击退出程序
     private long exitTime = 0;
-    FragmentTransaction transaction;
+    @Bind(R.id.coordinatorLayout)
+    CoordinatorLayout coordinatorLayout;
 
+
+    //底部的切换栏
     private RadioGroup radioGroup;
+    FragmentTransaction transaction;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +58,6 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-
 
         radioGroup = (RadioGroup) findViewById(R.id.radiogroup);
 
@@ -87,26 +93,20 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    //显示右上角菜单栏
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.menu_add_friend) {
-            System.out.println("123456");
+            startActivity(new Intent(this,AddFriendsActivity.class));
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity
         transaction.commit();
     }
 
-
+    //检测两次返回键
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -184,8 +184,9 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    //退出登录
     private void accountExit() {
-         materialDialog = new MaterialDialog(this);
+        materialDialog = new MaterialDialog(this);
         materialDialog.setTitle("退出登录");
         materialDialog.setMessage("请确认是否退出登录");
         materialDialog.setPositiveButton("确定", new View.OnClickListener() {
@@ -202,13 +203,11 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onProgress(int progress, String status) {
                         // TODO Auto-generated method stub
-
                     }
 
                     @Override
                     public void onError(int code, String message) {
                         // TODO Auto-generated method stub
-
                     }
                 });
             }
