@@ -1,14 +1,9 @@
 package com.a32.yuqu.activity;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.Looper;
 import android.support.percent.PercentRelativeLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -16,8 +11,6 @@ import com.a32.yuqu.R;
 import com.a32.yuqu.base.BaseActivity;
 import com.a32.yuqu.utils.KeyBoardUtils;
 import com.a32.yuqu.utils.PhoneUtils;
-import com.a32.yuqu.utils.ToastUtils;
-import com.a32.yuqu.view.MyDialog;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
 
@@ -94,7 +87,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             public void onSuccess() {
                 EMClient.getInstance().groupManager().loadAllGroups();
                 EMClient.getInstance().chatManager().loadAllConversations();
-//                Log.d("main", "登录聊天服务器成功！");
                 startActivity(new Intent(LoginActivity.this,MainActivity.class));
             }
 
