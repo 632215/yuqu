@@ -2,6 +2,7 @@ package com.a32.yuqu.applicaption;
 
 import android.app.Application;
 
+import com.hyphenate.chat.EMChatManager;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMOptions;
 import com.hyphenate.easeui.controller.EaseUI;
@@ -19,12 +20,15 @@ public class MyAaplicaption extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+
+
         EMOptions options=new EMOptions();
         options.setAcceptInvitationAlways(false);
 //        application = this;
         EaseUI.getInstance().init(this,null);
 //        EMClient.getInstance().init(this,options);//
         EMClient.getInstance().setDebugMode(true);
-
-    }
+        EMClient.getInstance().chatManager().getAllConversations();
+    };
 }

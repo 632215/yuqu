@@ -16,26 +16,9 @@ import com.a32.yuqu.R;
 
 public class TopTitleBar extends RelativeLayout implements View.OnClickListener{
     private TextView title;
-    private TextView save;
-    private ImageView reback;
+    private TextView reback;
     private Context mContext;
     private OnTopTitleBarCallback callback;
-
-    public ImageView getReback() {
-        return reback;
-    }
-
-    public void setReback(ImageView reback) {
-        this.reback = reback;
-    }
-
-    public TextView getSave() {
-        return save;
-    }
-
-    public void setSave(TextView save) {
-        this.save = save;
-    }
 
     public TextView getTitle() {
         return title;
@@ -43,6 +26,14 @@ public class TopTitleBar extends RelativeLayout implements View.OnClickListener{
 
     public void setTitle(TextView title) {
         this.title = title;
+    }
+
+    public TextView getReback() {
+        return reback;
+    }
+
+    public void setReback(TextView reback) {
+        this.reback = reback;
     }
 
     public TopTitleBar(Context context) {
@@ -57,28 +48,11 @@ public class TopTitleBar extends RelativeLayout implements View.OnClickListener{
 
     private void initView(Context context) {
         View view = LayoutInflater.from(context).inflate(R.layout.toptoolbar,this);
-        title= (TextView) view.findViewById(R.id.tv_toolbar_title);
-        reback = (ImageView) view.findViewById(R.id.iv_toolbar_return);
-        save = (TextView) view.findViewById(R.id.tv_toolbar_save);
+        title= (TextView) view.findViewById(R.id.title);
+        reback = (TextView) view.findViewById(R.id.tv_return);
         title.setOnClickListener(this);
         reback.setOnClickListener(this);
-        save.setOnClickListener(this);
     }
-
-    /**
-     * 设置save按钮可见
-     */
-    public void setSaveVisible(){
-        save.setVisibility(VISIBLE);
-    }
-
-    /**
-     * 设置save按钮不可见
-     */
-    public void setSaveInVisible(){
-        save.setVisibility(INVISIBLE);
-    }
-
 
     public void setTitle(String s){
         title.setText(s);
@@ -100,7 +74,7 @@ public class TopTitleBar extends RelativeLayout implements View.OnClickListener{
     @Override
     public void onClick(View view) {
         switch (view.getId()){
-            case R.id.iv_toolbar_return:
+            case R.id.tv_return:
                 callback.onBackClick();
                 break;
         }

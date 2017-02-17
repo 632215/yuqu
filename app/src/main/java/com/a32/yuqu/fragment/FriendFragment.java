@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import com.a32.yuqu.R;
 import com.a32.yuqu.base.BaseFragment;
 import com.hyphenate.EMCallBack;
+import com.hyphenate.chat.EMChatManager;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.easeui.domain.EaseUser;
 import com.hyphenate.easeui.widget.EaseContactList;
@@ -28,7 +29,7 @@ import butterknife.Bind;
  */
 
 public class FriendFragment extends BaseFragment {
-    @Bind(R.id.contactList)
+    @Bind(R.id.contact_list)
     EaseContactList contact;
     private List<String> contactList;
     private List<EaseUser> easeUserList;
@@ -46,7 +47,6 @@ public class FriendFragment extends BaseFragment {
         } catch (HyphenateException e) {
             e.printStackTrace();
         }
-        contactList.add("1223");
         easeUserList=new ArrayList<>();
         for (int i=0;i<contactList.size();i++){
             easeUserList.add(new EaseUser(contactList.get(i)));

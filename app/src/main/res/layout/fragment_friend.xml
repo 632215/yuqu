@@ -19,7 +19,7 @@
         android:background="@color/gray_normal" />
 
     <com.hyphenate.easeui.widget.EaseContactList
-        android:id="@+id/contactList"
+        android:id="@+id/contact_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"></com.hyphenate.easeui.widget.EaseContactList>
+        android:layout_height="match_parent" />
 </LinearLayout>

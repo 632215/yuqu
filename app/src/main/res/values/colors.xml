@@ -15,4 +15,6 @@
     <color name="colorBlack">#242424</color>
     <color name="window_background">#00000000</color>
     <color name="lightBlue">#59acd8</color>
+    <color name="colorTitle">#1197D9</color>
+
 </resources>

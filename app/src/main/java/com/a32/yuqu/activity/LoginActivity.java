@@ -44,6 +44,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         login.setOnClickListener(this);
         register.setOnClickListener(this);
         percentRelativeLayout.setOnClickListener(this);
+        userName.setText("15223084076");
+        pwd.setText("123456");
+
     }
 
     @Override
