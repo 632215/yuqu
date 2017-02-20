@@ -26,7 +26,6 @@ import com.a32.yuqu.fragment.WhereFragment;
 import com.a32.yuqu.view.MaterialDialog;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
-import com.hyphenate.easeui.ui.EaseContactListFragment;
 
 import butterknife.Bind;
 
@@ -38,7 +37,6 @@ public class MainActivity extends AppCompatActivity
     private FriendFragment friendFragment;
     private WhereFragment whereFragment;
     private DynamicFragment dynamicFragment;
-    private EaseContactListFragment easeContactListFragment;
     //两次点击退出程序
     private long exitTime = 0;
     @Bind(R.id.coordinatorLayout)

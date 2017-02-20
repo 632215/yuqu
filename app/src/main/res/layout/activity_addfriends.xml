@@ -30,7 +30,7 @@
             android:textSize="14sp"
             android:paddingLeft="10dp"
             android:layout_marginRight="10dp"
-            android:textColor="@color/black_deep"
+            android:textColor="@color/colorBlack"
             android:background="@drawable/edittext_bg"
             android:textColorHint="@color/colorTextGray" />
 
@@ -44,7 +44,7 @@
             android:text="添加"
             android:padding="5dp"
             android:textSize="14sp"
-            android:textColor="@color/black_deep"/>
+            android:textColor="@color/colorBlack"/>
     </LinearLayout>
 
     <TextView
@@ -59,7 +59,7 @@
         android:padding="10dp"
         android:textSize="14sp"
         android:paddingLeft="10dp"
-        android:textColor="@color/black_deep"
+        android:textColor="@color/colorBlack"
         android:background="@color/colorWhite"
         android:text="扫一扫"/>
     <TextView

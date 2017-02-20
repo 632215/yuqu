@@ -19,7 +19,7 @@
             android:layout_height="48dp"
             android:text="原密码"
             android:gravity="center_vertical"
-            android:textColor="@color/black_deep"
+            android:textColor="@color/colorBlack"
             android:textSize="14sp" />
 
         <EditText
@@ -45,7 +45,7 @@
             android:layout_height="match_parent"
             android:text="新密码"
             android:gravity="center_vertical"
-            android:textColor="@color/black_deep"
+            android:textColor="@color/colorBlack"
             android:textSize="14sp" />
 
         <EditText
@@ -71,7 +71,7 @@
             android:layout_height="match_parent"
             android:text="确认密码"
             android:gravity="center_vertical"
-            android:textColor="@color/black_deep"
+            android:textColor="@color/colorBlack"
             android:textSize="14sp" />
 
         <EditText

@@ -1,6 +1,7 @@
 package com.a32.yuqu.base;
 
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.view.Window;
@@ -49,6 +50,8 @@ public abstract class BaseActivity extends FragmentActivity {
 
 
     public void showToast(String msg) {
+
         ToastUtils.showShort(BaseActivity.this, msg);
+
     }
 }

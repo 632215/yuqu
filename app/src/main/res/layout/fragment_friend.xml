@@ -10,16 +10,12 @@
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:text="@string/mycontact"
-        android:textColor="@color/black_deep"
+        android:textColor="@color/colorBlack"
         android:textSize="14sp" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/gray_normal" />
+        android:background="@color/colorBlack" />
 
-    <com.hyphenate.easeui.widget.EaseContactList
-        android:id="@+id/contact_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 </LinearLayout>

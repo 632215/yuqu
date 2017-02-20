@@ -7,8 +7,6 @@ import android.widget.TextView;
 import com.a32.yuqu.R;
 import com.a32.yuqu.base.BaseActivity;
 import com.a32.yuqu.view.TopTitleBar;
-import com.hyphenate.chat.EMClient;
-import com.hyphenate.exceptions.HyphenateException;
 
 import butterknife.Bind;
 
@@ -43,13 +41,13 @@ public class AddFriendsActivity extends BaseActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.add:
-                try {
-                    EMClient.getInstance().contactManager().addContact(etName.getText().toString().trim(),"add");
-                    //核对是否有此用户
-                    showToast("已发出请求");
-                } catch (HyphenateException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    EMClient.getInstance().contactManager().addContact(etName.getText().toString().trim(),"add");
+//                    //核对是否有此用户
+//                    showToast("已发出请求");
+//                } catch (HyphenateException e) {
+//                    e.printStackTrace();
+//                }
                 break;
             case R.id.scan:
                 break;

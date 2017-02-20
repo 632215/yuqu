@@ -11,7 +11,9 @@ import com.a32.yuqu.R;
 import com.a32.yuqu.base.BaseActivity;
 import com.a32.yuqu.utils.KeyBoardUtils;
 import com.a32.yuqu.utils.PhoneUtils;
+import com.a32.yuqu.utils.ToastUtils;
 import com.hyphenate.EMCallBack;
+import com.hyphenate.EMError;
 import com.hyphenate.chat.EMClient;
 
 import butterknife.Bind;
@@ -44,8 +46,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         login.setOnClickListener(this);
         register.setOnClickListener(this);
         percentRelativeLayout.setOnClickListener(this);
-        userName.setText("15223084076");
-        pwd.setText("123456");
+//        userName.setText("15223084076");
+//        pwd.setText("123456");
 
     }
 
@@ -76,21 +78,25 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 startActivity(new Intent(this, RegisterActivity.class));
                 break;
             case R.id.login:
-                KeyBoardUtils.closeKeybord(userName,LoginActivity.this);
-                KeyBoardUtils.closeKeybord(pwd,LoginActivity.this);
+                KeyBoardUtils.closeKeybord(userName, LoginActivity.this);
+                KeyBoardUtils.closeKeybord(pwd, LoginActivity.this);
                 break;
         }
 
     }
 
-    private void loginAccount( String name,  String password) {
-        EMClient.getInstance().login(name,password,new EMCallBack() {
+    private void loginAccount(String name, String password) {
+        EMClient.getInstance().login(name, password, new EMCallBack() {
             //回调
             @Override
             public void onSuccess() {
+                // 加载所有会话到内存
+                EMClient.getInstance().chatManager().loadAllConversations();
+
                 EMClient.getInstance().groupManager().loadAllGroups();
                 EMClient.getInstance().chatManager().loadAllConversations();
-                startActivity(new Intent(LoginActivity.this,MainActivity.class));
+                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                finish();
             }
 
             @Override
@@ -100,10 +106,67 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
             @Override
             public void onError(int code, String message) {
-                Looper.prepare();
-                showToast("用户名或密码错误！");
-                Looper.loop();
-
+//                Looper.prepare();
+//                showToast("用户名或密码错误！");
+//                Looper.loop();
+                switch (code) {
+                    // 网络异常 2
+                    case EMError.NETWORK_ERROR:
+                        Looper.prepare();
+                        ToastUtils.showLong(LoginActivity.this,"网络错误！");
+                        Looper.loop();
+                        break;
+                    // 无效的用户名 101
+                    case EMError.INVALID_USER_NAME:
+                        Looper.prepare();
+                        ToastUtils.showLong(LoginActivity.this,"无效的用户名！");
+                        Looper.loop();
+                        break;
+                    // 无效的密码 102
+                    case EMError.INVALID_PASSWORD:
+                        Looper.prepare();
+                        ToastUtils.showLong(LoginActivity.this,"无效的密码！");
+                        Looper.loop();
+                        break;
+                    // 用户认证失败，用户名或密码错误 202
+                    case EMError.USER_AUTHENTICATION_FAILED:
+                        Looper.prepare();
+                        ToastUtils.showLong(LoginActivity.this,"用户认证失败，用户名或密码错误！");
+                        Looper.loop();
+                        break;
+                    // 用户不存在 204
+                    case EMError.USER_NOT_FOUND:
+                        Looper.prepare();
+                        ToastUtils.showLong(LoginActivity.this,"用户不存在！");
+                        Looper.loop();
+                        break;
+                    // 无法访问到服务器 300
+                    case EMError.SERVER_NOT_REACHABLE:
+                        Looper.prepare();
+                        ToastUtils.showLong(LoginActivity.this,"无法访问到服务器！");
+                        Looper.loop();
+                        break;
+                    // 等待服务器响应超时 301
+                    case EMError.SERVER_TIMEOUT:
+                        Looper.prepare();
+                        ToastUtils.showLong(LoginActivity.this,"等待服务器响应超时！");
+                        Looper.loop();
+                        break;
+                    // 服务器繁忙 302
+                    case EMError.SERVER_BUSY:
+                        Looper.prepare();
+                        ToastUtils.showLong(LoginActivity.this,"服务器繁忙！");
+                        Looper.loop();
+                        break;
+                    // 未知 Server 异常 303 一般断网会出现这个错误
+                    case EMError.SERVER_UNKNOWN_ERROR:
+                        Looper.prepare();
+                        ToastUtils.showLong(LoginActivity.this,"未知的服务器异常！");
+                        Looper.loop();
+                        break;
+                    default:
+                        break;
+                }
             }
         });
     }

@@ -1,8 +1,6 @@
 package com.a32.yuqu.activity;
-
 import android.content.Intent;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.view.View;
 import android.widget.Button;
@@ -140,7 +138,6 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
             public void run() {
                 try {
                     EMClient.getInstance().createAccount(phone, pwd);
-                    Looper.prepare();
                     final MyDialog myDialog = new MyDialog(RegisterActivity.this, R.style.MyDialog, new MyDialog.sureListener() {
                         @Override
                         public void onClick() {
@@ -151,8 +148,6 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
                     myDialog.setmContent("注册成功");
                     myDialog.setmSure("确定");
                     myDialog.show();
-                    Looper.loop();
-
                 } catch (HyphenateException e) {
                     e.printStackTrace();
                     int err = e.getErrorCode();

@@ -31,5 +31,5 @@ dependencies {
     compile 'com.android.support:percent:25.0.0'
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.jph.takephoto:takephoto_library:4.0.2'
-    compile project(':easeui')
+    compile files('src/main/jniLibs/hyphenatechat_3.2.3.jar')
 }
