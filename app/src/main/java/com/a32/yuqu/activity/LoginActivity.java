@@ -92,7 +92,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             public void onSuccess() {
                 // 加载所有会话到内存
                 EMClient.getInstance().chatManager().loadAllConversations();
-
                 EMClient.getInstance().groupManager().loadAllGroups();
                 EMClient.getInstance().chatManager().loadAllConversations();
                 startActivity(new Intent(LoginActivity.this, MainActivity.class));
@@ -105,68 +104,52 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             }
 
             @Override
-            public void onError(int code, String message) {
-//                Looper.prepare();
-//                showToast("用户名或密码错误！");
-//                Looper.loop();
-                switch (code) {
-                    // 网络异常 2
-                    case EMError.NETWORK_ERROR:
-                        Looper.prepare();
-                        ToastUtils.showLong(LoginActivity.this,"网络错误！");
-                        Looper.loop();
-                        break;
-                    // 无效的用户名 101
-                    case EMError.INVALID_USER_NAME:
-                        Looper.prepare();
-                        ToastUtils.showLong(LoginActivity.this,"无效的用户名！");
-                        Looper.loop();
-                        break;
-                    // 无效的密码 102
-                    case EMError.INVALID_PASSWORD:
-                        Looper.prepare();
-                        ToastUtils.showLong(LoginActivity.this,"无效的密码！");
-                        Looper.loop();
-                        break;
-                    // 用户认证失败，用户名或密码错误 202
-                    case EMError.USER_AUTHENTICATION_FAILED:
-                        Looper.prepare();
-                        ToastUtils.showLong(LoginActivity.this,"用户认证失败，用户名或密码错误！");
-                        Looper.loop();
-                        break;
-                    // 用户不存在 204
-                    case EMError.USER_NOT_FOUND:
-                        Looper.prepare();
-                        ToastUtils.showLong(LoginActivity.this,"用户不存在！");
-                        Looper.loop();
-                        break;
-                    // 无法访问到服务器 300
-                    case EMError.SERVER_NOT_REACHABLE:
-                        Looper.prepare();
-                        ToastUtils.showLong(LoginActivity.this,"无法访问到服务器！");
-                        Looper.loop();
-                        break;
-                    // 等待服务器响应超时 301
-                    case EMError.SERVER_TIMEOUT:
-                        Looper.prepare();
-                        ToastUtils.showLong(LoginActivity.this,"等待服务器响应超时！");
-                        Looper.loop();
-                        break;
-                    // 服务器繁忙 302
-                    case EMError.SERVER_BUSY:
-                        Looper.prepare();
-                        ToastUtils.showLong(LoginActivity.this,"服务器繁忙！");
-                        Looper.loop();
-                        break;
-                    // 未知 Server 异常 303 一般断网会出现这个错误
-                    case EMError.SERVER_UNKNOWN_ERROR:
-                        Looper.prepare();
-                        ToastUtils.showLong(LoginActivity.this,"未知的服务器异常！");
-                        Looper.loop();
-                        break;
-                    default:
-                        break;
-                }
+            public void onError(final int code, String message) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        switch (code) {
+                            // 网络异常 2
+                            case EMError.NETWORK_ERROR:
+                                ToastUtils.showLong(LoginActivity.this, "网络错误！");
+                                break;
+                            // 无效的用户名 101
+                            case EMError.INVALID_USER_NAME:
+                                ToastUtils.showLong(LoginActivity.this, "无效的用户名！");
+                                break;
+                            // 无效的密码 102
+                            case EMError.INVALID_PASSWORD:
+                                ToastUtils.showLong(LoginActivity.this, "无效的密码！");
+                                break;
+                            // 用户认证失败，用户名或密码错误 202
+                            case EMError.USER_AUTHENTICATION_FAILED:
+                                ToastUtils.showLong(LoginActivity.this, "用户认证失败，用户名或密码错误！");
+                                break;
+                            // 用户不存在 204
+                            case EMError.USER_NOT_FOUND:
+                                ToastUtils.showLong(LoginActivity.this, "用户不存在！");
+                                break;
+                            // 无法访问到服务器 300
+                            case EMError.SERVER_NOT_REACHABLE:
+                                ToastUtils.showLong(LoginActivity.this, "无法访问到服务器！");
+                                break;
+                            // 等待服务器响应超时 301
+                            case EMError.SERVER_TIMEOUT:
+                                ToastUtils.showLong(LoginActivity.this, "等待服务器响应超时！");
+                                break;
+                            // 服务器繁忙 302
+                            case EMError.SERVER_BUSY:
+                                ToastUtils.showLong(LoginActivity.this, "服务器繁忙！");
+                                break;
+                            // 未知 Server 异常 303 一般断网会出现这个错误
+                            case EMError.SERVER_UNKNOWN_ERROR:
+                                ToastUtils.showLong(LoginActivity.this, "未知的服务器异常！");
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                });
             }
         });
     }

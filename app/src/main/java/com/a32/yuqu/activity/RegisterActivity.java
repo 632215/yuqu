@@ -1,4 +1,5 @@
 package com.a32.yuqu.activity;
+
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
@@ -93,21 +94,26 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
                 }
                 if (pwd.getText().toString().trim().isEmpty()) {
                     showToast("请输入密码！");
+                    return;
                 }
                 if (pwd.getText().toString().trim().length() < 6) {
                     showToast("请设置大于6位的密码！");
+                    return;
                 }
                 if (confirmpwd.getText().toString().trim().isEmpty()) {
                     showToast("请再次输入密码！");
+                    return;
                 }
                 if (!confirmpwd.getText().toString().trim().equals(pwd.getText().toString().trim())) {
                     showToast("两次输入密码不一致！");
                     pwd.setText("");
                     confirmpwd.setText("");
                     name.setText("");
+                    return;
                 }
                 if (name.getText().toString().trim().isEmpty()) {
                     showToast("请设置用户名！");
+                    return;
                 }
                 //post请求，如果成功怎保存用户信息到shareperference，转到登录界面
                 //如果失败怎显示错误
@@ -138,37 +144,47 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
             public void run() {
                 try {
                     EMClient.getInstance().createAccount(phone, pwd);
-                    final MyDialog myDialog = new MyDialog(RegisterActivity.this, R.style.MyDialog, new MyDialog.sureListener() {
+                    runOnUiThread(new Runnable() {
                         @Override
-                        public void onClick() {
-                            startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+                        public void run() {
+                            MyDialog myDialog = new MyDialog(RegisterActivity.this, listener);
+                            myDialog.setmTitle("消息提示");
+                            myDialog.setmContent("注册成功，返回登陆!");
+                            myDialog.setmSure("我知道了");
+                            myDialog.show();
                         }
                     });
-                    myDialog.setmTitle("提示");
-                    myDialog.setmContent("注册成功");
-                    myDialog.setmSure("确定");
-                    myDialog.show();
+
                 } catch (HyphenateException e) {
                     e.printStackTrace();
-                    int err = e.getErrorCode();
-                    Message message = new Message();
-                    message.what = err;
-                    registerHandler.sendMessage(message);
+                    final int err = e.getErrorCode();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            showErrTips(err);
+                        }
+                    });
                 }
             }
         }).start();
     }
 
-    private Handler registerHandler = new Handler() {
+
+    private void showErrTips(int err) {
+        if (err == 203) {
+            errorTips.setText("错误提示：该手机号码已注册！");
+            errorTips.setVisibility(View.VISIBLE);
+        } else {
+            errorTips.setText("错误提示：网络错误！");
+            errorTips.setVisibility(View.VISIBLE);
+        }
+    }
+
+    MyDialog.sureListener listener = new MyDialog.sureListener() {
         @Override
-        public void handleMessage(Message msg) {
-            if (msg.what == 203) {
-                errorTips.setText("错误提示：该手机号码已注册！");
-                errorTips.setVisibility(View.VISIBLE);
-            } else {
-                errorTips.setText("错误提示：网络错误！");
-                errorTips.setVisibility(View.VISIBLE);
-            }
+        public void onClick() {
+            startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+            finish();
         }
     };
 }
