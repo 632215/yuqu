@@ -19,6 +19,7 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.a32.yuqu.R;
+import com.a32.yuqu.applicaption.MyApplicaption;
 import com.a32.yuqu.fragment.DynamicFragment;
 import com.a32.yuqu.fragment.FriendFragment;
 import com.a32.yuqu.fragment.NewsFragment;
@@ -104,7 +105,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.menu_add_friend) {
-            startActivity(new Intent(this,AddFriendsActivity.class));
+            startActivity(new Intent(this, AddFriendsActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -192,22 +193,21 @@ public class MainActivity extends AppCompatActivity
         materialDialog.setPositiveButton("确定", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EMClient.getInstance().logout(false, new EMCallBack() {
+                MyApplicaption.getInstance().logout(true, new EMCallBack() {
                     @Override
                     public void onSuccess() {
-                        // TODO Auto-generated method stub
                         startActivity(new Intent(MainActivity.this, LoginActivity.class));
                         finish();
                     }
 
                     @Override
-                    public void onProgress(int progress, String status) {
-                        // TODO Auto-generated method stub
+                    public void onError(int i, String s) {
+
                     }
 
                     @Override
-                    public void onError(int code, String message) {
-                        // TODO Auto-generated method stub
+                    public void onProgress(int i, String s) {
+
                     }
                 });
             }

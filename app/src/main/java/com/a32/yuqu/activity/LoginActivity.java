@@ -46,8 +46,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         login.setOnClickListener(this);
         register.setOnClickListener(this);
         percentRelativeLayout.setOnClickListener(this);
-//        userName.setText("15223084076");
-//        pwd.setText("123456");
+        userName.setText("15223084076");
+        pwd.setText("123456");
 
     }
 
@@ -85,8 +85,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
     }
 
-    private void loginAccount(String name, String password) {
-        EMClient.getInstance().login(name, password, new EMCallBack() {
+    private void loginAccount(String mname, String mpassword) {
+        System.out.println("xxxxxx"+mname);
+        System.out.println("xxxxxx"+mpassword);
+
+        EMClient.getInstance().login(mname, mpassword, new EMCallBack() {
             //回调
             @Override
             public void onSuccess() {
