@@ -8,13 +8,20 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.a32.yuqu.R;
+import com.a32.yuqu.applicaption.MyApplicaption;
 import com.a32.yuqu.base.BaseActivity;
+import com.a32.yuqu.db.EaseUser;
 import com.a32.yuqu.utils.KeyBoardUtils;
 import com.a32.yuqu.utils.PhoneUtils;
 import com.a32.yuqu.utils.ToastUtils;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.EMError;
 import com.hyphenate.chat.EMClient;
+import com.hyphenate.exceptions.HyphenateException;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import butterknife.Bind;
 
@@ -97,6 +104,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 EMClient.getInstance().chatManager().loadAllConversations();
                 EMClient.getInstance().groupManager().loadAllGroups();
                 EMClient.getInstance().chatManager().loadAllConversations();
+                getFriends();
                 startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 finish();
             }
@@ -155,6 +163,22 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 });
             }
         });
+    }
+
+
+    private  void  getFriends(){
+        try {
+            List<String> usernames = EMClient.getInstance().contactManager().getAllContactsFromServer();
+            Map<String ,EaseUser> users=new HashMap<String ,EaseUser>();
+            for(String username:usernames){
+                EaseUser user=new EaseUser(username);
+                users.put(username, user);
+            }
+            MyApplicaption.getInstance().setContactList(users);
+        } catch (HyphenateException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }

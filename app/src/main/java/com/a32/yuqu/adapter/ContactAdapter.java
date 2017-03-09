@@ -52,7 +52,8 @@ public class ContactAdapter extends BaseAdapter {
             holder = (viewHolder) convertView.getTag();
         }
         EaseUser easeUser=usersList.get(position);
-        holder.name.setText(easeUser.getUsername());
+//        holder.name.setText(easeUser.getUsername());
+       holder.name.setText(easeUser.getInitialLetter());
         return convertView;
     }
 

@@ -29,29 +29,28 @@ import java.util.Map;
 
 public class MyApplicaption extends Application {
 
-    // 上下文菜单
-    private Context mContext;
+    public static Context applicationContext;
     private static MyApplicaption instance;
     private String username = "";
     private Map<String, EaseUser> contactList;
     // 记录是否已经初始化
     private boolean isInit = false;
 
-    public static MyApplicaption getInstance() {
-        return instance;
-    }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        mContext = this;
+        applicationContext = this;
         instance = this;
-        init(mContext);
         // 初始化环信SDK
+        init(applicationContext);
     }
 
+    public static MyApplicaption getInstance() {
+        return instance;
+    }
 /*
-	 * 第一步：sdk的一些参数配置 EMOptions 第二步：将配置参数封装类 传入SDK初始化
+     * 第一步：sdk的一些参数配置 EMOptions 第二步：将配置参数封装类 传入SDK初始化
 	 */
 
     public void init(Context context) {
@@ -66,6 +65,7 @@ public class MyApplicaption extends Application {
             initDbDao(context);
         }
     }
+
     private void initDbDao(Context context) {
         userDao = new UserDao(context);
     }
@@ -113,7 +113,7 @@ public class MyApplicaption extends Application {
         // 为了防止环信SDK被初始化2次，加此判断会保证SDK被初始化1次
         // 默认的app会在以包名为默认的process name下运行，如果查到的process name不是app的process
         // name就立即返回
-        if (processAppName == null || !processAppName.equalsIgnoreCase(mContext.getPackageName())) {
+        if (processAppName == null || !processAppName.equalsIgnoreCase(applicationContext.getPackageName())) {
 
             // 则此application::onCreate 是被service 调用的，直接返回
             return false;
@@ -137,7 +137,7 @@ public class MyApplicaption extends Application {
     @SuppressWarnings("rawtypes")
     private String getAppName(int pID) {
         String processName = null;
-        ActivityManager am = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+        ActivityManager am = (ActivityManager) applicationContext.getSystemService(Context.ACTIVITY_SERVICE);
         List l = am.getRunningAppProcesses();
         Iterator i = l.iterator();
         while (i.hasNext()) {
@@ -155,7 +155,9 @@ public class MyApplicaption extends Application {
     }
 
     public void setContactList(Map<String, EaseUser> contactList) {
+
         this.contactList = contactList;
+
         userDao.saveContactList(new ArrayList<EaseUser>(contactList.values()));
 
     }
@@ -168,15 +170,11 @@ public class MyApplicaption extends Application {
 
     }
 
-
-    MaterialDialog materialDialog;
     /**
      * 退出登录
      *
-     * @param unbindDeviceToken
-     *            是否解绑设备token(使用GCM才有)
-     * @param callback
-     *            callback
+     * @param unbindDeviceToken 是否解绑设备token(使用GCM才有)
+     * @param callback          callback
      */
     public void logout(boolean unbindDeviceToken, final EMCallBack callback) {
         EMClient.getInstance().logout(unbindDeviceToken, new EMCallBack() {
