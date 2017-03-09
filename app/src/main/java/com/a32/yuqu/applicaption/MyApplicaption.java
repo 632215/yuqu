@@ -33,8 +33,6 @@ public class MyApplicaption extends Application {
     private static MyApplicaption instance;
     private String username = "";
     private Map<String, EaseUser> contactList;
-    // 记录是否已经初始化
-    private boolean isInit = false;
 
 
     @Override
@@ -128,9 +126,6 @@ public class MyApplicaption extends Application {
     }
 
     /**
-     * check the application process name if process name is not qualified, then
-     * we think it is a service process and we will not init SDK
-     *
      * @param pID
      * @return
      */

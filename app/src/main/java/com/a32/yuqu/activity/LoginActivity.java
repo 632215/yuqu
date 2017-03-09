@@ -3,14 +3,19 @@ package com.a32.yuqu.activity;
 import android.content.Intent;
 import android.os.Looper;
 import android.support.percent.PercentRelativeLayout;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.a32.yuqu.R;
 import com.a32.yuqu.applicaption.MyApplicaption;
 import com.a32.yuqu.base.BaseActivity;
+import com.a32.yuqu.db.DemoDBManager;
 import com.a32.yuqu.db.EaseUser;
+import com.a32.yuqu.utils.CommonUtils;
 import com.a32.yuqu.utils.KeyBoardUtils;
 import com.a32.yuqu.utils.PhoneUtils;
 import com.a32.yuqu.utils.ToastUtils;
@@ -30,6 +35,12 @@ import butterknife.Bind;
  */
 
 public class LoginActivity extends BaseActivity implements View.OnClickListener {
+    private static final String TAG = "LoginActivity";
+    public static final int REQUEST_CODE_SETNICK = 1;
+    private boolean autoLogin = false;
+    private String currentUsername;
+    private String currentPassword;
+
     @Bind(R.id.et_login_username)
     EditText userName;
     @Bind(R.id.et_login_pwd)
@@ -38,10 +49,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     PercentRelativeLayout percentRelativeLayout;
 
     @Bind(R.id.btn_login_login)
-    Button login;
-
+    Button btnLogin;
     @Bind(R.id.btn_login_register)
-    Button register;
+    Button btnRegister;
 
     @Override
     protected int getContentViewId() {
@@ -50,12 +60,28 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
     @Override
     protected void initView() {
-        login.setOnClickListener(this);
-        register.setOnClickListener(this);
+        btnLogin.setOnClickListener(this);
+        btnRegister.setOnClickListener(this);
         percentRelativeLayout.setOnClickListener(this);
         userName.setText("15223084076");
         pwd.setText("123456");
-
+        //如果用户名改变，清空密码
+//        userName.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+//
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+//                pwd.setText("");
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable editable) {
+//
+//            }
+//        });
     }
 
     @Override
@@ -79,7 +105,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     showToast("请设置大于6位的密码！");
                     return;
                 }
-                loginAccount(userName.getText().toString().trim(), pwd.getText().toString().trim());
+                currentUsername = userName.getText().toString().trim();
+                currentPassword = pwd.getText().toString().trim();
+//                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                loginAccount(currentUsername, currentPassword);
                 break;
             case R.id.btn_login_register:
                 startActivity(new Intent(this, RegisterActivity.class));
@@ -93,29 +122,44 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     }
 
     private void loginAccount(String mname, String mpassword) {
-        System.out.println("xxxxxx"+mname);
-        System.out.println("xxxxxx"+mpassword);
+        System.out.println("xxxxxx" + mname);
+        System.out.println("xxxxxx" + mpassword);
+        //检测网络连通性
+        if (!CommonUtils.isNetWorkConnected(this)) {
+            Toast.makeText(this, R.string.network_isnot_available, Toast.LENGTH_SHORT).show();
+            return;
+        }
+//DemoDB可能会依然在执行一些异步回调，所以DemoDB会再次重新打开，
+// 所以我们要在登陆之前确保DemoDB不会被Overlap。所以我们关闭一下数据库。
+        DemoDBManager.getInstance().closeDB();
+        MyApplicaption.getInstance().setCurrentUserName(mname);
 
         EMClient.getInstance().login(mname, mpassword, new EMCallBack() {
             //回调
             @Override
             public void onSuccess() {
                 // 加载所有会话到内存
-                EMClient.getInstance().chatManager().loadAllConversations();
                 EMClient.getInstance().groupManager().loadAllGroups();
                 EMClient.getInstance().chatManager().loadAllConversations();
                 getFriends();
-                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                Intent intent = new Intent(LoginActivity.this,
+                        MainActivity.class);
+                startActivity(intent);
                 finish();
             }
 
             @Override
             public void onProgress(int progress, String status) {
+                System.out.println("xxxxxx" + "onProgress");
 
             }
 
             @Override
             public void onError(final int code, String message) {
+                System.out.println("xxxxxxxxxxx+onError"+code);
+                System.out.println("xxxxxxxxxxx+onError"+message);
+
+                System.out.println("xxxxxxxxxxx+onError");
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -157,6 +201,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                 ToastUtils.showLong(LoginActivity.this, "未知的服务器异常！");
                                 break;
                             default:
+                                ToastUtils.showLong(LoginActivity.this, "未知错误！");
                                 break;
                         }
                     }
@@ -166,12 +211,13 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     }
 
 
-    private  void  getFriends(){
+    private void getFriends() {
         try {
             List<String> usernames = EMClient.getInstance().contactManager().getAllContactsFromServer();
-            Map<String ,EaseUser> users=new HashMap<String ,EaseUser>();
-            for(String username:usernames){
-                EaseUser user=new EaseUser(username);
+            System.out.println("xxxxxxxxxxxxx" + usernames.size());
+            Map<String, EaseUser> users = new HashMap<String, EaseUser>();
+            for (String username : usernames) {
+                EaseUser user = new EaseUser(username);
                 users.put(username, user);
             }
             MyApplicaption.getInstance().setContactList(users);
