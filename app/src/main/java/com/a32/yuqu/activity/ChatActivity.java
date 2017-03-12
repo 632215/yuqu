@@ -96,7 +96,6 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
             }
             conversation.loadMoreMsgFromDB(msgId, pagesize - msgCount);
         }
-
     }
 
     private void setMesaage(String content) {
