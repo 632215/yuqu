@@ -3,17 +3,12 @@ package com.a32.yuqu.applicaption;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
 import android.text.TextUtils;
-import android.view.View;
 
-import com.a32.yuqu.activity.LoginActivity;
-import com.a32.yuqu.activity.MainActivity;
-import com.a32.yuqu.db.Constant;
 import com.a32.yuqu.db.EaseUser;
 import com.a32.yuqu.db.Myinfo;
 import com.a32.yuqu.db.UserDao;
-import com.a32.yuqu.view.MaterialDialog;
+import com.a32.yuqu.utils.Constant;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMOptions;

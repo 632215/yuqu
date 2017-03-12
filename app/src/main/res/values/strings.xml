@@ -159,5 +159,6 @@
     <string name="voice_prefix">[语音]</string>
     <string name="dynamic_expression">[动态表情]</string>
     <string name="video_call">[视频通话]</string>
+    <string name="newcontact">新的朋友</string>
 
 </resources>

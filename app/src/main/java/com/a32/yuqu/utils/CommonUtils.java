@@ -9,7 +9,6 @@ import android.net.NetworkInfo;
 import android.text.TextUtils;
 
 import com.a32.yuqu.R;
-import com.a32.yuqu.db.Constant;
 import com.a32.yuqu.db.EaseUser;
 import com.hyphenate.chat.EMConversation.EMConversationType;
 import com.hyphenate.chat.EMMessage;

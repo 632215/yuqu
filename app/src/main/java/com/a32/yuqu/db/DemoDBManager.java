@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import com.a32.yuqu.utils.CommonUtils;
 import com.a32.yuqu.applicaption.MyApplicaption;
 import com.a32.yuqu.db.InviteMessage.InviteMesageStatus;
+import com.a32.yuqu.utils.Constant;
+
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;

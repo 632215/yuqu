@@ -19,7 +19,7 @@
             android:textSize="14sp"
             android:gravity="center_vertical"
             android:drawableLeft="@mipmap/more"
-            android:drawablePadding="2dp"
+            android:drawablePadding="5dp"
             android:textColor="@color/colorBlack"
             />
 

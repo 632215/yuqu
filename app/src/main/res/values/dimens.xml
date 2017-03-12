@@ -14,4 +14,7 @@
     <dimen name="action_button_min_width">56dp</dimen>
     <dimen name="action_button_padding_horizontal">4dp</dimen>
     <dimen name="title_marge_left">15dp</dimen>
+
+    <dimen name="height_top_bar">46dp</dimen>
+
 </resources>

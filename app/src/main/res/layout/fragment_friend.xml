@@ -3,9 +3,37 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+    <LinearLayout
+        android:id="@+id/newContact"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="@string/newcontact"
+            android:textColor="@color/colorBlack"
+            android:textSize="14sp" />
+        <TextView
+            android:id="@+id/tips"
+            android:visibility="invisible"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:text="new"
+            android:textSize="8dp"
+            android:gravity="center"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/circle"/>
+    </LinearLayout>
 
     <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="10dp"
+        android:background="@color/colorLineGray" />
 
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
@@ -16,7 +44,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorBlack" />
+        android:background="@color/colorLineGray" />
     <ListView
         android:id="@+id/listView"
         android:layout_width="match_parent"

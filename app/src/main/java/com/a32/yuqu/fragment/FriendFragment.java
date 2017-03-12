@@ -6,13 +6,18 @@ import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.a32.yuqu.R;
+import com.a32.yuqu.activity.ChatActivity;
 import com.a32.yuqu.adapter.ContactAdapter;
 import com.a32.yuqu.applicaption.MyApplicaption;
 import com.a32.yuqu.base.BaseFragment;
 import com.a32.yuqu.db.EaseUser;
+import com.a32.yuqu.db.InviteMessage;
+import com.a32.yuqu.db.InviteMessgeDao;
 import com.a32.yuqu.utils.CommonUtils;
 import com.hyphenate.EMValueCallBack;
 import com.hyphenate.chat.EMChatManager;
@@ -42,6 +47,13 @@ public class FriendFragment extends BaseFragment {
     //联系人列表的listView
     @Bind(R.id.listView)
     ListView listView;
+
+    @Bind(R.id.newContact)
+    LinearLayout newContact;
+
+    @Bind(R.id.tips)
+    TextView tips;
+
     @Override
     protected int getLayoutId() {
         return R.layout.fragment_friend;
@@ -50,20 +62,38 @@ public class FriendFragment extends BaseFragment {
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void initView(View view, Bundle savedInstanceState) {
+        initFriendData();
+        initNewContactData();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void initNewContactData() {
+        InviteMessgeDao dao = new InviteMessgeDao(getActivity());
+        List<InviteMessage> msgsList = dao.getMessagesList();
+        System.out.println("xxxxxxxxxx"+msgsList.size());
+        if (msgsList.size()!=0){
+            tips.setVisibility(View.VISIBLE);
+        }
+        newContact.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+    }
+
+    private void initFriendData() {
         getContactList();
-        System.out.println("xxxxxxxxxxx"+contactList.size());
         adapter = new ContactAdapter(this.getActivity(), contactList);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-//                startActivity(new Intent(ContactActivity.this,ChatActivity.class).putExtra("username", adapter.getItem(arg2).getUsername()));
-//                finish();
+                startActivity(new Intent(getActivity(),ChatActivity.class).putExtra("username", adapter.getItem(arg2).getUsername()));
             }
 
         });
-
     }
 
     /**
@@ -73,8 +103,6 @@ public class FriendFragment extends BaseFragment {
         contactList.clear();
         // 获取联系人列表
         contactsMap = MyApplicaption.getInstance().getContactList();
-        System.out.println("xxxxxxxxxx"+contactsMap.size());
-
         if (contactsMap == null) {
             System.out.println("contactList"+null);
             return;
@@ -93,7 +121,6 @@ public class FriendFragment extends BaseFragment {
                         CommonUtils.setUserInitialLetter(user);
                         contactList.add(user);
                     }
-                    System.out.println("contactList"+contactList.size());
                 }
             }
         }

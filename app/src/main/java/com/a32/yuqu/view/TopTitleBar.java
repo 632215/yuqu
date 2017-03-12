@@ -9,6 +9,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.a32.yuqu.R;
+import com.a32.yuqu.activity.ChatActivity;
 
 /**
  * Created by 32 on 2016/12/30.
@@ -66,6 +67,8 @@ public class TopTitleBar extends RelativeLayout implements View.OnClickListener{
     public void setOnTopTitleBarCallback(OnTopTitleBarCallback callback) {
         this.callback = callback;
     }
+
+
 
     public interface OnTopTitleBarCallback {
         void onBackClick();

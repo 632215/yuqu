@@ -76,6 +76,14 @@
             android:name=".activity.AddFriendsActivity"
             android:screenOrientation="portrait"></activity>
 
+        <activity
+            android:name=".activity.ChatActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <activity
+            android:name=".activity.AddFriendMsgActivity"
+            android:screenOrientation="portrait"></activity>
+
     </application>
 
 </manifest>
