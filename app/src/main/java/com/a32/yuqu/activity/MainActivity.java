@@ -3,14 +3,9 @@ package com.a32.yuqu.activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -21,6 +16,7 @@ import android.widget.Toast;
 
 import com.a32.yuqu.R;
 import com.a32.yuqu.applicaption.MyApplicaption;
+import com.a32.yuqu.base.BaseActivity;
 import com.a32.yuqu.db.EaseUser;
 import com.a32.yuqu.db.InviteMessage;
 import com.a32.yuqu.db.InviteMessgeDao;
@@ -30,6 +26,7 @@ import com.a32.yuqu.fragment.FriendFragment;
 import com.a32.yuqu.fragment.NewsFragment;
 import com.a32.yuqu.fragment.WhereFragment;
 import com.a32.yuqu.view.MaterialDialog;
+import com.a32.yuqu.view.MyToolbar;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.EMContactListener;
 import com.hyphenate.chat.EMClient;
@@ -40,8 +37,8 @@ import java.util.Map;
 
 import butterknife.Bind;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, RadioGroup.OnCheckedChangeListener {
+public class MainActivity extends BaseActivity
+        implements NavigationView.OnNavigationItemSelectedListener, RadioGroup.OnCheckedChangeListener, MyToolbar.OnSiderbarCallBack, MyToolbar.OnMoreCallBack {
     MaterialDialog materialDialog;
     private FragmentManager mfragmentManager;
     private NewsFragment newsFragment;
@@ -50,49 +47,70 @@ public class MainActivity extends AppCompatActivity
     private DynamicFragment dynamicFragment;
     //两次点击退出程序
     private long exitTime = 0;
-    @Bind(R.id.coordinatorLayout)
-    CoordinatorLayout coordinatorLayout;
-
-
+    //    @Bind(R.id.coordinatorLayout)
+//    CoordinatorLayout coordinatorLayout;
     //底部的切换栏
-    private RadioGroup radioGroup;
     FragmentTransaction transaction;
 
+    @Bind(R.id.toolbar)
+    MyToolbar toolbar;
+
+    @Bind(R.id.drawer_layout)
+    DrawerLayout drawer;
+
+    @Bind(R.id.nav_view)//导航菜单
+    NavigationView navigationView;
+
+    @Bind(R.id.radiogroup)
+    RadioGroup radioGroup;
+
+    private boolean isOpenSiderBar=false;
+//    @Override
+//    protected void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        if (!EMClient.getInstance().isLoggedInBefore()) {
+//            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+//            startActivity(intent);
+//            finish();
+//            return;
+//        }
+//        setContentView(R.layout.activity_main);
+//        initView();
+//        initUser();
+//    }
+
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (!EMClient.getInstance().isLoggedInBefore()) {
-            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-            startActivity(intent);
-            finish();
-            return;
-        }
-        setContentView(R.layout.activity_main);
-        initView();
-        initUser();
+    protected int getContentViewId() {
+        return R.layout.activity_main;
     }
 
-
-
-    private void initView() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-
-        radioGroup = (RadioGroup) findViewById(R.id.radiogroup);
-
-        setSupportActionBar(toolbar);
-
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
+    @Override
+    protected void initView() {
+        toolbar.setOnSiderbarCallback(this);
+        toolbar.setOnMoreCallback(this);
         navigationView.setNavigationItemSelectedListener(this);
 
         mfragmentManager = getFragmentManager();
         transaction = mfragmentManager.beginTransaction();
         setDefaultRadio();
         radioGroup.setOnCheckedChangeListener(this);
+        initUser();
+    }
+
+    @Override
+    public void onMoreBackClick() {
+
+    }
+
+    @Override
+    public void onSiderbarBackClick() {
+        if (isOpenSiderBar == false){
+            drawer.openDrawer(GravityCompat.START);
+        }else {
+            drawer.closeDrawer(GravityCompat.END);
+            isOpenSiderBar =true;
+        }
     }
 
     //设置默认的Radiogroup选择为第一项
@@ -105,7 +123,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -120,15 +137,15 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.menu_add_friend) {
-            startActivity(new Intent(this, AddFriendsActivity.class));
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        int id = item.getItemId();
+//        if (id == R.id.menu_add_friend) {
+//            startActivity(new Intent(this, AddFriendsActivity.class));
+//            return true;
+//        }
+//        return super.onOptionsItemSelected(item);
+//    }
 
     //侧边栏按钮监听事件
     @SuppressWarnings("StatementWithEmptyBody")
@@ -144,8 +161,9 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_about) {
             startActivity(new Intent(this, VersionActivity.class));
         }
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+        item.setCheckable(true);//设置选项可选
+        item.setChecked(true);//设置选型被选中
+        drawer.closeDrawers();//关闭侧边菜单栏
         return true;
     }
 
@@ -250,9 +268,10 @@ public class MainActivity extends AppCompatActivity
 
     private InviteMessgeDao inviteMessgeDao;
     private UserDao userDao;
+
+
     /***
      * 好友变化listener
-     *
      */
     public class MyContactListener implements EMContactListener {
 
@@ -268,11 +287,11 @@ public class MainActivity extends AppCompatActivity
             }
             toAddUsers.put(username, user);
             localUsers.putAll(toAddUsers);
-            runOnUiThread(new Runnable(){
+            runOnUiThread(new Runnable() {
 
                 @Override
                 public void run() {
-                    Toast.makeText(getApplicationContext(), "增加联系人：+"+username, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "增加联系人：+" + username, Toast.LENGTH_SHORT).show();
                 }
 
 
@@ -289,11 +308,11 @@ public class MainActivity extends AppCompatActivity
             userDao.deleteContact(username);
             inviteMessgeDao.deleteMessage(username);
 
-            runOnUiThread(new Runnable(){
+            runOnUiThread(new Runnable() {
 
                 @Override
                 public void run() {
-                    Toast.makeText(getApplicationContext(), "删除联系人：+"+username, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "删除联系人：+" + username, Toast.LENGTH_SHORT).show();
                 }
 
 
@@ -320,11 +339,11 @@ public class MainActivity extends AppCompatActivity
             // 设置相应status
             msg.setStatus(InviteMessage.InviteMesageStatus.BEINVITEED);
             notifyNewIviteMessage(msg);
-            runOnUiThread(new Runnable(){
+            runOnUiThread(new Runnable() {
 
                 @Override
                 public void run() {
-                    Toast.makeText(getApplicationContext(), "收到好友申请：+"+username, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "收到好友申请：+" + username, Toast.LENGTH_SHORT).show();
                 }
 
 
@@ -347,11 +366,11 @@ public class MainActivity extends AppCompatActivity
 
             msg.setStatus(InviteMessage.InviteMesageStatus.BEAGREED);
             notifyNewIviteMessage(msg);
-            runOnUiThread(new Runnable(){
+            runOnUiThread(new Runnable() {
 
                 @Override
                 public void run() {
-                    Toast.makeText(getApplicationContext(), "好友申请同意：+"+username, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "好友申请同意：+" + username, Toast.LENGTH_SHORT).show();
                 }
 
 
@@ -366,10 +385,11 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * 保存并提示消息的邀请消息
+     *
      * @param msg
      */
-    private void notifyNewIviteMessage(InviteMessage msg){
-        if(inviteMessgeDao == null){
+    private void notifyNewIviteMessage(InviteMessage msg) {
+        if (inviteMessgeDao == null) {
             inviteMessgeDao = new InviteMessgeDao(MainActivity.this);
         }
         inviteMessgeDao.saveMessage(msg);

@@ -138,6 +138,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             //回调
             @Override
             public void onSuccess() {
+                System.out.println("xxxxxx" + "onSuccess");
+
                 // 加载所有会话到内存
                 EMClient.getInstance().groupManager().loadAllGroups();
                 EMClient.getInstance().chatManager().loadAllConversations();
