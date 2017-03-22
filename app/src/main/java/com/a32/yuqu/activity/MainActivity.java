@@ -2,16 +2,19 @@ package com.a32.yuqu.activity;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.a32.yuqu.R;
@@ -26,6 +29,7 @@ import com.a32.yuqu.fragment.FriendFragment;
 import com.a32.yuqu.fragment.NewsFragment;
 import com.a32.yuqu.fragment.WhereFragment;
 import com.a32.yuqu.view.MaterialDialog;
+import com.a32.yuqu.view.MyPopWindows;
 import com.a32.yuqu.view.MyToolbar;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.EMContactListener;
@@ -38,7 +42,7 @@ import java.util.Map;
 import butterknife.Bind;
 
 public class MainActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener, RadioGroup.OnCheckedChangeListener, MyToolbar.OnSiderbarCallBack, MyToolbar.OnMoreCallBack {
+        implements NavigationView.OnNavigationItemSelectedListener, RadioGroup.OnCheckedChangeListener, MyToolbar.OnSiderbarCallBack, MyToolbar.OnMoreCallBack, View.OnClickListener {
     MaterialDialog materialDialog;
     private FragmentManager mfragmentManager;
     private NewsFragment newsFragment;
@@ -47,8 +51,7 @@ public class MainActivity extends BaseActivity
     private DynamicFragment dynamicFragment;
     //两次点击退出程序
     private long exitTime = 0;
-    //    @Bind(R.id.coordinatorLayout)
-//    CoordinatorLayout coordinatorLayout;
+
     //底部的切换栏
     FragmentTransaction transaction;
 
@@ -98,9 +101,34 @@ public class MainActivity extends BaseActivity
         initUser();
     }
 
+    private TextView addFriend;
+    private TextView myEWM;
+
     @Override
     public void onMoreBackClick() {
+        MyPopWindows morePopWindows = new MyPopWindows(this);
+        morePopWindows.setContentView(View.inflate(this,R.layout.more_popuwindow,null));
+        morePopWindows.showAtLocation(drawer, Gravity.CENTER,0,0);
 
+        View view = morePopWindows.getContentView();
+        addFriend= (TextView) view.findViewById(R.id.addFriend);
+        myEWM= (TextView) view.findViewById(R.id.myEWM);
+        addFriend.setOnClickListener(this);
+        myEWM.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.addFriend:
+                startActivity(new Intent(this, AddFriendsActivity.class));
+                break;
+            case R.id.myEWM:
+                System.out.println("xxxxxxxxewm");
+
+                break;
+
+        }
     }
 
     @Override
@@ -129,23 +157,6 @@ public class MainActivity extends BaseActivity
             super.onBackPressed();
         }
     }
-
-    //显示右上角菜单栏
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        int id = item.getItemId();
-//        if (id == R.id.menu_add_friend) {
-//            startActivity(new Intent(this, AddFriendsActivity.class));
-//            return true;
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
 
     //侧边栏按钮监听事件
     @SuppressWarnings("StatementWithEmptyBody")
