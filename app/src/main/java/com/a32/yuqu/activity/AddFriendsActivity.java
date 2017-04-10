@@ -1,6 +1,7 @@
 package com.a32.yuqu.activity;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
@@ -10,6 +11,8 @@ import android.widget.Toast;
 import com.a32.yuqu.R;
 import com.a32.yuqu.base.BaseActivity;
 import com.a32.yuqu.view.TopTitleBar;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.hyphenate.chat.EMClient;
 
 import butterknife.Bind;
@@ -64,14 +67,41 @@ public class AddFriendsActivity extends BaseActivity implements View.OnClickList
 //                }
                 break;
             case R.id.scan:
+                customScan();
                 break;
+        }
+    }
+
+    //扫码
+    public void customScan() {
+        new IntentIntegrator(this)
+                .setOrientationLocked(false)
+                .setCaptureActivity(CustomScanActivity.class) // 设置自定义的activity是CustomActivity
+                .initiateScan(); // 初始化扫描
+    }
+
+    @Override
+// 通过 onActivityResult的方法获取 扫描回来的 值
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        if (intentResult != null) {
+            if (intentResult.getContents() == null) {
+                Toast.makeText(this, "内容为空", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, "扫描成功"+intentResult.getContents(), Toast.LENGTH_LONG).show();
+                // ScanResult 为 获取到的字符串
+                String scanResult = intentResult.getContents();
+                addContact(scanResult);
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
     /**
      * 添加contact
      *
-     * @param view
+     * @param
      */
     public void addContact(final String username) {
         progressDialog = new ProgressDialog(this);
@@ -88,7 +118,7 @@ public class AddFriendsActivity extends BaseActivity implements View.OnClickList
                     runOnUiThread(new Runnable() {
                         public void run() {
                             progressDialog.dismiss();
-                            Toast.makeText(getApplicationContext(), "送请求成功,等待对方验证",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "送请求成功,等待对方验证", Toast.LENGTH_SHORT).show();
                         }
                     });
                 } catch (final Exception e) {

@@ -87,7 +87,7 @@ public class EaseConversationAdapater extends ArrayAdapter<EMConversation> {
         if (conversation.getAllMsgCount() != 0) {
             // 把最后一条消息的内容作为item的message内容
             EMMessage lastMessage = conversation.getLastMessage();
-            holder.message.setText(lastMessage.getBody().toString());
+            holder.message.setText(lastMessage.getBody().toString().substring(5,lastMessage.getBody().toString().length()-1));
             holder.time.setText(DateUtils.getTimestampString(new Date(lastMessage.getMsgTime())));
             if (lastMessage.direct() == EMMessage.Direct.SEND && lastMessage.status() == EMMessage.Status.FAIL) {
                 holder.msgState.setVisibility(View.VISIBLE);

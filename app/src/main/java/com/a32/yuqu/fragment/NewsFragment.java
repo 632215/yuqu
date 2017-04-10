@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.a32.yuqu.R;
@@ -18,6 +19,8 @@ import com.a32.yuqu.activity.ChatActivity;
 import com.a32.yuqu.adapter.EaseConversationAdapater;
 import com.a32.yuqu.applicaption.MyApplicaption;
 import com.a32.yuqu.base.BaseFragment;
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshScrollView;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMConversation;
 
@@ -34,9 +37,14 @@ import butterknife.Bind;
  * Created by 32 on 2016/12/30.
  */
 
-public class NewsFragment extends BaseFragment {
+public class NewsFragment extends BaseFragment implements PullToRefreshBase.OnRefreshListener2<ScrollView>, View.OnClickListener {
+
+    @Bind(R.id.pullRefresh)
+    PullToRefreshScrollView pullRefresh;
+
     @Bind(R.id.listView)
     ListView listView;
+
     private List<EMConversation> conversationList = new ArrayList<EMConversation>();
     private EaseConversationAdapater adapter;
 
@@ -47,6 +55,8 @@ public class NewsFragment extends BaseFragment {
 
     @Override
     protected void initView(View view, Bundle savedInstanceState) {
+        pullRefresh.setMode(PullToRefreshBase.Mode.BOTH);
+        pullRefresh.setOnRefreshListener(this);
         initData();
     }
 
@@ -76,7 +86,7 @@ public class NewsFragment extends BaseFragment {
     /**
      * 获取会话列表
      *
-     * @param context
+//     * @param context
      * @return +
      */
     protected List<EMConversation> loadConversationList() {
@@ -94,8 +104,8 @@ public class NewsFragment extends BaseFragment {
                 if (conversation.getAllMessages().size() != 0) {
                     sortList.add(
                             new Pair<Long, EMConversation>(conversation.getLastMessage().getMsgTime(), conversation));
-
                 }
+                pullRefresh.onRefreshComplete();
             }
         }
         try {
@@ -113,7 +123,7 @@ public class NewsFragment extends BaseFragment {
     /**
      * 根据最后一条消息的时间排序
      *
-     * @param usernames
+//     * @param usernames
      */
     private void sortConversationByLastChatTime(List<Pair<Long, EMConversation>> conversationList) {
         Collections.sort(conversationList, new Comparator<Pair<Long, EMConversation>>() {
@@ -136,5 +146,20 @@ public class NewsFragment extends BaseFragment {
     public void onResume() {
         super.onResume();
         adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onPullDownToRefresh(PullToRefreshBase<ScrollView> refreshView) {
+        loadConversationList();
+    }
+
+    @Override
+    public void onPullUpToRefresh(PullToRefreshBase<ScrollView> refreshView) {
+        loadConversationList();
+    }
+
+    @Override
+    public void onClick(View view) {
+
     }
 }

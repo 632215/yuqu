@@ -66,7 +66,7 @@ public class MainActivity extends BaseActivity
 
     @Bind(R.id.radiogroup)
     RadioGroup radioGroup;
-
+    private  MyPopWindows morePopWindows;//右上角弹出框
     private boolean isOpenSiderBar=false;
 //    @Override
 //    protected void onCreate(Bundle savedInstanceState) {
@@ -106,7 +106,7 @@ public class MainActivity extends BaseActivity
 
     @Override
     public void onMoreBackClick() {
-        MyPopWindows morePopWindows = new MyPopWindows(this);
+        morePopWindows = new MyPopWindows(this);
         morePopWindows.setContentView(View.inflate(this,R.layout.more_popuwindow,null));
         morePopWindows.showAtLocation(drawer, Gravity.CENTER,0,0);
 
@@ -122,10 +122,11 @@ public class MainActivity extends BaseActivity
         switch (view.getId()) {
             case R.id.addFriend:
                 startActivity(new Intent(this, AddFriendsActivity.class));
+                morePopWindows.dismiss();
                 break;
             case R.id.myEWM:
-                System.out.println("xxxxxxxxewm");
-
+                morePopWindows.dismiss();
+                startActivity(new Intent(this, EWMActivity.class));
                 break;
 
         }

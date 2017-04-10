@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 import com.a32.yuqu.R;
 import com.a32.yuqu.activity.ChatActivity;
+import com.a32.yuqu.activity.FriendApplyActivity;
+import com.a32.yuqu.activity.MainActivity;
 import com.a32.yuqu.adapter.ContactAdapter;
 import com.a32.yuqu.applicaption.MyApplicaption;
 import com.a32.yuqu.base.BaseFragment;
@@ -48,6 +50,7 @@ public class FriendFragment extends BaseFragment {
     @Bind(R.id.listView)
     ListView listView;
 
+    //新的朋友
     @Bind(R.id.newContact)
     LinearLayout newContact;
 
@@ -66,6 +69,7 @@ public class FriendFragment extends BaseFragment {
         initNewContactData();
     }
 
+    //查看是否有好友请求
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void initNewContactData() {
         InviteMessgeDao dao = new InviteMessgeDao(getActivity());
@@ -77,11 +81,14 @@ public class FriendFragment extends BaseFragment {
         newContact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                //进入好友申请页面
+                startActivity(new Intent(getActivity(),FriendApplyActivity.class));
             }
         });
     }
 
+
+    //初始化好友列表
     private void initFriendData() {
         getContactList();
         adapter = new ContactAdapter(this.getActivity(), contactList);

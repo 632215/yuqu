@@ -4,9 +4,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-
+    <com.handmark.pulltorefresh.library.PullToRefreshScrollView
+        android:id="@+id/pullRefresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <ListView
         android:id="@+id/listView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+    </com.handmark.pulltorefresh.library.PullToRefreshScrollView>
 </LinearLayout>
