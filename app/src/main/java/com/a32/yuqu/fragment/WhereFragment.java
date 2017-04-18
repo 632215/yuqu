@@ -48,7 +48,6 @@ public class WhereFragment extends BaseFragment implements View.OnClickListener 
                 break;
             case R.id.tv_where_location:
                 startActivity(new Intent(this.getActivity(), BaiduMapActivity.class));
-
                 break;
             case R.id.tv_where_myreport:
                 break;

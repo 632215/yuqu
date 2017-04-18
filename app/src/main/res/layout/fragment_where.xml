@@ -25,7 +25,7 @@
                 android:layout_margin="20dp"
                 android:drawablePadding="10dp"
                 android:drawableTop="@mipmap/locationserver"
-                android:text="@string/location"
+                android:text="我的位置"
                 android:textSize="14sp" />
         </RelativeLayout>
 
@@ -44,7 +44,7 @@
                 android:layout_margin="20dp"
                 android:drawablePadding="10dp"
                 android:drawableTop="@mipmap/manage"
-                android:text="@string/my_report"
+                android:text="我的发现"
                 android:textSize="14sp" />
         </RelativeLayout>
 
@@ -52,7 +52,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-
             >
 
             <TextView
@@ -70,7 +69,7 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="20dp"
+        android:layout_height="10dp"
         android:background="@color/colorLineGray" />
 
     <LinearLayout

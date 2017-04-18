@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.a32.yuqu">
 
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="com.android.launcher.permission.READ_SETTINGS" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -27,11 +29,15 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <!--百度地图-->
+        <meta-data
+            android:name="com.baidu.lbsapi.API_KEY"
+            android:value="uBrOSsGSyrYZiht7EgRQYsh6qSOfsgnL" />
+
         <!-- 设置环信应用的AppKey -->
         <meta-data
             android:name="EASEMOB_APPKEY"
             android:value="1149170123178799#yuqu" />
-        <!-- 声明SDK所需的service SDK核心功能-->
         <!-- 声明SDK所需的service SDK核心功能 -->
         <service
             android:name="com.hyphenate.chat.EMChatService"
@@ -69,31 +75,60 @@
 
         <activity
             android:name=".activity.RegisterActivity"
-            android:screenOrientation="portrait"></activity>
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan|stateHidden"></activity>
 
         <activity
             android:name=".activity.VersionActivity"
-            android:screenOrientation="portrait"></activity>
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan|stateHidden"></activity>
 
         <activity
             android:name=".activity.AddFriendsActivity"
-            android:screenOrientation="portrait"></activity>
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan|stateHidden"></activity>
 
         <activity
             android:name=".activity.ChatActivity"
-            android:screenOrientation="portrait"></activity>
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan|stateHidden"></activity>
 
         <activity
             android:name=".activity.FriendApplyActivity"
-            android:screenOrientation="portrait"></activity>
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan|stateHidden"></activity>
 
         <activity
             android:name=".activity.EWMActivity"
-            android:screenOrientation="portrait"></activity>
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan|stateHidden"></activity>
 
         <activity
             android:name=".activity.CustomScanActivity"
-            android:screenOrientation="portrait"></activity>
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan|stateHidden"></activity>
+
+        <activity
+            android:name=".activity.BaiduMapActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan|stateHidden"
+            ></activity>
 
     </application>
 

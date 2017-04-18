@@ -34,4 +34,5 @@ dependencies {
     compile project(':libraryPulltorefresh')
     compile 'com.google.zxing:core:3.2.1'
     compile 'com.journeyapps:zxing-android-embedded:3.3.0'
+    compile files('src/main/jniLibs/BaiduLBS_Android.jar')
 }

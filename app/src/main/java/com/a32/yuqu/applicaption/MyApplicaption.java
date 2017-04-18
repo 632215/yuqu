@@ -9,6 +9,7 @@ import com.a32.yuqu.db.EaseUser;
 import com.a32.yuqu.db.Myinfo;
 import com.a32.yuqu.db.UserDao;
 import com.a32.yuqu.utils.Constant;
+import com.baidu.mapapi.SDKInitializer;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMOptions;
@@ -37,6 +38,7 @@ public class MyApplicaption extends Application {
         instance = this;
         // 初始化环信SDK
         init(applicationContext);
+        SDKInitializer.initialize(getApplicationContext());
     }
 
     public static MyApplicaption getInstance() {

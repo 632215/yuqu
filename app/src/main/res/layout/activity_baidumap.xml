@@ -10,49 +10,56 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <LinearLayout
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:background="@color/colorWhite"-->
+        <!--android:orientation="horizontal"-->
+        <!--&gt;-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/tv_baidumap_location"-->
+            <!--android:gravity="center_horizontal"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"-->
+            <!--android:padding="10dp"-->
+            <!--android:text="@string/mylocation"-->
+            <!--android:textColor="@color/colorBlack"-->
+            <!--android:textSize="14sp" />-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/tv_baidumap_nearby"-->
+            <!--android:gravity="center_horizontal"-->
+
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"-->
+            <!--android:padding="10dp"-->
+            <!--android:text="@string/nearby"-->
+            <!--android:textColor="@color/colorBlack"-->
+            <!--android:textSize="14sp" />-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/tv_baidumap_mark"-->
+            <!--android:gravity="center_horizontal"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"-->
+            <!--android:padding="10dp"-->
+            <!--android:text="@string/mark"-->
+            <!--android:textColor="@color/colorBlack"-->
+            <!--android:textSize="14sp" />-->
+    <!--</LinearLayout>-->
+
+    <!--<TextView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="10dp" />-->
+
+    <com.baidu.mapapi.map.MapView
+        android:id="@+id/bmapView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorWhite"
-        android:orientation="horizontal"
-        >
+        android:layout_height="match_parent"
+        android:clickable="true" />
 
-        <TextView
-            android:id="@+id/tv_baidumap_location"
-            android:gravity="center_horizontal"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:padding="10dp"
-            android:text="@string/mylocation"
-            android:textColor="@color/colorBlack"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/tv_baidumap_nearby"
-            android:gravity="center_horizontal"
-
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:padding="10dp"
-            android:text="@string/nearby"
-            android:textColor="@color/colorBlack"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/tv_baidumap_mark"
-            android:gravity="center_horizontal"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:padding="10dp"
-            android:text="@string/mark"
-            android:textColor="@color/colorBlack"
-            android:textSize="14sp" />
-    </LinearLayout>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="10dp" />
 </LinearLayout>
