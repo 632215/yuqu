@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import com.a32.yuqu.db.EaseUser;
 import com.a32.yuqu.db.Myinfo;
 import com.a32.yuqu.db.UserDao;
+import com.a32.yuqu.service.LocationService;
 import com.a32.yuqu.utils.Constant;
 import com.baidu.mapapi.SDKInitializer;
 import com.hyphenate.EMCallBack;
@@ -29,7 +30,7 @@ public class MyApplicaption extends Application {
     private static MyApplicaption instance;
     private String username = "";
     private Map<String, EaseUser> contactList;
-
+    public static LocationService locationService;
 
     @Override
     public void onCreate() {
@@ -38,6 +39,7 @@ public class MyApplicaption extends Application {
         instance = this;
         // 初始化环信SDK
         init(applicationContext);
+        locationService=new LocationService(this);
         SDKInitializer.initialize(getApplicationContext());
     }
 
