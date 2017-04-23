@@ -3,6 +3,7 @@ package com.a32.yuqu.activity;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,6 +16,7 @@ import com.a32.yuqu.base.BaseActivity;
 import com.a32.yuqu.utils.KeyBoardUtils;
 import com.a32.yuqu.utils.PhoneUtils;
 import com.a32.yuqu.view.MyDialog;
+import com.a32.yuqu.view.MyPopWindows;
 import com.a32.yuqu.view.TopTitleBar;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.exceptions.HyphenateException;
@@ -27,34 +29,32 @@ import butterknife.Bind;
 
 public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopTitleBarCallback
         , View.OnClickListener {
+    @Bind(R.id.registerLayout)
+    LinearLayout registerLayout;
     @Bind(R.id.et_register_phone)
     EditText phone;
-
     @Bind(R.id.et_register_pwd)
     EditText pwd;
-
     @Bind(R.id.et_register_confirmpwd)
     EditText confirmpwd;
-
     @Bind(R.id.et_register_name)
     EditText name;
-
     @Bind(R.id.tv_register_errortips)
     TextView errorTips;
-
-    @Bind(R.id.register)
-    LinearLayout linearLayout;
-
     @Bind(R.id.btn_registerNow)
     Button register;
-
     @Bind(R.id.register_titlebar)
     TopTitleBar titleBar;
-
     @Bind(R.id.img_register_head)
     ImageView head;
 
-
+    private MyPopWindows morePopWindows;//头像来源选择
+    private TextView fromAlbum;
+    private TextView fromCamera;
+    /* 请求识别码 */
+    private static final int CODE_GALLERY_REQUEST = 0xa0;
+    private static final int CODE_CAMERA_REQUEST = 0xa1;
+    private static final int CODE_RESULT_REQUEST = 0xa2;
     @Override
     protected int getContentViewId() {
         return R.layout.activity_register;
@@ -66,7 +66,6 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
         titleBar.setOnTopTitleBarCallback(this);
         register.setOnClickListener(this);
         head.setOnClickListener(this);
-        linearLayout.setOnClickListener(this);
         phone.setOnClickListener(this);
         pwd.setOnClickListener(this);
         confirmpwd.setOnClickListener(this);
@@ -120,8 +119,9 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
                 registAccount(phone.getText().toString().trim(), pwd.getText().toString().trim());
                 break;
             case R.id.img_register_head:
+                startSelect();
                 break;
-            case R.id.register:
+            case R.id.registerLayout:
                 //关闭键盘
                 KeyBoardUtils.closeKeybord(phone, RegisterActivity.this);
                 KeyBoardUtils.closeKeybord(pwd, RegisterActivity.this);
@@ -134,8 +134,24 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
             case R.id.et_register_name:
                 errorTips.setVisibility(View.INVISIBLE);
                 break;
+            case R.id.fromAlbum:
+
+                break;
+            case R.id.fromCamera:
+                break;
 
         }
+    }
+
+    private void startSelect() {
+        morePopWindows = new MyPopWindows(this);
+        morePopWindows.setContentView(View.inflate(this,R.layout.picture_popuwindow,null));
+        morePopWindows.showAtLocation(registerLayout, Gravity.BOTTOM,0,0);
+        View viewPopWindows = morePopWindows.getContentView();
+        fromAlbum= (TextView) viewPopWindows.findViewById(R.id.fromAlbum);
+        fromCamera= (TextView) viewPopWindows.findViewById(R.id.fromCamera);
+        fromAlbum.setOnClickListener(this);
+        fromCamera.setOnClickListener(this);
     }
 
     private void registAccount(final String phone, final String pwd) {

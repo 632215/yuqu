@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet config="main"><source path="D:\GitData\yuqu\libraryPulltorefresh\src\main\assets"/><source path="D:\GitData\yuqu\libraryPulltorefresh\build\generated\assets\shaders\release"/></dataSet><dataSet config="release"><source path="D:\GitData\yuqu\libraryPulltorefresh\src\release\assets"/></dataSet></merger>

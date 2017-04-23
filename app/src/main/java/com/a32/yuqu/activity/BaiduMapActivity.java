@@ -41,8 +41,9 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
 
     private LocationService locationService;
     private BaiduMap mBaiduMap;
-    private boolean isFisrtLoc =true;
-    private MyBDLocationListener myBDLocationListener =new MyBDLocationListener();
+    private boolean isFisrtLoc = true;
+    private MyBDLocationListener myBDLocationListener = new MyBDLocationListener();
+
     @Override
     protected int getContentViewId() {
         return R.layout.activity_baidumap;
@@ -81,29 +82,38 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
             case R.id.markFishPlace://标记我的位置为渔场
                 break;
             case R.id.myLocation://定位我的位置
-                System.out.println("xxxxxxxxxxcccccccccccitude"+latitude);
-
-                showLocation();
+                System.out.println("xxxxxxxxxxcccccccccccitude" + latitude);
+                showMyLocation(myLatitude, myLongitude);
                 break;
         }
     }
-   private Double longitude = 0.00;
+
     private Double latitude = 0.00;
-    private float radius=0;
-    public class MyBDLocationListener implements BDLocationListener{
+    private Double longitude = 0.00;
+
+    private Double myLatitude = 0.00;
+    private Double myLongitude = 0.00;
+    private float radius = 0;
+
+    public class MyBDLocationListener implements BDLocationListener {
 
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
-            if (bdLocation==null||bmapView==null){
+            if (bdLocation == null || bmapView == null) {
+                System.out.println("xxxxxxxxxxxxx" );
                 return;
             }
-            longitude  =bdLocation.getLongitude();
-            latitude  =bdLocation.getLatitude();
-            System.out.println("xxxxxxxxxxxxxlongitude"+longitude);
-            System.out.println("xxxxxxxxxxxxxlatitude"+latitude);
-            radius=bdLocation.getRadius();
+            latitude = bdLocation.getLatitude();
+            longitude = bdLocation.getLongitude();
+
+            //存储自身位置
+            myLatitude = bdLocation.getLatitude();
+            myLongitude = bdLocation.getLongitude();
+
+            System.out.println("xxxxxxxxxxxxxlongitude" + longitude);
+            System.out.println("xxxxxxxxxxxxxlatitude" + latitude);
+            radius = bdLocation.getRadius();
             showLocation();
-            System.out.println("xxxxxxxxxxxxx");
         }
 
         @Override
@@ -112,8 +122,15 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
         }
     }
 
+    private void showMyLocation(Double myLatitude, Double myLongitude) {
+            LatLng latLng = new LatLng(myLatitude, myLongitude);
+            MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newLatLngZoom(latLng, 16);
+            mBaiduMap.animateMapStatus(mapStatusUpdate);
+    }
+
+
     private void showLocation() {
-        MyLocationData locationData =new MyLocationData.Builder()
+        MyLocationData locationData = new MyLocationData.Builder()
                 .accuracy(radius)
                 .direction(100)
                 .latitude(latitude)
@@ -121,29 +138,28 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
                 .build();
         mBaiduMap.setMyLocationData(locationData);
 
-        if (isFisrtLoc){
-            isFisrtLoc=false;
-            LatLng latLng=new LatLng(latitude,longitude);
-            MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newLatLngZoom(latLng,16);
+        if (isFisrtLoc) {
+            isFisrtLoc = false;
+            LatLng latLng = new LatLng(latitude, longitude);
+            MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newLatLngZoom(latLng, 16);
             mBaiduMap.animateMapStatus(mapStatusUpdate);
-        }}
+        }
+    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         //在activity执行onDestroy时执行mMapView.onDestroy()，实现地图生命周期管理
-        if (bmapView!=null){
+        if (bmapView != null) {
             bmapView.onDestroy();
         }
-//        locationService.unregisterListener(myBDLocationListener);
-//        locationService.stop();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         //在activity执行onResume时执行mMapView. onResume ()，实现地图生命周期管理
-        if (bmapView!=null){
+        if (bmapView != null) {
             bmapView.onResume();
         }
     }
@@ -152,10 +168,10 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
     protected void onPause() {
         super.onPause();
         //在activity执行onPause时执行mMapView. onPause ()，实现地图生命周期管理
-        if (bmapView!=null){
+        if (bmapView != null) {
             bmapView.onPause();
         }
-//        locationService.unregisterListener(myBDLocationListener);
-//        locationService.stop();
+        locationService.unregisterListener(myBDLocationListener);
+        locationService.stop();
     }
 }

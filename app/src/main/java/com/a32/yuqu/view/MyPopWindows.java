@@ -20,7 +20,7 @@ import android.widget.PopupWindow;
 public class MyPopWindows extends PopupWindow {
 
     private Context mContext;
-    private float mShowAlpha = 0.88f;
+    private float mShowAlpha = 0.5f;
     private Drawable mBackgroundDrawable;
 
     public MyPopWindows(Context context) {
