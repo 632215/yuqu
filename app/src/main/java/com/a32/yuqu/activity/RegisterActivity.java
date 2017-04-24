@@ -1,27 +1,55 @@
 package com.a32.yuqu.activity;
 
+import android.Manifest;
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.a32.yuqu.R;
 import com.a32.yuqu.base.BaseActivity;
 import com.a32.yuqu.utils.KeyBoardUtils;
 import com.a32.yuqu.utils.PhoneUtils;
+import com.a32.yuqu.utils.RandomUtil;
 import com.a32.yuqu.view.MyDialog;
 import com.a32.yuqu.view.MyPopWindows;
 import com.a32.yuqu.view.TopTitleBar;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.exceptions.HyphenateException;
+import com.hyphenate.util.FileUtils;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import butterknife.Bind;
+
+import static android.R.attr.path;
+import static com.a32.yuqu.utils.Utils.context;
 
 /**
  * Created by 32 on 2016/12/30.
@@ -54,7 +82,10 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
     /* 请求识别码 */
     private static final int CODE_GALLERY_REQUEST = 0xa0;
     private static final int CODE_CAMERA_REQUEST = 0xa1;
-    private static final int CODE_RESULT_REQUEST = 0xa2;
+    private static final int REQUESTCODE_CROP = 0xa2;
+    private String photoPathCamera = "";
+    private Uri photoPathAlbum;
+
     @Override
     protected int getContentViewId() {
         return R.layout.activity_register;
@@ -135,21 +166,195 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
                 errorTips.setVisibility(View.INVISIBLE);
                 break;
             case R.id.fromAlbum:
-
+                checkAlbumPermission();
                 break;
             case R.id.fromCamera:
+                checkCameraPermission();
                 break;
 
         }
     }
 
+    private void checkAlbumPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        } else {
+            album();
+        }
+    }
+
+
+    //检查权限
+    final int NEED_CAMERA = 200;
+
+    private void checkCameraPermission() {
+        //检测是否有相机和读写文件权限
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                this.requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, NEED_CAMERA);
+            }
+        } else {
+            camera();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                           int[] grantResults) {
+        switch (requestCode) {
+            case NEED_CAMERA:
+                // 如果权限被拒绝，grantResults 为空
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    camera();
+                } else {
+                    Toast.makeText(this, "请打开需要相机和读写文件权限", Toast.LENGTH_SHORT).show();
+                }
+                break;
+
+        }
+    }
+
+    //相机相册选择返回回调
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        super.onActivityResult(requestCode, resultCode, data);
+        Bitmap changedImage = null;
+        // 相机回调
+        switch (resultCode){
+            case CODE_CAMERA_REQUEST:
+
+                break;
+            case CODE_GALLERY_REQUEST:
+
+                break;
+            case REQUESTCODE_CROP:
+                break;
+        }
+    }
+
+    /**
+     *4.4以下系统处理图片的方法
+     * */
+    private void handleImageBeforeKitKat(Intent data) {
+        Uri uri = data.getData();
+        String imagePath = getImagePath(uri,null);
+        displayImage(imagePath);
+    }
+
+
+    /**
+     * 4.4及以上系统处理图片的方法
+     * */
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    private void handleImgeOnKitKat(Intent data) {
+        String imagePath = null;
+        Uri uri = data.getData();
+        if (DocumentsContract.isDocumentUri(this,uri)) {
+            //如果是document类型的uri，则通过document id处理
+            String docId = DocumentsContract.getDocumentId(uri);
+            if ("com.android.providers.media.documents".equals(uri.getAuthority())) {
+                //解析出数字格式的id
+                String id = docId.split(":")[1];
+                String selection = MediaStore.Images.Media._ID + "=" + id;
+                imagePath = getImagePath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,selection);
+            }else if ("com.android.providers.downloads.documents".equals(uri.getAuthority())) {
+                Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"),Long.valueOf(docId));
+                imagePath = getImagePath(contentUri,null);
+            }else if ("content".equalsIgnoreCase(uri.getScheme())) {
+                //如果是content类型的uri，则使用普通方式处理
+                imagePath = getImagePath(uri,null);
+            }else if ("file".equalsIgnoreCase(uri.getScheme())) {
+                //如果是file类型的uri，直接获取图片路径即可
+                imagePath = uri.getPath();
+            }
+            //根据图片路径显示图片
+            displayImage(imagePath);
+        }
+    }
+    /**
+     * 根据图片路径显示图片的方法
+     * */
+    private void displayImage(String imagePath) {
+        if (imagePath != null) {
+            Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
+            head.setImageBitmap(bitmap);
+        }else {
+
+        }
+    }
+
+    /**
+     * 通过uri和selection来获取真实的图片路径
+     * */
+    private String getImagePath(Uri uri,String selection) {
+        String path = null;
+        Cursor cursor = getContentResolver().query(uri,null,selection,null,null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+            }
+            cursor.close();
+        }
+        return path;
+    }
+
+
+    private void startPhotoZoom(Activity activity, Uri uri) {
+        Intent intent = new Intent("com.android.camera.action.CROP");
+        intent.setDataAndType(uri, "image/*");
+        // 下面这个crop=true是设置在开启的Intent中设置显示的VIEW可裁剪
+        intent.putExtra("crop", "true");
+        // aspectX aspectY 是宽高的比例
+        intent.putExtra("aspectX", 1);
+        intent.putExtra("aspectY", 1);
+        // outputX outputY 是裁剪图片宽高
+        intent.putExtra("outputX", 100);
+        intent.putExtra("outputY", 100);
+        intent.putExtra("scale", true);
+        intent.putExtra("return-data", false);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, photoPathAlbum);
+        intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
+        intent.putExtra("noFaceDetection", true);
+        activity.startActivityForResult(intent, REQUESTCODE_CROP);
+    }
+
+    //从相ce选取
+    private void album() {
+        Intent intent = new Intent("android.intent.action.GET_CONTENT");
+        intent.setType("image/*");
+        startActivityForResult(intent, CODE_GALLERY_REQUEST);
+    }
+
+
+    //从相机拍照
+    private void camera() {
+        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+        photoPathCamera = "/yuqu" + RandomUtil.getRandomFileName() + ".jpg";
+        File mCurrentPhotoFile = new File(photoPathCamera);
+        if (!mCurrentPhotoFile.exists()) {
+            try {
+                mCurrentPhotoFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mCurrentPhotoFile));
+        startActivityForResult(intent, CODE_CAMERA_REQUEST);
+    }
+
     private void startSelect() {
         morePopWindows = new MyPopWindows(this);
-        morePopWindows.setContentView(View.inflate(this,R.layout.picture_popuwindow,null));
-        morePopWindows.showAtLocation(registerLayout, Gravity.BOTTOM,0,0);
+        morePopWindows.setContentView(View.inflate(this, R.layout.picture_popuwindow, null));
+        morePopWindows.showAtLocation(registerLayout, Gravity.BOTTOM, 0, 0);
         View viewPopWindows = morePopWindows.getContentView();
-        fromAlbum= (TextView) viewPopWindows.findViewById(R.id.fromAlbum);
-        fromCamera= (TextView) viewPopWindows.findViewById(R.id.fromCamera);
+        fromAlbum = (TextView) viewPopWindows.findViewById(R.id.fromAlbum);
+        fromCamera = (TextView) viewPopWindows.findViewById(R.id.fromCamera);
         fromAlbum.setOnClickListener(this);
         fromCamera.setOnClickListener(this);
     }
