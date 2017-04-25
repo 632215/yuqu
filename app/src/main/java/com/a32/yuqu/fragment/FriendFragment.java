@@ -51,7 +51,7 @@ public class FriendFragment extends BaseFragment {
     ListView listView;
 
     //新的朋友
-    @Bind(R.id.newContact)
+    @Bind(R.id.newContactLayout)
     LinearLayout newContact;
 
     @Bind(R.id.tips)

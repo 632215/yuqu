@@ -10,9 +10,15 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.DocumentsContract;
@@ -20,6 +26,7 @@ import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -35,6 +42,7 @@ import com.a32.yuqu.base.BaseActivity;
 import com.a32.yuqu.utils.KeyBoardUtils;
 import com.a32.yuqu.utils.PhoneUtils;
 import com.a32.yuqu.utils.RandomUtil;
+import com.a32.yuqu.view.CircleImageView;
 import com.a32.yuqu.view.MyDialog;
 import com.a32.yuqu.view.MyPopWindows;
 import com.a32.yuqu.view.TopTitleBar;
@@ -44,6 +52,7 @@ import com.hyphenate.util.FileUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import butterknife.Bind;
@@ -74,7 +83,7 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
     @Bind(R.id.register_titlebar)
     TopTitleBar titleBar;
     @Bind(R.id.img_register_head)
-    ImageView head;
+    CircleImageView head;
 
     private MyPopWindows morePopWindows;//头像来源选择
     private TextView fromAlbum;
@@ -83,9 +92,8 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
     private static final int CODE_GALLERY_REQUEST = 0xa0;
     private static final int CODE_CAMERA_REQUEST = 0xa1;
     private static final int REQUESTCODE_CROP = 0xa2;
-    private String photoPathCamera = "";
-    private Uri photoPathAlbum;
-
+    private static String path = "/sdcard/yuqu/myHead/";// sd路径
+    private Bitmap bitmapHead;// 头像Bitmap
     @Override
     protected int getContentViewId() {
         return R.layout.activity_register;
@@ -167,9 +175,11 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
                 break;
             case R.id.fromAlbum:
                 checkAlbumPermission();
+                morePopWindows.dismiss();
                 break;
             case R.id.fromCamera:
                 checkCameraPermission();
+                morePopWindows.dismiss();
                 break;
 
         }
@@ -187,7 +197,6 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
 
     //检查权限
     final int NEED_CAMERA = 200;
-
     private void checkCameraPermission() {
         //检测是否有相机和读写文件权限
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
@@ -222,130 +231,127 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
     //相机相册选择返回回调
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
         super.onActivityResult(requestCode, resultCode, data);
-        Bitmap changedImage = null;
+        Log.i("xxxxx","xxxxxxxx ");
         // 相机回调
-        switch (resultCode){
+        switch (requestCode){
             case CODE_CAMERA_REQUEST:
-
+                Log.i("xxx","收到相机拍照返回");
+                File temp = new File(Environment.getExternalStorageDirectory() + "/head.jpg");
+                cropPhoto(Uri.fromFile(temp));// 裁剪图片
+                    cropPhoto(data.getData());// 裁剪图片
                 break;
             case CODE_GALLERY_REQUEST:
-
+                Log.i("xxx","收到相册返回");
+                cropPhoto(data.getData());// 裁剪图片
                 break;
             case REQUESTCODE_CROP:
+                Log.i("xxx","收到剪裁返回");
+                if (data != null) {
+                    Bundle extras = data.getExtras();
+                    bitmapHead = extras.getParcelable("data");
+                    if (bitmapHead != null) {
+                        /**
+                         * 上传服务器代码
+                         */
+                        setPicToView(bitmapHead);// 保存在SD卡中
+                        head.setImageBitmap(toRoundBitmap(bitmapHead));// 用ImageView显示出来
+                    }
+                }
                 break;
         }
     }
 
-    /**
-     *4.4以下系统处理图片的方法
-     * */
-    private void handleImageBeforeKitKat(Intent data) {
-        Uri uri = data.getData();
-        String imagePath = getImagePath(uri,null);
-        displayImage(imagePath);
-    }
+    /*保存图片到本地*/
+    private void setPicToView(Bitmap mBitmap) {
+        String sdStatus = Environment.getExternalStorageState();
+        if (!sdStatus.equals(Environment.MEDIA_MOUNTED)) { // 检测sd是否可用
+            return;
+        }
+        FileOutputStream b = null;
+        File file = new File(path);
+        file.mkdirs();// 创建文件夹
+        String fileName = path + "head.jpg";// 图片名字
+        try {
+            b = new FileOutputStream(fileName);
+            mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, b);// 把数据写入文件
 
-
-    /**
-     * 4.4及以上系统处理图片的方法
-     * */
-    @TargetApi(Build.VERSION_CODES.KITKAT)
-    private void handleImgeOnKitKat(Intent data) {
-        String imagePath = null;
-        Uri uri = data.getData();
-        if (DocumentsContract.isDocumentUri(this,uri)) {
-            //如果是document类型的uri，则通过document id处理
-            String docId = DocumentsContract.getDocumentId(uri);
-            if ("com.android.providers.media.documents".equals(uri.getAuthority())) {
-                //解析出数字格式的id
-                String id = docId.split(":")[1];
-                String selection = MediaStore.Images.Media._ID + "=" + id;
-                imagePath = getImagePath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,selection);
-            }else if ("com.android.providers.downloads.documents".equals(uri.getAuthority())) {
-                Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"),Long.valueOf(docId));
-                imagePath = getImagePath(contentUri,null);
-            }else if ("content".equalsIgnoreCase(uri.getScheme())) {
-                //如果是content类型的uri，则使用普通方式处理
-                imagePath = getImagePath(uri,null);
-            }else if ("file".equalsIgnoreCase(uri.getScheme())) {
-                //如果是file类型的uri，直接获取图片路径即可
-                imagePath = uri.getPath();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                // 关闭流
+                b.flush();
+                b.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            //根据图片路径显示图片
-            displayImage(imagePath);
-        }
-    }
-    /**
-     * 根据图片路径显示图片的方法
-     * */
-    private void displayImage(String imagePath) {
-        if (imagePath != null) {
-            Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
-            head.setImageBitmap(bitmap);
-        }else {
-
         }
     }
 
     /**
-     * 通过uri和selection来获取真实的图片路径
+     * 把bitmap转成圆形
      * */
-    private String getImagePath(Uri uri,String selection) {
-        String path = null;
-        Cursor cursor = getContentResolver().query(uri,null,selection,null,null);
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
-            }
-            cursor.close();
+    public Bitmap toRoundBitmap(Bitmap bitmap) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        int r = 0;
+        // 取最短边做边长
+        if (width < height) {
+            r = width;
+        } else {
+            r = height;
         }
-        return path;
+        // 构建一个bitmap
+        Bitmap backgroundBm = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        // new一个Canvas，在backgroundBmp上画图
+        Canvas canvas = new Canvas(backgroundBm);
+        Paint p = new Paint();
+        // 设置边缘光滑，去掉锯齿
+        p.setAntiAlias(true);
+        RectF rect = new RectF(0, 0, r, r);
+        // 通过制定的rect画一个圆角矩形，当圆角X轴方向的半径等于Y轴方向的半径时，
+        // 且都等于r/2时，画出来的圆角矩形就是圆形
+        canvas.drawRoundRect(rect, r / 2, r / 2, p);
+        // 设置当两个图形相交时的模式，SRC_IN为取SRC图形相交的部分，多余的将被去掉
+        p.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        // canvas将bitmap画在backgroundBmp上
+        canvas.drawBitmap(bitmap, null, rect, p);
+        return backgroundBm;
     }
-
-
-    private void startPhotoZoom(Activity activity, Uri uri) {
+    /**
+     * 调用系统的裁剪
+     *
+     * @param uri
+     */
+    public void cropPhoto(Uri uri) {
+        Log.i("xxx","进入剪裁");
         Intent intent = new Intent("com.android.camera.action.CROP");
         intent.setDataAndType(uri, "image/*");
-        // 下面这个crop=true是设置在开启的Intent中设置显示的VIEW可裁剪
         intent.putExtra("crop", "true");
         // aspectX aspectY 是宽高的比例
         intent.putExtra("aspectX", 1);
         intent.putExtra("aspectY", 1);
         // outputX outputY 是裁剪图片宽高
-        intent.putExtra("outputX", 100);
-        intent.putExtra("outputY", 100);
-        intent.putExtra("scale", true);
-        intent.putExtra("return-data", false);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, photoPathAlbum);
-        intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
-        intent.putExtra("noFaceDetection", true);
-        activity.startActivityForResult(intent, REQUESTCODE_CROP);
+        intent.putExtra("outputX", 150);
+        intent.putExtra("outputY", 150);
+        intent.putExtra("return-data", true);
+        startActivityForResult(intent, REQUESTCODE_CROP);
     }
 
     //从相ce选取
     private void album() {
-        Intent intent = new Intent("android.intent.action.GET_CONTENT");
-        intent.setType("image/*");
-        startActivityForResult(intent, CODE_GALLERY_REQUEST);
+        Intent intent1 = new Intent(Intent.ACTION_PICK, null);
+        intent1.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+        startActivityForResult(intent1, CODE_GALLERY_REQUEST);
     }
 
 
     //从相机拍照
     private void camera() {
-        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-        photoPathCamera = "/yuqu" + RandomUtil.getRandomFileName() + ".jpg";
-        File mCurrentPhotoFile = new File(photoPathCamera);
-        if (!mCurrentPhotoFile.exists()) {
-            try {
-                mCurrentPhotoFile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mCurrentPhotoFile));
-        startActivityForResult(intent, CODE_CAMERA_REQUEST);
+        Intent intent2 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        intent2.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(Environment.getExternalStorageDirectory(), "head.jpg")));
+        startActivityForResult(intent2, CODE_CAMERA_REQUEST);// 采用ForResult打开
     }
 
     private void startSelect() {
