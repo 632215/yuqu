@@ -23,6 +23,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -38,7 +39,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.a32.yuqu.R;
+import com.a32.yuqu.applicaption.MyApplicaption;
 import com.a32.yuqu.base.BaseActivity;
+import com.a32.yuqu.bean.UserBean;
+import com.a32.yuqu.http.HttpMethods;
+import com.a32.yuqu.http.HttpResult;
+import com.a32.yuqu.http.progress.ProgressSubscriber;
+import com.a32.yuqu.http.progress.SubscriberOnNextListener;
+import com.a32.yuqu.utils.FileUtil;
 import com.a32.yuqu.utils.KeyBoardUtils;
 import com.a32.yuqu.utils.PhoneUtils;
 import com.a32.yuqu.utils.RandomUtil;
@@ -46,14 +54,29 @@ import com.a32.yuqu.view.CircleImageView;
 import com.a32.yuqu.view.MyDialog;
 import com.a32.yuqu.view.MyPopWindows;
 import com.a32.yuqu.view.TopTitleBar;
+import com.google.gson.Gson;
+import com.handmark.pulltorefresh.library.internal.LoadingLayout;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.exceptions.HyphenateException;
 import com.hyphenate.util.FileUtils;
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.RequestParams;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import butterknife.Bind;
 
@@ -92,8 +115,9 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
     private static final int CODE_GALLERY_REQUEST = 0xa0;
     private static final int CODE_CAMERA_REQUEST = 0xa1;
     private static final int REQUESTCODE_CROP = 0xa2;
-    private static String path = "/sdcard/yuqu/myHead/";// sd路径
     private Bitmap bitmapHead;// 头像Bitmap
+    private String headPath;// 头像Bitmap
+
     @Override
     protected int getContentViewId() {
         return R.layout.activity_register;
@@ -153,9 +177,9 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
                     showToast("请设置用户名！");
                     return;
                 }
-                //post请求，如果成功怎保存用户信息到shareperference，转到登录界面
+                registerUser(headPath);
                 //如果失败怎显示错误
-                registAccount(phone.getText().toString().trim(), pwd.getText().toString().trim());
+//                registAccount(phone.getText().toString().trim(), pwd.getText().toString().trim());
                 break;
             case R.id.img_register_head:
                 startSelect();
@@ -183,6 +207,30 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
                 break;
 
         }
+    }
+
+    private void registerUser(String headPath) {
+        SubscriberOnNextListener onNextListener = new SubscriberOnNextListener<UserBean>() {
+            @Override
+            public void onNext(UserBean info) {
+                Log.i("xxx","xxxxxx");
+                if (info != null) {
+
+                } else {
+                }
+            }
+
+            @Override
+            public void onError(String Code, String Msg) {
+                showToast(Msg);
+            }
+        };
+        Map<String, String> map = new HashMap<>();
+        map.put("headPath", headPath);
+        map.put("phone", phone.getText().toString().trim());
+        map.put("password", pwd.getText().toString().trim());
+        map.put("name", name.getText().toString().trim());
+        HttpMethods.getInstance().userRegister(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, RegisterActivity.this, true), map);
     }
 
     private void checkAlbumPermission() {
@@ -239,7 +287,6 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
                 Log.i("xxx","收到相机拍照返回");
                 File temp = new File(Environment.getExternalStorageDirectory() + "/head.jpg");
                 cropPhoto(Uri.fromFile(temp));// 裁剪图片
-                    cropPhoto(data.getData());// 裁剪图片
                 break;
             case CODE_GALLERY_REQUEST:
                 Log.i("xxx","收到相册返回");
@@ -254,71 +301,14 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
                         /**
                          * 上传服务器代码
                          */
-                        setPicToView(bitmapHead);// 保存在SD卡中
-                        head.setImageBitmap(toRoundBitmap(bitmapHead));// 用ImageView显示出来
+                        headPath = FileUtil.savePic(bitmapHead);// 保存在SD卡中
+                        head.setImageBitmap(bitmapHead);
                     }
                 }
                 break;
         }
     }
 
-    /*保存图片到本地*/
-    private void setPicToView(Bitmap mBitmap) {
-        String sdStatus = Environment.getExternalStorageState();
-        if (!sdStatus.equals(Environment.MEDIA_MOUNTED)) { // 检测sd是否可用
-            return;
-        }
-        FileOutputStream b = null;
-        File file = new File(path);
-        file.mkdirs();// 创建文件夹
-        String fileName = path + "head.jpg";// 图片名字
-        try {
-            b = new FileOutputStream(fileName);
-            mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, b);// 把数据写入文件
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                // 关闭流
-                b.flush();
-                b.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * 把bitmap转成圆形
-     * */
-    public Bitmap toRoundBitmap(Bitmap bitmap) {
-        int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
-        int r = 0;
-        // 取最短边做边长
-        if (width < height) {
-            r = width;
-        } else {
-            r = height;
-        }
-        // 构建一个bitmap
-        Bitmap backgroundBm = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        // new一个Canvas，在backgroundBmp上画图
-        Canvas canvas = new Canvas(backgroundBm);
-        Paint p = new Paint();
-        // 设置边缘光滑，去掉锯齿
-        p.setAntiAlias(true);
-        RectF rect = new RectF(0, 0, r, r);
-        // 通过制定的rect画一个圆角矩形，当圆角X轴方向的半径等于Y轴方向的半径时，
-        // 且都等于r/2时，画出来的圆角矩形就是圆形
-        canvas.drawRoundRect(rect, r / 2, r / 2, p);
-        // 设置当两个图形相交时的模式，SRC_IN为取SRC图形相交的部分，多余的将被去掉
-        p.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        // canvas将bitmap画在backgroundBmp上
-        canvas.drawBitmap(bitmap, null, rect, p);
-        return backgroundBm;
-    }
     /**
      * 调用系统的裁剪
      *
