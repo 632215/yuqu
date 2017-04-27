@@ -1,65 +1,27 @@
 package com.a32.yuqu.http;
 
 /**
- * Created by liukun on 16/3/5.
+ * Created by 32 on 17/3/5.
  */
 public class HttpResult<T> {
-
-    private int total;
-    private String errcode;
-    private String sessionId;
-    private String userId;
-    private String errmsg;
-    private String pageInfo;
+    private String status;
+    private String msg ;
     private T data;
 
-    public String getPageInfo() {
-        return pageInfo;
+    public String getStatus() {
+        return status;
     }
 
-    public void setPageInfo(String pageInfo) {
-        this.pageInfo = pageInfo;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
-    public int getTotal() {
-        return total;
+    public String getMsg() {
+        return msg;
     }
 
-    public void setTotal(int total) {
-        this.total = total;
-    }
-
-    public String getSessionId() {
-        return sessionId;
-    }
-
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public int getErrcode() {
-
-        return Integer.parseInt(errcode);
-    }
-
-    public void setErrcode(String errcode) {
-        this.errcode = errcode;
-    }
-
-    public String getErrmsg() {
-        return errmsg;
-    }
-
-    public void setErrmsg(String errmsg) {
-        this.errmsg = errmsg;
+    public void setMsg(String msg) {
+        this.msg = msg;
     }
 
     public T getData() {
@@ -73,8 +35,8 @@ public class HttpResult<T> {
     @Override
     public String toString() {
         return "HttpResult{" +
-                "errcode=" + errcode +
-                ", errmsg='" + errmsg + '\'' +
+                "status=" + status +
+                ", msg='" + msg + '\'' +
                 ", data=" + data +
                 '}';
     }

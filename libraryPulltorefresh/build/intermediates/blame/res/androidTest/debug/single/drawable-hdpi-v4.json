@@ -8,19 +8,7 @@
         "source": "E:\\yuqu\\libraryPulltorefresh\\build\\intermediates\\bundles\\debug\\res\\drawable-hdpi-v4\\indicator_arrow.png"
     },
     {
-        "merged": "D:\\GitData\\yuqu\\libraryPulltorefresh\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-hdpi-v4\\default_ptr_rotate.png",
-        "source": "D:\\GitData\\yuqu\\libraryPulltorefresh\\build\\intermediates\\bundles\\debug\\res\\drawable-hdpi-v4\\default_ptr_rotate.png"
-    },
-    {
-        "merged": "D:\\GitData\\yuqu\\libraryPulltorefresh\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-hdpi-v4\\indicator_arrow.png",
-        "source": "D:\\GitData\\yuqu\\libraryPulltorefresh\\build\\intermediates\\bundles\\debug\\res\\drawable-hdpi-v4\\indicator_arrow.png"
-    },
-    {
         "merged": "E:\\yuqu\\libraryPulltorefresh\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-hdpi-v4\\default_ptr_flip.png",
         "source": "E:\\yuqu\\libraryPulltorefresh\\build\\intermediates\\bundles\\debug\\res\\drawable-hdpi-v4\\default_ptr_flip.png"
-    },
-    {
-        "merged": "D:\\GitData\\yuqu\\libraryPulltorefresh\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-hdpi-v4\\default_ptr_flip.png",
-        "source": "D:\\GitData\\yuqu\\libraryPulltorefresh\\build\\intermediates\\bundles\\debug\\res\\drawable-hdpi-v4\\default_ptr_flip.png"
     }
 ]

@@ -23,8 +23,8 @@ public class ApiException extends RuntimeException {
     public static final int INTERNALAPICALLERROR = 3001;
 
 
-    public ApiException(int resultCode, String msg) {
-        getApiExceptionMessage(resultCode);
+    public ApiException(String state, String msg) {
+        getApiExceptionMessage(msg);
     }
 
 
@@ -32,10 +32,10 @@ public class ApiException extends RuntimeException {
      * 由于服务器传递过来的错误信息直接给用户看的话，用户未必能够理解
      * 需要根据错误码对错误信息进行一个转换，在显示给用户
      *
-     * @param code
+     * @param msg
      * @return
      */
-    private static void getApiExceptionMessage(int code) {
+    private static void getApiExceptionMessage(String msg) {
 
     }
 

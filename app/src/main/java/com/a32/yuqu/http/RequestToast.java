@@ -16,6 +16,6 @@ public class RequestToast extends Handler {
     public void handleMessage(Message msg) {
         super.handleMessage(msg);
         HttpResult httpResult= (HttpResult) msg.obj;
-        Toast.makeText(MyApplicaption.getInstance(),httpResult.getErrmsg(),Toast.LENGTH_SHORT).show();
+        Toast.makeText(MyApplicaption.getInstance(),httpResult.getMsg(),Toast.LENGTH_SHORT).show();
     }
 }

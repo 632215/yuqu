@@ -25,7 +25,7 @@ import java.util.Map;
  */
 
 public class MyApplicaption extends Application {
-
+    public static String Tag ="32tag";
     public static Context applicationContext;
     private static MyApplicaption instance;
     private String username = "";

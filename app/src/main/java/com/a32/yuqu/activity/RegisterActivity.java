@@ -55,6 +55,7 @@ import com.a32.yuqu.view.MyDialog;
 import com.a32.yuqu.view.MyPopWindows;
 import com.a32.yuqu.view.TopTitleBar;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.handmark.pulltorefresh.library.internal.LoadingLayout;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.exceptions.HyphenateException;
@@ -66,6 +67,8 @@ import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -81,6 +84,7 @@ import java.util.TreeMap;
 import butterknife.Bind;
 
 import static android.R.attr.path;
+import static com.a32.yuqu.R.string.map;
 import static com.a32.yuqu.utils.Utils.context;
 
 /**
@@ -213,15 +217,12 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
         SubscriberOnNextListener onNextListener = new SubscriberOnNextListener<UserBean>() {
             @Override
             public void onNext(UserBean info) {
-                Log.i("xxx","xxxxxx");
-                if (info != null) {
-
-                } else {
-                }
+                Log.i(MyApplicaption.Tag,"xxxxxx");
             }
 
             @Override
             public void onError(String Code, String Msg) {
+                Log.i(MyApplicaption.Tag,"fffffff");
                 showToast(Msg);
             }
         };
@@ -230,6 +231,8 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
         map.put("phone", phone.getText().toString().trim());
         map.put("password", pwd.getText().toString().trim());
         map.put("name", name.getText().toString().trim());
+//        JSONObject jsonObject =new JSONObject(map);
+//        HttpMethods.getInstance().userRegister(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, RegisterActivity.this, true), jsonObject);
         HttpMethods.getInstance().userRegister(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, RegisterActivity.this, true), map);
     }
 

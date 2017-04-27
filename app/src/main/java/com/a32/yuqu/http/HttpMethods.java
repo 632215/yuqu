@@ -2,8 +2,13 @@ package com.a32.yuqu.http;
 
 
 import android.os.Message;
+import android.util.Log;
 
+import com.a32.yuqu.applicaption.MyApplicaption;
 import com.a32.yuqu.bean.UserBean;
+import com.google.gson.Gson;
+
+import org.json.JSONObject;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -78,11 +83,12 @@ public class HttpMethods {
 
         @Override
         public T call(HttpResult<T> httpResult) {
-            if (httpResult.getErrcode() != 1) {
+            Log.i(MyApplicaption.Tag+"httpResult",httpResult.getStatus());
+            if (httpResult.getStatus().equals(true) ) {
                 Message message = new Message();
                 message.obj = httpResult;
                 requestToast.sendMessage(message);
-                throw new ApiException(httpResult.getErrcode(), httpResult.getErrmsg());
+                throw new ApiException(httpResult.getStatus(), httpResult.getMsg());
             } else {
                 Message message = new Message();
                 message.obj = httpResult;
@@ -96,10 +102,12 @@ public class HttpMethods {
      * 注册
      *
      * @param subscriber
-     * @param map
+     * @param gson
      */
-    public void userRegister(Subscriber<HttpResult<UserBean>> subscriber, Map<String, String> map) {
-        Observable observable = movieService.userRegister(map);
+//    public void userRegister(Subscriber<HttpResult<UserBean>> subscriber, JSONObject gson) {
+//        Observable observable = movieService.userRegister(gson);
+    public void userRegister(Subscriber<HttpResult<UserBean>> subscriber, Map<String ,String > gson) {
+        Observable observable = movieService.userRegister(gson);
         toSubscribe(observable, subscriber);
     }
 }

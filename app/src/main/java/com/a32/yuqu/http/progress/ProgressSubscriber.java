@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.a32.yuqu.applicaption.MyApplicaption;
 import com.a32.yuqu.http.HttpResult;
 
 import java.net.ConnectException;
@@ -90,10 +91,11 @@ public class ProgressSubscriber<T> extends Subscriber<T> implements ProgressCanc
     public void onNext(T t) {
         HttpResult httpResult = (HttpResult) t;
         if (mSubscriberOnNextListener != null) {
-            if (httpResult.getErrcode() == 1) {
+            Log.i(MyApplicaption.Tag,httpResult.getStatus()+"xxxxxxxxxxxxxx");
+            if (httpResult.getStatus().equals(true)) {
                 mSubscriberOnNextListener.onNext(httpResult.getData());
             } else {
-                mSubscriberOnNextListener.onError(httpResult.getErrcode() + "", httpResult.getErrmsg());
+                mSubscriberOnNextListener.onError(httpResult.getStatus() + "", httpResult.getMsg());
             }
         }
     }
