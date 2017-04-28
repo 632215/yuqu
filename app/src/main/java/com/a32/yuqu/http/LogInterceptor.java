@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.a32.yuqu.applicaption.MyApplicaption;
 
+
 import java.io.IOException;
 
 import okhttp3.Interceptor;
@@ -25,7 +26,7 @@ public class LogInterceptor implements Interceptor {
 //        LogUtils.i(String.format(Locale.getDefault(), "Received response for %s in %.1fms%n%s", response.request().url(), (t2 - t1) / 1e6d, response.headers()));
         okhttp3.MediaType mediaType = response.body().contentType();
         String content = response.body().string();
-        Log.i(MyApplicaption.Tag, content);
+        Log.i(MyApplicaption.Tag +"content:", content);
         return response.newBuilder()
                 .body(okhttp3.ResponseBody.create(mediaType, content))
                 .build();

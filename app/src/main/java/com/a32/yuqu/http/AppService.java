@@ -24,5 +24,5 @@ public interface AppService {
 //    Observable<HttpResult<UserBean>> userRegister(@Body JSONObject gson);
     @FormUrlEncoded
     @POST("reigist.php")
-    Observable<HttpResult<UserBean>> userRegister(@FieldMap Map<String, String> map);
+    Observable<HttpResult<UserBean>> userRegister(@FieldMap Map<String, String> mapgson);
 }

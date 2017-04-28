@@ -1,40 +1,22 @@
 package com.a32.yuqu.activity;
 
 import android.Manifest;
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
-import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,43 +31,18 @@ import com.a32.yuqu.http.progress.SubscriberOnNextListener;
 import com.a32.yuqu.utils.FileUtil;
 import com.a32.yuqu.utils.KeyBoardUtils;
 import com.a32.yuqu.utils.PhoneUtils;
-import com.a32.yuqu.utils.RandomUtil;
 import com.a32.yuqu.view.CircleImageView;
 import com.a32.yuqu.view.MyDialog;
 import com.a32.yuqu.view.MyPopWindows;
 import com.a32.yuqu.view.TopTitleBar;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.handmark.pulltorefresh.library.internal.LoadingLayout;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.exceptions.HyphenateException;
-import com.hyphenate.util.FileUtils;
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.RequestParams;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import butterknife.Bind;
-
-import static android.R.attr.path;
-import static com.a32.yuqu.R.string.map;
-import static com.a32.yuqu.utils.Utils.context;
 
 /**
  * Created by 32 on 2016/12/30.
@@ -120,7 +77,7 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
     private static final int CODE_CAMERA_REQUEST = 0xa1;
     private static final int REQUESTCODE_CROP = 0xa2;
     private Bitmap bitmapHead;// 头像Bitmap
-    private String headPath;// 头像Bitmap
+    private String headPath="";// 头像Bitmap
 
     @Override
     protected int getContentViewId() {
@@ -215,6 +172,7 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
 
     private void registerUser(String headPath) {
         SubscriberOnNextListener onNextListener = new SubscriberOnNextListener<UserBean>() {
+
             @Override
             public void onNext(UserBean info) {
                 Log.i(MyApplicaption.Tag,"xxxxxx");
@@ -233,7 +191,7 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
         map.put("name", name.getText().toString().trim());
 //        JSONObject jsonObject =new JSONObject(map);
 //        HttpMethods.getInstance().userRegister(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, RegisterActivity.this, true), jsonObject);
-        HttpMethods.getInstance().userRegister(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, RegisterActivity.this, true), map);
+        HttpMethods.getInstance().userRegister(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, this, false), map);
     }
 
     private void checkAlbumPermission() {

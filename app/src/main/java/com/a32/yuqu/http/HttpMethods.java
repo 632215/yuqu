@@ -30,6 +30,7 @@ import rx.schedulers.Schedulers;
 public class HttpMethods {
 
     public static final String BASE_URL = "http://weis.tunnel.qydev.com/";
+//    public static final String BASE_URL = "http://mml.jinke-live.com:8080/Cruiselchcs/";//测试
 
     private static final int DEFAULT_TIMEOUT = 120;
     private RequestToast requestToast;
@@ -68,6 +69,7 @@ public class HttpMethods {
     }
 
     private <T> void toSubscribe(Observable<T> o, Subscriber<T> s) {
+        Log.i(MyApplicaption.Tag," toSubscribe");
         o.subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -83,12 +85,11 @@ public class HttpMethods {
 
         @Override
         public T call(HttpResult<T> httpResult) {
-            Log.i(MyApplicaption.Tag+"httpResult",httpResult.getStatus());
-            if (httpResult.getStatus().equals(true) ) {
+            if (httpResult.getStatus().equals(false)) {
                 Message message = new Message();
                 message.obj = httpResult;
                 requestToast.sendMessage(message);
-                throw new ApiException(httpResult.getStatus(), httpResult.getMsg());
+                throw new ApiException(String.valueOf(httpResult.getStatus()), httpResult.getMsg());
             } else {
                 Message message = new Message();
                 message.obj = httpResult;
