@@ -20,9 +20,14 @@ import static com.hyphenate.cloud.EMHttpClient.POST;
  * Created by liukun on 16/3/9.
  */
 public interface AppService {
-    //    @POST("reigist.php")
-//    Observable<HttpResult<UserBean>> userRegister(@Body JSONObject gson);
+    //注册
     @FormUrlEncoded
     @POST("reigist.php")
     Observable<HttpResult<UserBean>> userRegister(@FieldMap Map<String, String> mapgson);
+
+    //上传图片
+    @FormUrlEncoded
+    @POST("uploadHead.php")
+    Observable<HttpResult<UserBean>> uploadHead(@FieldMap Map<String, String> mapgson);
+
 }

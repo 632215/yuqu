@@ -10,11 +10,16 @@ import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Converter;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -28,11 +33,9 @@ import rx.schedulers.Schedulers;
  * Created by liukun on 16/3/9.
  */
 public class HttpMethods {
-
     public static final String BASE_URL = "http://weis.tunnel.qydev.com/";
-//    public static final String BASE_URL = "http://mml.jinke-live.com:8080/Cruiselchcs/";//测试
 
-    private static final int DEFAULT_TIMEOUT = 120;
+    private static final int DEFAULT_TIMEOUT = 520;
     private RequestToast requestToast;
     private Retrofit retrofit;
     private AppService movieService;
@@ -50,6 +53,7 @@ public class HttpMethods {
 
         retrofit = new Retrofit.Builder()
                 .client(builder.build())
+//                .addConverterFactory(new NullOnEmptyConverterFactory())
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .baseUrl(BASE_URL)
@@ -99,16 +103,42 @@ public class HttpMethods {
         }
     }
 
+
+
+    public class NullOnEmptyConverterFactory extends Converter.Factory {
+
+        @Override
+        public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit) {
+            final Converter<ResponseBody, ?> delegate = retrofit.nextResponseBodyConverter(this, type, annotations);
+            return new Converter<ResponseBody,Object>() {
+                @Override
+                public Object convert(ResponseBody body) throws IOException {
+                    if (body.contentLength() == 0) return null;
+                    return delegate.convert(body);
+                }
+            };
+        }
+    }
     /**
      * 注册
      *
      * @param subscriber
      * @param gson
      */
-//    public void userRegister(Subscriber<HttpResult<UserBean>> subscriber, JSONObject gson) {
-//        Observable observable = movieService.userRegister(gson);
     public void userRegister(Subscriber<HttpResult<UserBean>> subscriber, Map<String ,String > gson) {
         Observable observable = movieService.userRegister(gson);
         toSubscribe(observable, subscriber);
     }
+
+    /**
+     * 上传图片
+     *
+     * @param subscriber
+     * @param gson
+     */
+    public void uploadHead(Subscriber<HttpResult<UserBean>> subscriber, Map<String ,String > gson) {
+        Observable observable = movieService.uploadHead(gson);
+        toSubscribe(observable, subscriber);
+    }
+
 }

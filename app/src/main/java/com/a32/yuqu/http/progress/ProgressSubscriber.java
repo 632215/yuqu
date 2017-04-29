@@ -73,6 +73,8 @@ public class ProgressSubscriber<T> extends Subscriber<T> implements ProgressCanc
     @Override
     public void onError(Throwable e) {
         Log.i(MyApplicaption.Tag,"创建onError");
+        Log.i(MyApplicaption.Tag,e.getMessage());
+
         if (e instanceof SocketTimeoutException) {
             Toast.makeText(context, "网络中断，请检查您的网络状态", Toast.LENGTH_SHORT).show();
         } else if (e instanceof ConnectException) {
@@ -93,8 +95,7 @@ public class ProgressSubscriber<T> extends Subscriber<T> implements ProgressCanc
         Log.i(MyApplicaption.Tag,"创建onNext");
         HttpResult httpResult = (HttpResult) t;
         if (mSubscriberOnNextListener != null) {
-            Log.i(MyApplicaption.Tag,httpResult.getStatus()+"xxxxxxxxxxxxxx");
-            if (httpResult.getStatus().equals(true)) {
+            if (httpResult.getStatus().equals("true")) {
                 mSubscriberOnNextListener.onNext(httpResult.getData());
             } else {
                 mSubscriberOnNextListener.onError(httpResult.getStatus() + "", httpResult.getMsg());

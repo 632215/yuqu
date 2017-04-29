@@ -5,7 +5,7 @@ package com.a32.yuqu.http;
  */
 public class HttpResult<T> {
     private String status;
-    private String msg ;
+    private String message ;
     private T data;
 
     public String getStatus() {
@@ -16,11 +16,11 @@ public class HttpResult<T> {
     }
 
     public String getMsg() {
-        return msg;
+        return message;
     }
 
     public void setMsg(String msg) {
-        this.msg = msg;
+        this.message = msg;
     }
 
     public T getData() {
@@ -35,7 +35,7 @@ public class HttpResult<T> {
     public String toString() {
         return "HttpResult{" +
                 "status=" + status +
-                ", msg='" + msg + '\'' +
+                ", msg='" + message + '\'' +
                 ", data=" + data +
                 '}';
     }

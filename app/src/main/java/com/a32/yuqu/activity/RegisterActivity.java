@@ -37,6 +37,12 @@ import com.a32.yuqu.view.MyPopWindows;
 import com.a32.yuqu.view.TopTitleBar;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.exceptions.HyphenateException;
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.RequestParams;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest;
 
 import java.io.File;
 import java.util.HashMap;
@@ -77,7 +83,8 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
     private static final int CODE_CAMERA_REQUEST = 0xa1;
     private static final int REQUESTCODE_CROP = 0xa2;
     private Bitmap bitmapHead;// 头像Bitmap
-    private String headPath="";// 头像Bitmap
+    private String headPath = "";// 头像Bitmap
+    private String tempPath = Environment.getExternalStorageDirectory() + "/head.jpg";
 
     @Override
     protected int getContentViewId() {
@@ -139,8 +146,6 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
                     return;
                 }
                 registerUser(headPath);
-                //如果失败怎显示错误
-//                registAccount(phone.getText().toString().trim(), pwd.getText().toString().trim());
                 break;
             case R.id.img_register_head:
                 startSelect();
@@ -170,17 +175,23 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
         }
     }
 
-    private void registerUser(String headPath) {
+    private void registerUser(final String headPath) {
         SubscriberOnNextListener onNextListener = new SubscriberOnNextListener<UserBean>() {
 
             @Override
             public void onNext(UserBean info) {
-                Log.i(MyApplicaption.Tag,"xxxxxx");
+                /**
+                 * 上传服务器
+                 */
+                if (!headPath.equals("")) {
+                    uploadHead(headPath);
+                }
+                //在本地注册成功，在环信服务器上注册相同账户
+                registAccount(phone.getText().toString().trim(), pwd.getText().toString().trim());
             }
 
             @Override
             public void onError(String Code, String Msg) {
-                Log.i(MyApplicaption.Tag,"fffffff");
                 showToast(Msg);
             }
         };
@@ -189,10 +200,32 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
         map.put("phone", phone.getText().toString().trim());
         map.put("password", pwd.getText().toString().trim());
         map.put("name", name.getText().toString().trim());
-//        JSONObject jsonObject =new JSONObject(map);
-//        HttpMethods.getInstance().userRegister(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, RegisterActivity.this, true), jsonObject);
-        HttpMethods.getInstance().userRegister(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, this, false), map);
+        HttpMethods.getInstance().userRegister(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, this, true), map);
     }
+
+    private void uploadHead(String headPath) {
+        final RequestParams params = new RequestParams();
+        params.addBodyParameter("head", new File(headPath));
+        params.addBodyParameter("headPath", headPath);
+        HttpUtils http = new HttpUtils(200000);
+
+        http.send(HttpRequest.HttpMethod.POST,
+                HttpMethods.BASE_URL + "uploadHead.php",
+                params, new RequestCallBack<String>() {
+                    @Override
+                    public void onSuccess(ResponseInfo<String> responseInfo) {
+                        Log.i(MyApplicaption.Tag,"onSuccess");
+
+                    }
+
+                    @Override
+                    public void onFailure(HttpException error, String msg) {
+                        Log.i(MyApplicaption.Tag,"onFailure");
+
+                    }
+                });
+    }
+
 
     private void checkAlbumPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -206,6 +239,7 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
 
     //检查权限
     final int NEED_CAMERA = 200;
+
     private void checkCameraPermission() {
         //检测是否有相机和读写文件权限
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
@@ -241,28 +275,29 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.i("xxxxx","xxxxxxxx ");
+        Log.i("xxxxx", "xxxxxxxx ");
         // 相机回调
-        switch (requestCode){
+        switch (requestCode) {
             case CODE_CAMERA_REQUEST:
-                Log.i("xxx","收到相机拍照返回");
-                File temp = new File(Environment.getExternalStorageDirectory() + "/head.jpg");
+                Log.i(MyApplicaption.Tag, "收到相机拍照返回");
+                File temp = new File(tempPath);
                 cropPhoto(Uri.fromFile(temp));// 裁剪图片
                 break;
             case CODE_GALLERY_REQUEST:
-                Log.i("xxx","收到相册返回");
+                Log.i(MyApplicaption.Tag, "收到相册返回");
                 cropPhoto(data.getData());// 裁剪图片
                 break;
             case REQUESTCODE_CROP:
-                Log.i("xxx","收到剪裁返回");
+                Log.i(MyApplicaption.Tag, "收到剪裁返回");
                 if (data != null) {
                     Bundle extras = data.getExtras();
                     bitmapHead = extras.getParcelable("data");
                     if (bitmapHead != null) {
                         /**
-                         * 上传服务器代码
+                         * 保存本地
                          */
-                        headPath = FileUtil.savePic(bitmapHead);// 保存在SD卡中
+                        headPath = FileUtil.savePic(bitmapHead, tempPath);// 保存在SD卡中
+                        Log.i(MyApplicaption.Tag, "headPath" + headPath);
                         head.setImageBitmap(bitmapHead);
                     }
                 }
@@ -276,7 +311,7 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
      * @param uri
      */
     public void cropPhoto(Uri uri) {
-        Log.i("xxx","进入剪裁");
+        Log.i("xxx", "进入剪裁");
         Intent intent = new Intent("com.android.camera.action.CROP");
         intent.setDataAndType(uri, "image/*");
         intent.putExtra("crop", "true");
