@@ -24,7 +24,7 @@ import java.util.Date;
  */
 
 public class FileUtil {
-    private static String path =Environment.getExternalStorageDirectory() + "/sdcard/yuqu/myHead/";// sd路径
+    private static String path = Environment.getExternalStorageDirectory() + "/yuqu/myHead/";// sd路径
     private static String fileName="";
 
     /*保存图片到本地*/
@@ -36,10 +36,10 @@ public class FileUtil {
         FileOutputStream b = null;
         File file = new File(path);
         file.mkdirs();// 创建文件夹
-        fileName = path + getNewFileName() + "head.jpg";// 图片名字
+        fileName = getNewFileName() + "head.jpg";// 图片名字
         Log.i(MyApplicaption.Tag,fileName);
         try {
-            b = new FileOutputStream(fileName);
+            b = new FileOutputStream(path+fileName);
             mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, b);// 把数据写入文件
 
         } catch (FileNotFoundException e) {
@@ -84,5 +84,20 @@ public class FileUtil {
             return file.delete();
         }
         return false;
+    }
+
+    //判断文件是否存在
+    public static boolean fileIsExists(String name){
+        try{
+            File f=new File(path+name);
+            if(!f.exists()){
+                return false;
+            }
+
+        }catch (Exception e) {
+            // TODO: handle exception
+            return false;
+        }
+        return true;
     }
 }

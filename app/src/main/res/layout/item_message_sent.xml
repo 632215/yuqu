@@ -20,15 +20,14 @@
         android:paddingLeft="10dp"
         android:paddingRight="10dp">
 
-        <ImageView
+        <com.a32.yuqu.view.CircleImageView
             android:id="@+id/iv_userhead"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="5dp"
-            android:background="@mipmap/head"
-            android:scaleType="fitXY" />
+            android:src="@mipmap/head" />
 
         <TextView
             android:id="@+id/tv_chatcontent"

@@ -2,17 +2,20 @@ package com.a32.yuqu.activity;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Environment;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,6 +23,7 @@ import android.widget.Toast;
 import com.a32.yuqu.R;
 import com.a32.yuqu.applicaption.MyApplicaption;
 import com.a32.yuqu.base.BaseActivity;
+import com.a32.yuqu.bean.UserInfo;
 import com.a32.yuqu.db.EaseUser;
 import com.a32.yuqu.db.InviteMessage;
 import com.a32.yuqu.db.InviteMessgeDao;
@@ -28,6 +32,13 @@ import com.a32.yuqu.fragment.DynamicFragment;
 import com.a32.yuqu.fragment.FriendFragment;
 import com.a32.yuqu.fragment.NewsFragment;
 import com.a32.yuqu.fragment.WhereFragment;
+import com.a32.yuqu.http.HttpMethods;
+import com.a32.yuqu.http.HttpResult;
+import com.a32.yuqu.http.progress.ProgressSubscriber;
+import com.a32.yuqu.http.progress.SubscriberOnNextListener;
+import com.a32.yuqu.utils.CommonUtils;
+import com.a32.yuqu.utils.CommonlyUtils;
+import com.a32.yuqu.view.CircleImageView;
 import com.a32.yuqu.view.MaterialDialog;
 import com.a32.yuqu.view.MyPopWindows;
 import com.a32.yuqu.view.MyToolbar;
@@ -49,21 +60,20 @@ public class MainActivity extends BaseActivity
     private FriendFragment friendFragment;
     private WhereFragment whereFragment;
     private DynamicFragment dynamicFragment;
+    private LinearLayout headerLayout;//侧边栏控件赋值
+    private ImageView imgHead;
+    private TextView tvName;
+
     //两次点击退出程序
     private long exitTime = 0;
-
     //底部的切换栏
     FragmentTransaction transaction;
-
     @Bind(R.id.toolbar)
     MyToolbar toolbar;
-
     @Bind(R.id.drawer_layout)
     DrawerLayout drawer;
-
     @Bind(R.id.nav_view)//导航菜单
     NavigationView navigationView;
-
     @Bind(R.id.radiogroup)
     RadioGroup radioGroup;
     private  MyPopWindows morePopWindows;//右上角弹出框
@@ -93,12 +103,44 @@ public class MainActivity extends BaseActivity
         toolbar.setOnSiderbarCallback(this);
         toolbar.setOnMoreCallback(this);
         navigationView.setNavigationItemSelectedListener(this);
-
+        initLeft();//初始化左侧控件
+        getUserInfo();//初始化左侧的基本信息
         mfragmentManager = getFragmentManager();
         transaction = mfragmentManager.beginTransaction();
         setDefaultRadio();
         radioGroup.setOnCheckedChangeListener(this);
         initUser();
+    }
+
+    private void initLeft() {
+        headerLayout = (LinearLayout) navigationView.getHeaderView(0);
+        imgHead = (CircleImageView) headerLayout.findViewById(R.id.imgHead);
+        tvName = (TextView) headerLayout.findViewById(R.id.tvName);
+    }
+
+    private void getUserInfo() {
+        SubscriberOnNextListener onNextListener = new SubscriberOnNextListener<UserInfo>() {
+            @Override
+            public void onNext(UserInfo info) {
+                Log.i(MyApplicaption.Tag,"onNext");
+                if (info!=null){
+                    tvName.setText(info.getUserName());
+                    Bitmap head = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory() + "/yuqu/myHead/"+info.getUserHead());
+                    imgHead.setImageBitmap(head);
+                    UserInfo userInfo=CommonlyUtils.getUserInfo(MainActivity.this);
+                    userInfo.setUserHead(info.getUserHead());
+                    CommonlyUtils.saveUserInfo(MainActivity.this,userInfo);
+                }
+            }
+
+            @Override
+            public void onError(String Msg) {
+                Log.i(MyApplicaption.Tag,"Msg:"+Msg);
+            }
+        };
+        Map<String, String> map = new HashMap<>();
+        map.put("phone", CommonlyUtils.getUserInfo(this).getUserPhone());
+        HttpMethods.getInstance().getUserInfo(new ProgressSubscriber<HttpResult<UserInfo>>(onNextListener, this, false), map);
     }
 
     private TextView addFriend;
@@ -167,7 +209,7 @@ public class MainActivity extends BaseActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_setting) {
-
+            startActivity(new Intent(this, PersonSetActivity.class));
         } else if (id == R.id.nav_exit) {
             accountExit();
         } else if (id == R.id.nav_about) {
@@ -230,7 +272,7 @@ public class MainActivity extends BaseActivity
             exitTime = System.currentTimeMillis();
         } else {
             accountExit();
-            System.exit(0);
+//            System.exit(0);
         }
     }
 
@@ -245,6 +287,7 @@ public class MainActivity extends BaseActivity
                 MyApplicaption.getInstance().logout(true, new EMCallBack() {
                     @Override
                     public void onSuccess() {
+                        CommonlyUtils.clearUserInfo(MainActivity.this);
                         startActivity(new Intent(MainActivity.this, LoginActivity.class));
                         finish();
                     }

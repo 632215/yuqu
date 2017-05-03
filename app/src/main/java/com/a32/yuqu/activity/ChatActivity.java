@@ -1,18 +1,27 @@
 package com.a32.yuqu.activity;
 
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.a32.yuqu.R;
 import com.a32.yuqu.adapter.MessageAdapter;
+import com.a32.yuqu.applicaption.MyApplicaption;
 import com.a32.yuqu.base.BaseActivity;
+import com.a32.yuqu.bean.UserBean;
+import com.a32.yuqu.bean.UserInfo;
+import com.a32.yuqu.http.HttpMethods;
+import com.a32.yuqu.http.HttpResult;
+import com.a32.yuqu.http.progress.ProgressSubscriber;
+import com.a32.yuqu.http.progress.SubscriberOnNextListener;
 import com.a32.yuqu.utils.CommonUtils;
+import com.a32.yuqu.utils.CommonlyUtils;
 import com.a32.yuqu.utils.Constant;
+import com.a32.yuqu.utils.KeyBoardUtils;
 import com.a32.yuqu.view.TopTitleBar;
 import com.hyphenate.EMMessageListener;
 import com.hyphenate.chat.EMClient;
@@ -20,27 +29,23 @@ import com.hyphenate.chat.EMConversation;
 import com.hyphenate.chat.EMMessage;
 import com.hyphenate.chat.EMMessage.ChatType;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.Bind;
 
 public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitleBarCallback {
     @Bind(R.id.listView)
     ListView listView;
-
     @Bind(R.id.btn_send)
     Button btn_send;
-
     @Bind(R.id.titleBar)
     TopTitleBar titleBar;
-
-    private String toChatUsername;
-
     @Bind(R.id.et_content)
     EditText et_content;
-
+    private String toChatUsername="";//实际上是指用户电话号码
     private int chatType = 1;
-
     private List<EMMessage> msgList;
     private EMConversation conversation;
     protected int pagesize = 20;
@@ -53,12 +58,14 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
 
     @Override
     protected void initView() {
-        toChatUsername = this.getIntent().getStringExtra("username");
-        titleBar.setTitle(toChatUsername);
-        titleBar.setOnTopTitleBarCallback(this);
+//        toChatUsername = this.getIntent().getStringExtra("username");
+//        getheadPath(toChatUsername);//根据用户手机号码获取用户其他信息
+        toChatUsername = CommonlyUtils.getObjectUser().getUserPhone();
         getAllMessage();
+        titleBar.setTitle(CommonlyUtils.getObjectUser().getUserName());
+        titleBar.setOnTopTitleBarCallback(ChatActivity.this);
         msgList = conversation.getAllMessages();
-        messageAdapter = new MessageAdapter(msgList, ChatActivity.this);
+        messageAdapter = new MessageAdapter(msgList, ChatActivity.this,toChatUsername);
         listView.setAdapter(messageAdapter);
         listView.setSelection(listView.getCount() - 1);
         btn_send.setOnClickListener(new OnClickListener() {
@@ -67,10 +74,10 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
             public void onClick(View v) {
                 String content = et_content.getText().toString().trim();
                 if (TextUtils.isEmpty(content)) {
-
                     return;
                 }
                 setMesaage(content);
+                KeyBoardUtils.closeKeybord(et_content,ChatActivity.this);
             }
 
         });
@@ -78,9 +85,27 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
 
     }
 
+//    private void getheadPath(String phone) {
+//        SubscriberOnNextListener onNextListener = new SubscriberOnNextListener<UserBean>() {
+//            @Override
+//            public void onNext(UserBean info) {
+//                Log.i(MyApplicaption.Tag,"info--"+info.getName()+"----"+info.getHead());
+//                if (info != null){
+//
+//                }
+//            }
+//
+//            @Override
+//            public void onError( String Msg) {
+//            }
+//        };
+//        Map<String, String> map = new HashMap<>();
+//        map.put("phone",phone);
+//        HttpMethods.getInstance().getheadPath(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, this, false), map);
+//    }
+
     protected void getAllMessage() {
         // 获取当前conversation对象
-
         conversation = EMClient.getInstance().chatManager().getConversation(toChatUsername,
                 CommonUtils.getConversationType(chatType), true);
         // 把此会话的未读数置为0
@@ -96,6 +121,7 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
             }
             conversation.loadMoreMsgFromDB(msgId, pagesize - msgCount);
         }
+        Log.i(MyApplicaption.Tag,"msgs"+msgs.size());
     }
 
     private void setMesaage(String content) {

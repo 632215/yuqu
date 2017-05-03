@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.a32.yuqu.applicaption.MyApplicaption;
 import com.a32.yuqu.bean.UserBean;
+import com.a32.yuqu.bean.UserInfo;
 import com.google.gson.Gson;
 
 import org.json.JSONObject;
@@ -33,8 +34,9 @@ import rx.schedulers.Schedulers;
  * Created by liukun on 16/3/9.
  */
 public class HttpMethods {
-    public static final String BASE_URL = "http://weis.tunnel.qydev.com/";
+//    public static final String BASE_URL = "http://weis.tunnel.qydev.com/";
 
+    public static final String BASE_URL = "http://192.168.0.107/";
     private static final int DEFAULT_TIMEOUT = 520;
     private RequestToast requestToast;
     private Retrofit retrofit;
@@ -53,7 +55,6 @@ public class HttpMethods {
 
         retrofit = new Retrofit.Builder()
                 .client(builder.build())
-//                .addConverterFactory(new NullOnEmptyConverterFactory())
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .baseUrl(BASE_URL)
@@ -103,22 +104,6 @@ public class HttpMethods {
         }
     }
 
-
-
-    public class NullOnEmptyConverterFactory extends Converter.Factory {
-
-        @Override
-        public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit) {
-            final Converter<ResponseBody, ?> delegate = retrofit.nextResponseBodyConverter(this, type, annotations);
-            return new Converter<ResponseBody,Object>() {
-                @Override
-                public Object convert(ResponseBody body) throws IOException {
-                    if (body.contentLength() == 0) return null;
-                    return delegate.convert(body);
-                }
-            };
-        }
-    }
     /**
      * 注册
      *
@@ -131,13 +116,47 @@ public class HttpMethods {
     }
 
     /**
-     * 上传图片
+     * 登录
      *
      * @param subscriber
      * @param gson
      */
-    public void uploadHead(Subscriber<HttpResult<UserBean>> subscriber, Map<String ,String > gson) {
-        Observable observable = movieService.uploadHead(gson);
+    public void loginAccount(Subscriber<HttpResult<UserBean>> subscriber, Map<String ,String > gson) {
+        Observable observable = movieService.loginAccount(gson);
+        toSubscribe(observable, subscriber);
+    }
+
+
+    /**
+     * 左侧数据获取
+     *
+     * @param subscriber
+     * @param gson
+     */
+    public void getUserInfo(Subscriber<HttpResult<UserInfo>> subscriber, Map<String ,String > gson) {
+        Observable observable = movieService.getUserInfo(gson);
+        toSubscribe(observable, subscriber);
+    }
+
+    /**
+     * 获取用户头像
+     *
+     * @param subscriber
+     * @param gson
+     */
+    public void getheadPath(Subscriber<HttpResult<UserBean>> subscriber, Map<String ,String > gson) {
+        Observable observable = movieService.getheadPath(gson);
+        toSubscribe(observable, subscriber);
+    }
+
+    /**
+     * 根据用户名获取头像
+     *
+     * @param subscriber
+     * @param gson
+     */
+    public void getUserByName(Subscriber<HttpResult<UserBean>> subscriber, Map<String ,String > gson) {
+        Observable observable = movieService.getUserByName(gson);
         toSubscribe(observable, subscriber);
     }
 

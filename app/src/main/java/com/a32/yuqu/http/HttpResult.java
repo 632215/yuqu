@@ -31,12 +31,21 @@ public class HttpResult<T> {
         this.data = data;
     }
 
-    @Override
-    public String toString() {
-        return "HttpResult{" +
-                "status=" + status +
-                ", msg='" + message + '\'' +
-                ", data=" + data +
-                '}';
-    }
+//    @Override
+//    public String toString() {
+//        return "HttpResult{" +
+//                "status=" + status +
+//                ", message='" + message + '\'' +
+//                ", data=" + data +
+//                '}';
+//    }
+@Override
+public String toString() {
+    return "HttpResult{" +
+            "status=" + status +
+            ", message='" + message + '\'' +
+            ", data=" + data +
+            '}';
+}
+
 }

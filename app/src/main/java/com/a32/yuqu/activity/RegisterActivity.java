@@ -38,7 +38,6 @@ import com.a32.yuqu.view.TopTitleBar;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.exceptions.HyphenateException;
 import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.RequestParams;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
@@ -49,6 +48,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import butterknife.Bind;
+
 
 /**
  * Created by 32 on 2016/12/30.
@@ -85,6 +85,7 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
     private Bitmap bitmapHead;// 头像Bitmap
     private String headPath = "";// 头像Bitmap
     private String tempPath = Environment.getExternalStorageDirectory() + "/head.jpg";
+    private String path =Environment.getExternalStorageDirectory() + "/yuqu/myHead/";// sd路径
 
     @Override
     protected int getContentViewId() {
@@ -191,7 +192,7 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
             }
 
             @Override
-            public void onError(String Code, String Msg) {
+            public void onError(String Msg) {
                 showToast(Msg);
             }
         };
@@ -203,25 +204,21 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
         HttpMethods.getInstance().userRegister(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, this, true), map);
     }
 
-    private void uploadHead(String headPath) {
-        final RequestParams params = new RequestParams();
-        params.addBodyParameter("head", new File(headPath));
+    private void uploadHead(final String headPath) {
+        RequestParams params = new RequestParams();
+        params.addBodyParameter("uploadedfile", new File(path+headPath));
         params.addBodyParameter("headPath", headPath);
+        Log.i(MyApplicaption.Tag,HttpMethods.BASE_URL + "uploadhead.php");
         HttpUtils http = new HttpUtils(200000);
-
         http.send(HttpRequest.HttpMethod.POST,
                 HttpMethods.BASE_URL + "uploadHead.php",
                 params, new RequestCallBack<String>() {
                     @Override
                     public void onSuccess(ResponseInfo<String> responseInfo) {
-                        Log.i(MyApplicaption.Tag,"onSuccess");
-
                     }
 
                     @Override
-                    public void onFailure(HttpException error, String msg) {
-                        Log.i(MyApplicaption.Tag,"onFailure");
-
+                    public void onFailure(com.lidroid.xutils.exception.HttpException e, String s) {
                     }
                 });
     }

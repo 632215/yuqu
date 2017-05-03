@@ -4,6 +4,7 @@ import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.a32.yuqu.db.EaseUser;
 import com.a32.yuqu.db.Myinfo;
@@ -41,6 +42,7 @@ public class MyApplicaption extends Application {
         init(applicationContext);
         locationService=new LocationService(this);
         SDKInitializer.initialize(getApplicationContext());
+        Log.i(Tag,"MyApplicaption"+username);
     }
 
     public static MyApplicaption getInstance() {
@@ -75,7 +77,6 @@ public class MyApplicaption extends Application {
     public String getCurrentUserName() {
         if (TextUtils.isEmpty(username)) {
             username = Myinfo.getInstance(instance).getUserInfo(Constant.KEY_USERNAME);
-
         }
         return username;
 
@@ -84,7 +85,6 @@ public class MyApplicaption extends Application {
     private UserDao userDao;
 
     private EMOptions initChatOptions() {
-
         // 获取到EMChatOptions对象
         EMOptions options = new EMOptions();
         // 默认添加好友时，是不需要验证的，改成需要验证

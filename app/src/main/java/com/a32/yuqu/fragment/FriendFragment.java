@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
@@ -17,10 +18,18 @@ import com.a32.yuqu.activity.MainActivity;
 import com.a32.yuqu.adapter.ContactAdapter;
 import com.a32.yuqu.applicaption.MyApplicaption;
 import com.a32.yuqu.base.BaseFragment;
+import com.a32.yuqu.bean.UserBean;
+import com.a32.yuqu.bean.UserInfo;
 import com.a32.yuqu.db.EaseUser;
 import com.a32.yuqu.db.InviteMessage;
 import com.a32.yuqu.db.InviteMessgeDao;
+import com.a32.yuqu.http.HttpMethods;
+import com.a32.yuqu.http.HttpResult;
+import com.a32.yuqu.http.progress.ProgressSubscriber;
+import com.a32.yuqu.http.progress.SubscriberOnNextListener;
 import com.a32.yuqu.utils.CommonUtils;
+import com.a32.yuqu.utils.CommonlyUtils;
+import com.a32.yuqu.view.FillListView;
 import com.hyphenate.EMValueCallBack;
 import com.hyphenate.chat.EMChatManager;
 import com.hyphenate.chat.EMClient;
@@ -31,6 +40,7 @@ import com.hyphenate.exceptions.HyphenateException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -48,15 +58,12 @@ public class FriendFragment extends BaseFragment {
     private ContactAdapter adapter;
     //联系人列表的listView
     @Bind(R.id.listView)
-    ListView listView;
-
+    FillListView listView;
     //新的朋友
     @Bind(R.id.newContactLayout)
     LinearLayout newContact;
-
     @Bind(R.id.tips)
     TextView tips;
-
     @Override
     protected int getLayoutId() {
         return R.layout.fragment_friend;
@@ -74,7 +81,6 @@ public class FriendFragment extends BaseFragment {
     private void initNewContactData() {
         InviteMessgeDao dao = new InviteMessgeDao(getActivity());
         List<InviteMessage> msgsList = dao.getMessagesList();
-        System.out.println("xxxxxxxxxx"+msgsList.size());
         if (msgsList.size()!=0){
             tips.setVisibility(View.VISIBLE);
         }
@@ -88,6 +94,32 @@ public class FriendFragment extends BaseFragment {
     }
 
 
+    private void getheadPath(final String name) {
+        SubscriberOnNextListener onNextListener = new SubscriberOnNextListener<UserBean>() {
+
+            @Override
+            public void onNext(UserBean info) {
+                if (info != null) {
+                    UserInfo objectInfo = new UserInfo();
+                    objectInfo.setUserName(info.getName());
+                    objectInfo.setUserHead(info.getHead());
+                    objectInfo.setUserPhone(name);
+                    CommonlyUtils.saveObjectUser(objectInfo);
+                    startActivity(new Intent(getActivity(),ChatActivity.class));
+
+                }
+            }
+
+            @Override
+            public void onError(String Msg) {
+            }
+        };
+        Map<String, String> map = new HashMap<>();
+        map.put("phone", name);
+        HttpMethods.getInstance().getheadPath(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, this.getActivity(), false), map);
+    }
+
+
     //初始化好友列表
     private void initFriendData() {
         getContactList();
@@ -97,9 +129,8 @@ public class FriendFragment extends BaseFragment {
 
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-                startActivity(new Intent(getActivity(),ChatActivity.class).putExtra("username", adapter.getItem(arg2).getUsername()));
+                getheadPath(adapter.getItem(arg2).getUsername());
             }
-
         });
     }
 

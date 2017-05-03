@@ -2,6 +2,7 @@ package com.a32.yuqu.http;
 
 
 import com.a32.yuqu.bean.UserBean;
+import com.a32.yuqu.bean.UserInfo;
 import com.google.gson.Gson;
 
 import org.json.JSONObject;
@@ -25,9 +26,25 @@ public interface AppService {
     @POST("reigist.php")
     Observable<HttpResult<UserBean>> userRegister(@FieldMap Map<String, String> mapgson);
 
-    //上传图片
+    //登录
     @FormUrlEncoded
-    @POST("uploadHead.php")
-    Observable<HttpResult<UserBean>> uploadHead(@FieldMap Map<String, String> mapgson);
+    @POST("userlogin.php")
+    Observable<HttpResult<UserBean>> loginAccount(@FieldMap Map<String, String> mapgson);
 
+
+    //z左侧数据获取
+    @FormUrlEncoded
+    @POST("getuserinfo.php")
+    Observable<HttpResult<UserInfo>> getUserInfo(@FieldMap Map<String, String> mapgson);
+
+
+    //获取头像
+    @FormUrlEncoded
+    @POST("getheadpath.php")
+    Observable<HttpResult<UserBean>> getheadPath(@FieldMap Map<String, String> mapgson);
+
+    //根据用户名获取头像
+    @FormUrlEncoded
+    @POST("getuserbyname.php")
+    Observable<HttpResult<UserBean>> getUserByName(@FieldMap Map<String, String> mapgson);
 }

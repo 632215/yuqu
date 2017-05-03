@@ -8,9 +8,13 @@
         android:id="@+id/pullRefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    <ListView
-        android:id="@+id/listView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <com.a32.yuqu.view.FillListView
+                android:id="@+id/listView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </RelativeLayout>
     </com.handmark.pulltorefresh.library.PullToRefreshScrollView>
 </LinearLayout>

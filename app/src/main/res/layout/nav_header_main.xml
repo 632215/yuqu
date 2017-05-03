@@ -8,13 +8,14 @@
     android:orientation="vertical"
     android:padding="20dp">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <com.a32.yuqu.view.CircleImageView
+        android:id="@+id/imgHead"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:src="@mipmap/yu92" />
 
     <TextView
+        android:id="@+id/tvName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/buzuolanhaoren"
@@ -22,5 +23,4 @@
         android:paddingTop="10dp"
         android:textColor="@color/colorWhite"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
-
 </LinearLayout>

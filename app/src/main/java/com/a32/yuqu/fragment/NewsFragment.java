@@ -1,16 +1,11 @@
 package com.a32.yuqu.fragment;
 
-import android.app.Activity;
-import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.util.Log;
 import android.util.Pair;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
@@ -19,15 +14,23 @@ import com.a32.yuqu.activity.ChatActivity;
 import com.a32.yuqu.adapter.EaseConversationAdapater;
 import com.a32.yuqu.applicaption.MyApplicaption;
 import com.a32.yuqu.base.BaseFragment;
+import com.a32.yuqu.bean.UserBean;
+import com.a32.yuqu.bean.UserInfo;
+import com.a32.yuqu.http.HttpMethods;
+import com.a32.yuqu.http.HttpResult;
+import com.a32.yuqu.http.progress.ProgressSubscriber;
+import com.a32.yuqu.http.progress.SubscriberOnNextListener;
+import com.a32.yuqu.utils.CommonlyUtils;
+import com.a32.yuqu.view.FillListView;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshScrollView;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMConversation;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,13 +41,10 @@ import butterknife.Bind;
  */
 
 public class NewsFragment extends BaseFragment implements PullToRefreshBase.OnRefreshListener2<ScrollView>, View.OnClickListener {
-
     @Bind(R.id.pullRefresh)
     PullToRefreshScrollView pullRefresh;
-
     @Bind(R.id.listView)
-    ListView listView;
-
+    FillListView listView;
     private List<EMConversation> conversationList = new ArrayList<EMConversation>();
     private EaseConversationAdapater adapter;
 
@@ -70,23 +70,51 @@ public class NewsFragment extends BaseFragment implements PullToRefreshBase.OnRe
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 EMConversation conversation = adapter.getItem(position);
+                //指定会话消息未读数清零
+                conversation.markAllMessagesAsRead();
                 String username = conversation.getLastMessage().getUserName();
                 if (username.equals(MyApplicaption.getInstance().getCurrentUserName()))
                     Toast.makeText(getActivity(), st2, Toast.LENGTH_SHORT).show();
                 else {
                     // 进入聊天页面
                     Intent intent = new Intent(getActivity(), ChatActivity.class);
-                    intent.putExtra("username", username);
-                    startActivity(intent);
+                    getheadPath(username,intent);
                 }
             }
         });
     }
 
+    private void getheadPath(final String name, final Intent intent) {
+        SubscriberOnNextListener onNextListener = new SubscriberOnNextListener<UserBean>() {
+
+            @Override
+            public void onNext(UserBean info) {
+                Log.i(MyApplicaption.Tag, "getUserByName info--" + info.getName() + "----" + info.getHead());
+                if (info != null) {
+                    UserInfo objectInfo = new UserInfo();
+                    objectInfo.setUserName(info.getName());
+                    objectInfo.setUserHead(info.getHead());
+                    objectInfo.setUserPhone(name);
+
+                    CommonlyUtils.saveObjectUser(objectInfo);
+                    startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onError(String Msg) {
+            }
+        };
+        Map<String, String> map = new HashMap<>();
+        map.put("phone", name);
+        HttpMethods.getInstance().getheadPath(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, this.getActivity(), false), map);
+    }
+
     /**
      * 获取会话列表
+     * <p>
+     * //     * @param context
      *
-//     * @param context
      * @return +
      */
     protected List<EMConversation> loadConversationList() {
@@ -101,7 +129,7 @@ public class NewsFragment extends BaseFragment implements PullToRefreshBase.OnRe
         List<Pair<Long, EMConversation>> sortList = new ArrayList<Pair<Long, EMConversation>>();
         synchronized (conversations) {
             for (EMConversation conversation : conversations.values()) {
-                if (conversation.getAllMessages().size() != 0) {
+                if (conversation.getAllMessages().size() > 0) {
                     sortList.add(
                             new Pair<Long, EMConversation>(conversation.getLastMessage().getMsgTime(), conversation));
                 }
@@ -122,8 +150,8 @@ public class NewsFragment extends BaseFragment implements PullToRefreshBase.OnRe
 
     /**
      * 根据最后一条消息的时间排序
-     *
-//     * @param usernames
+     * <p>
+     * //     * @param usernames
      */
     private void sortConversationByLastChatTime(List<Pair<Long, EMConversation>> conversationList) {
         Collections.sort(conversationList, new Comparator<Pair<Long, EMConversation>>() {
@@ -146,16 +174,19 @@ public class NewsFragment extends BaseFragment implements PullToRefreshBase.OnRe
     public void onResume() {
         super.onResume();
         adapter.notifyDataSetChanged();
+        pullRefresh.onRefreshComplete();
     }
 
     @Override
     public void onPullDownToRefresh(PullToRefreshBase<ScrollView> refreshView) {
-        loadConversationList();
+        adapter.notifyDataSetChanged();
+        pullRefresh.onRefreshComplete();
     }
 
     @Override
     public void onPullUpToRefresh(PullToRefreshBase<ScrollView> refreshView) {
-        loadConversationList();
+        adapter.notifyDataSetChanged();
+        pullRefresh.onRefreshComplete();
     }
 
     @Override

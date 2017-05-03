@@ -6,5 +6,6 @@ package com.a32.yuqu.http.progress;
 public interface SubscriberOnNextListener<T> {
     void onNext(T t);
 
-    void onError(String Code, String Msg);
+//    void onError(String Code, String Msg);
+    void onError( String Msg);
 }

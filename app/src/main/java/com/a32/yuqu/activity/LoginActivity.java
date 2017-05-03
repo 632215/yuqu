@@ -5,17 +5,27 @@ import android.os.Looper;
 import android.support.percent.PercentRelativeLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.a32.yuqu.R;
 import com.a32.yuqu.applicaption.MyApplicaption;
 import com.a32.yuqu.base.BaseActivity;
+import com.a32.yuqu.bean.UserBean;
+import com.a32.yuqu.bean.UserInfo;
 import com.a32.yuqu.db.DemoDBManager;
 import com.a32.yuqu.db.EaseUser;
+import com.a32.yuqu.http.HttpMethods;
+import com.a32.yuqu.http.HttpResult;
+import com.a32.yuqu.http.progress.ProgressDialogHandler;
+import com.a32.yuqu.http.progress.ProgressSubscriber;
+import com.a32.yuqu.http.progress.SubscriberOnNextListener;
 import com.a32.yuqu.utils.CommonUtils;
+import com.a32.yuqu.utils.CommonlyUtils;
 import com.a32.yuqu.utils.KeyBoardUtils;
 import com.a32.yuqu.utils.PhoneUtils;
 import com.a32.yuqu.utils.ToastUtils;
@@ -40,14 +50,14 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     private boolean autoLogin = false;
     private String currentUsername;
     private String currentPassword;
-
     @Bind(R.id.et_login_username)
     EditText userName;
     @Bind(R.id.et_login_pwd)
     EditText pwd;
     @Bind(R.id.login)
     PercentRelativeLayout percentRelativeLayout;
-
+    @Bind(R.id.tv_errortips_login)
+    TextView errorTips;
     @Bind(R.id.btn_login_login)
     Button btnLogin;
     @Bind(R.id.btn_login_register)
@@ -66,22 +76,24 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         userName.setText("15223084076");
         pwd.setText("123456");
         //如果用户名改变，清空密码
-//        userName.addTextChangedListener(new TextWatcher() {
-//            @Override
-//            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//
-//            }
-//
-//            @Override
-//            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        userName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 //                pwd.setText("");
-//            }
-//
-//            @Override
-//            public void afterTextChanged(Editable editable) {
-//
-//            }
-//        });
+                errorTips.setText("");
+                errorTips.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
     }
 
     @Override
@@ -107,10 +119,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 }
                 currentUsername = userName.getText().toString().trim();
                 currentPassword = pwd.getText().toString().trim();
-//                startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 loginAccount(currentUsername, currentPassword);
                 break;
             case R.id.btn_login_register:
+                errorTips.setVisibility(View.INVISIBLE);
                 startActivity(new Intent(this, RegisterActivity.class));
                 break;
             case R.id.login:
@@ -121,9 +133,40 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
     }
 
+//    private void loginAccount(final String currentUsername, final String currentPassword) {
+//        SubscriberOnNextListener onNextListener = new SubscriberOnNextListener<UserBean>() {
+//
+//            @Override
+//            public void onNext(UserBean info) {
+//                Log.i(MyApplicaption.Tag, "getUserByName info--" + info.getName() + "----" + info.getHead());
+//                if (info != null) {
+//                    EMClient.getInstance().groupManager().loadAllGroups();
+//                    EMClient.getInstance().chatManager().loadAllConversations();
+//                    getFriends();
+//                    UserInfo userInfo = new UserInfo();
+//                    userInfo.setUserPhone(currentUsername);
+//                    userInfo.setUserPwd(currentPassword);
+//                    CommonlyUtils.saveUserInfo(LoginActivity.this, userInfo);
+//                    Intent intent = new Intent(LoginActivity.this,
+//                            MainActivity.class);
+//                    startActivity(intent);
+//                    finish();
+//                }
+//            }
+//
+//            @Override
+//            public void onError(String Msg) {
+//                errorTips.setText(Msg);
+//                errorTips.setVisibility(View.VISIBLE);
+//            }
+//        };
+//        Map<String, String> map = new HashMap<>();
+//        map.put("phone", currentUsername);
+//        map.put("password", currentPassword);
+//        HttpMethods.getInstance().loginAccount(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, this, false), map);
+//    }
+
     private void loginAccount(String mname, String mpassword) {
-        System.out.println("xxxxxx" + mname);
-        System.out.println("xxxxxx" + mpassword);
         //检测网络连通性
         if (!CommonUtils.isNetWorkConnected(this)) {
             Toast.makeText(this, R.string.network_isnot_available, Toast.LENGTH_SHORT).show();
@@ -134,16 +177,24 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         DemoDBManager.getInstance().closeDB();
         MyApplicaption.getInstance().setCurrentUserName(mname);
 
+        Log.i(MyApplicaption.Tag,"mname"+mname);
+        Log.i(MyApplicaption.Tag,"getCurrentUserName"+MyApplicaption.getInstance().getCurrentUserName());
+        Log.i(MyApplicaption.Tag,"currentUsername"+currentUsername);
+
         EMClient.getInstance().login(mname, mpassword, new EMCallBack() {
             //回调
             @Override
             public void onSuccess() {
-                System.out.println("xxxxxx" + "onSuccess");
-
                 // 加载所有会话到内存
-                EMClient.getInstance().groupManager().loadAllGroups();
                 EMClient.getInstance().chatManager().loadAllConversations();
+                EMClient.getInstance().groupManager().loadAllGroups();
                 getFriends();
+                UserInfo userInfo=new UserInfo();
+                userInfo.setUserPhone(currentUsername);
+                userInfo.setUserPwd(currentPassword);
+
+                CommonlyUtils.saveUserInfo(LoginActivity.this,userInfo);
+
                 Intent intent = new Intent(LoginActivity.this,
                         MainActivity.class);
                 startActivity(intent);
@@ -152,16 +203,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
             @Override
             public void onProgress(int progress, String status) {
-                System.out.println("xxxxxx" + "onProgress");
 
             }
 
             @Override
             public void onError(final int code, String message) {
-                System.out.println("xxxxxxxxxxx+onError"+code);
-                System.out.println("xxxxxxxxxxx+onError"+message);
-
-                System.out.println("xxxxxxxxxxx+onError");
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -200,10 +246,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                 break;
                             // 未知 Server 异常 303 一般断网会出现这个错误
                             case EMError.SERVER_UNKNOWN_ERROR:
-                                ToastUtils.showLong(LoginActivity.this, "未知的服务器异常！");
-                                break;
                             default:
-                                ToastUtils.showLong(LoginActivity.this, "未知错误！");
+                                ToastUtils.showLong(LoginActivity.this, "服务器异常！");
                                 break;
                         }
                     }
@@ -216,7 +260,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     private void getFriends() {
         try {
             List<String> usernames = EMClient.getInstance().contactManager().getAllContactsFromServer();
-            System.out.println("xxxxxxxxxxxxx" + usernames.size());
             Map<String, EaseUser> users = new HashMap<String, EaseUser>();
             for (String username : usernames) {
                 EaseUser user = new EaseUser(username);
