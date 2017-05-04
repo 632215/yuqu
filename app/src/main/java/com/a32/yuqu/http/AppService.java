@@ -47,4 +47,9 @@ public interface AppService {
     @FormUrlEncoded
     @POST("getuserbyname.php")
     Observable<HttpResult<UserBean>> getUserByName(@FieldMap Map<String, String> mapgson);
+
+    //根据用户名获取头像
+    @FormUrlEncoded
+    @POST("markplace.php")
+    Observable<HttpResult<UserBean>> markPlace(@FieldMap Map<String, String> mapgson);
 }

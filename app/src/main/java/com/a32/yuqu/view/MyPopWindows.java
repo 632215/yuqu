@@ -28,6 +28,10 @@ public class MyPopWindows extends PopupWindow {
         initBasePopupWindow();
     }
 
+    public void setAlpha(float alpha){
+        this.mShowAlpha =alpha;
+    }
+
     @Override
     public void setOutsideTouchable(boolean touchable) {
         super.setOutsideTouchable(touchable);

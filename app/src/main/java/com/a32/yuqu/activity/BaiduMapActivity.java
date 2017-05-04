@@ -1,13 +1,27 @@
 package com.a32.yuqu.activity;
 
+import android.content.Intent;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.a32.yuqu.R;
 import com.a32.yuqu.applicaption.MyApplicaption;
 import com.a32.yuqu.base.BaseActivity;
+import com.a32.yuqu.bean.UserBean;
+import com.a32.yuqu.bean.UserInfo;
+import com.a32.yuqu.http.HttpMethods;
+import com.a32.yuqu.http.HttpResult;
+import com.a32.yuqu.http.progress.ProgressSubscriber;
+import com.a32.yuqu.http.progress.SubscriberOnNextListener;
 import com.a32.yuqu.service.LocationService;
+import com.a32.yuqu.utils.CommonlyUtils;
+import com.a32.yuqu.view.MyPopWindows;
 import com.a32.yuqu.view.TopTitleBar;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -20,14 +34,23 @@ import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import butterknife.Bind;
 
+import static com.a32.yuqu.R.id.etDescribe;
+import static com.a32.yuqu.R.id.etName;
+import static com.a32.yuqu.R.id.fromAlbum;
+import static com.a32.yuqu.R.id.fromCamera;
 import static com.a32.yuqu.R.string.location;
 
 /**
  * Created by pc on 2017/1/24.
  */
 public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopTitleBarCallback, View.OnClickListener {
+    @Bind(R.id.baiduLayout)
+    RelativeLayout baiduLayout;
     @Bind(R.id.titleBar)
     TopTitleBar titleBar;
     @Bind(R.id.bmapView)
@@ -43,7 +66,9 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
     private BaiduMap mBaiduMap;
     private boolean isFisrtLoc = true;
     private MyBDLocationListener myBDLocationListener = new MyBDLocationListener();
-
+    private  MyPopWindows addInfoPop;
+    private EditText etName;
+    private EditText etDescribe;
     @Override
     protected int getContentViewId() {
         return R.layout.activity_baidumap;
@@ -80,12 +105,25 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
             case R.id.nearFishPlace://附近渔场
                 break;
             case R.id.markFishPlace://标记我的位置为渔场
+                addInfo();//添加渔场的描述
                 break;
             case R.id.myLocation://定位我的位置
-                System.out.println("xxxxxxxxxxcccccccccccitude" + latitude);
                 showMyLocation(myLatitude, myLongitude);
                 break;
         }
+    }
+
+    private void addInfo() {
+        addInfoPop = new MyPopWindows(this);
+        addInfoPop.setAlpha(0.1f);
+        addInfoPop.setContentView(View.inflate(this, R.layout.addinfo_popuwindow, null));
+        addInfoPop.showAtLocation(baiduLayout, Gravity.CENTER, 0, 0);
+        View viewPopWindows = addInfoPop.getContentView();
+        etName = (EditText) viewPopWindows.findViewById(R.id.etName);
+        etDescribe = (EditText) viewPopWindows.findViewById(R.id.etDescribe);
+//        markPlace();
+//        fromAlbum.setOnClickListener(this);
+//        fromCamera.setOnClickListener(this);
     }
 
     private Double latitude = 0.00;
@@ -100,7 +138,7 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
             if (bdLocation == null || bmapView == null) {
-                System.out.println("xxxxxxxxxxxxx" );
+                System.out.println("xxxxxxxxxxxxx");
                 return;
             }
             latitude = bdLocation.getLatitude();
@@ -122,10 +160,32 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
         }
     }
 
+    private void markPlace(String placeName, String describe) {
+        SubscriberOnNextListener onNextListener = new SubscriberOnNextListener<UserBean>() {
+
+            @Override
+            public void onNext(UserBean info) {
+
+            }
+
+            @Override
+            public void onError(String Msg) {
+            }
+        };
+        Map<String, String> map = new HashMap<>();
+        map.put("phone", CommonlyUtils.getUserInfo(this).getUserPhone());
+        map.put("name", CommonlyUtils.getUserInfo(this).getUserName());
+        map.put("placeName", placeName);
+        map.put("longitude", String.valueOf(myLongitude));
+        map.put("latitude", String.valueOf(myLatitude));
+        map.put("describe", describe);
+        HttpMethods.getInstance().markPlace(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, this, false), map);
+    }
+
     private void showMyLocation(Double myLatitude, Double myLongitude) {
-            LatLng latLng = new LatLng(myLatitude, myLongitude);
-            MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newLatLngZoom(latLng, 16);
-            mBaiduMap.animateMapStatus(mapStatusUpdate);
+        LatLng latLng = new LatLng(myLatitude, myLongitude);
+        MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newLatLngZoom(latLng, 16);
+        mBaiduMap.animateMapStatus(mapStatusUpdate);
     }
 
 

@@ -160,4 +160,14 @@ public class HttpMethods {
         toSubscribe(observable, subscriber);
     }
 
+    /**
+     * 标记的我的渔场
+     *
+     * @param subscriber
+     * @param gson
+     */
+    public void markPlace(Subscriber<HttpResult<UserBean>> subscriber, Map<String ,String > gson) {
+        Observable observable = movieService.markPlace(gson);
+        toSubscribe(observable, subscriber);
+    }
 }

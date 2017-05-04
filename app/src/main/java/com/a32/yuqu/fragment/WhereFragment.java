@@ -44,7 +44,6 @@ public class WhereFragment extends BaseFragment implements View.OnClickListener 
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.ll_where_mybook:
-                startActivity(new Intent(this.getActivity(), MainActivity.class));
                 break;
             case R.id.tv_where_location:
                 startActivity(new Intent(this.getActivity(), BaiduMapActivity.class));
