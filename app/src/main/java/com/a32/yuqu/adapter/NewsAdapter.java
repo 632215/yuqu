@@ -6,7 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.a32.yuqu.R;
@@ -18,11 +18,10 @@ import com.a32.yuqu.http.progress.ProgressSubscriber;
 import com.a32.yuqu.http.progress.SubscriberOnNextListener;
 import com.a32.yuqu.utils.FileUtil;
 import com.a32.yuqu.view.CircleImageView;
+import com.a32.yuqu.view.FillListView;
 import com.hyphenate.chat.EMConversation;
 import com.hyphenate.chat.EMMessage;
 import com.hyphenate.util.DateUtils;
-import com.lidroid.xutils.BitmapUtils;
-import com.lidroid.xutils.bitmap.BitmapCommonUtils;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 
@@ -34,40 +33,33 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by 32 on 2017/3/12.
+ * Created by root on 6/01/17.
  */
-public class EaseConversationAdapater extends ArrayAdapter<EMConversation> {
-    private List<EMConversation> conversationList;
-    private List<EMConversation> copyConversationList;
-    private Context mcontext;
-    private boolean notiyfyByFilter;
 
-    protected int primaryColor;
-    protected int secondaryColor;
-    protected int timeColor;
-    protected int primarySize;
-    protected int secondarySize;
-    protected float timeSize;
+public class NewsAdapter extends BaseAdapter {
+    private Context mContext;
+    private LayoutInflater inflater;
+    private List<EMConversation> copyConversationList= new ArrayList<EMConversation>();
 
-    public EaseConversationAdapater(Context context, int resource, List<EMConversation> objects) {
-        super(context, resource, objects);
-        this.mcontext = context;
-        conversationList = objects;
-        copyConversationList = new ArrayList<EMConversation>();
-        copyConversationList.addAll(objects);
+    public NewsAdapter(Context mContext, List<EMConversation> objects) {
+        inflater = LayoutInflater.from(mContext);
+        this.mContext = mContext;
+        this.copyConversationList = objects;
+    }
+
+    public void setData(List<EMConversation> objects) {
+        this.copyConversationList = objects;
+        notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return conversationList.size();
+        return copyConversationList.size();
     }
 
     @Override
-    public EMConversation getItem(int arg0) {
-        if (arg0 < conversationList.size()) {
-            return conversationList.get(arg0);
-        }
-        return null;
+    public Object getItem(int position) {
+        return copyConversationList.get(position);
     }
 
     @Override
@@ -78,9 +70,16 @@ public class EaseConversationAdapater extends ArrayAdapter<EMConversation> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_conversation, parent, false);
+            convertView = inflater.inflate(R.layout.item_conversation, parent, false);
         }
-        ViewHolder holder = (ViewHolder) convertView.getTag();
+
+        if(parent instanceof FillListView){
+            if(((FillListView) parent).isMeasure){
+                return convertView;
+            }
+        }
+
+        holder = (ViewHolder) convertView.getTag();
         if (holder == null) {
             holder = new ViewHolder();
             holder.avatar = (CircleImageView) convertView.findViewById(R.id.avatar);
@@ -92,7 +91,7 @@ public class EaseConversationAdapater extends ArrayAdapter<EMConversation> {
             convertView.setTag(holder);
         }
         // 获取与此用户/群组的会话
-        EMConversation conversation = getItem(position);
+        EMConversation conversation = (EMConversation) getItem(position);
         // 获取用户username或者群组groupid
         String username = conversation.getLastMessage().getUserName();
         //加载头像
@@ -126,15 +125,14 @@ public class EaseConversationAdapater extends ArrayAdapter<EMConversation> {
             @Override
             public void onNext(UserBean info) {
                 if (info != null){
-//                        Picasso.with(mcontext).load(HttpMethods.BASE_URL + "upload/" + info.getHead())
                     if (FileUtil.fileIsExists(info.getHead())){
-                        Picasso.with(mcontext).load(new File(Environment.getExternalStorageDirectory() + "/yuqu/myHead/"+info.getHead()))
+                        Picasso.with(mContext).load(new File(Environment.getExternalStorageDirectory() + "/yuqu/myHead/"+info.getHead()))
                                 .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)//加速内存的回收
                                 .placeholder(R.mipmap.head)//加载中
                                 .error(R.mipmap.head)//加载失败
                                 .into(holder.avatar);
                     }else{
-                        Picasso.with(mcontext).load((HttpMethods.BASE_URL + "upload/" + info.getHead()))
+                        Picasso.with(mContext).load((HttpMethods.BASE_URL + "upload/" + info.getHead()))
                                 .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)//加速内存的回收
                                 .placeholder(R.mipmap.head)//加载中
                                 .error(R.mipmap.head)//加载失败
@@ -150,70 +148,37 @@ public class EaseConversationAdapater extends ArrayAdapter<EMConversation> {
         };
         Map<String, String> map = new HashMap<>();
         map.put("phone",phone);
-        HttpMethods.getInstance().getheadPath(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, mcontext, false), map);
+        HttpMethods.getInstance().getheadPath(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, mContext, false), map);
     }
 
-    @Override
-    public void notifyDataSetChanged() {
-        super.notifyDataSetChanged();
-        if (!notiyfyByFilter) {
-            copyConversationList.clear();
-            copyConversationList.addAll(conversationList);
-            notiyfyByFilter = false;
-        }
+    public ViewHolder holder;
+
+    class ViewHolder {
+        /**
+         * 和谁的聊天记录
+         */
+        TextView name;
+        /**
+         * 消息未读数
+         */
+        TextView unreadLabel;
+        /**
+         * 最后一条消息的内容
+         */
+        TextView message;
+        /**
+         * 最后一条消息的时间
+         */
+        TextView time;
+        /**
+         * 最后一条消息的发送状态
+         */
+        View msgState;
+        /**
+         * 整个list中每一行总布局
+         */
+        CircleImageView avatar;/**头像*/
     }
 
-    public void setPrimaryColor(int primaryColor) {
-        this.primaryColor = primaryColor;
-    }
-
-    public void setSecondaryColor(int secondaryColor) {
-        this.secondaryColor = secondaryColor;
-    }
-
-    public void setTimeColor(int timeColor) {
-        this.timeColor = timeColor;
-    }
-
-    public void setPrimarySize(int primarySize) {
-        this.primarySize = primarySize;
-    }
-
-    public void setSecondarySize(int secondarySize) {
-        this.secondarySize = secondarySize;
-    }
-
-    public void setTimeSize(float timeSize) {
-        this.timeSize = timeSize;
-    }
 
 }
-
-class ViewHolder {
-    /**
-     * 和谁的聊天记录
-     */
-    TextView name;
-    /**
-     * 消息未读数
-     */
-    TextView unreadLabel;
-    /**
-     * 最后一条消息的内容
-     */
-    TextView message;
-    /**
-     * 最后一条消息的时间
-     */
-    TextView time;
-    /**
-     * 最后一条消息的发送状态
-     */
-    View msgState;
-    /**
-     * 整个list中每一行总布局
-     */
-
-    CircleImageView avatar;/**头像*/
-}
-

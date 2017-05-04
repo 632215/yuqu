@@ -45,10 +45,15 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/colorLineGray" />
-    <com.a32.yuqu.view.FillListView
-        android:id="@+id/listView"
+
+    <com.handmark.pulltorefresh.library.PullToRefreshScrollView
+        android:id="@+id/pullRefresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
 
-
+        <com.a32.yuqu.view.FillListView
+            android:id="@+id/listView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </com.handmark.pulltorefresh.library.PullToRefreshScrollView>
 </LinearLayout>

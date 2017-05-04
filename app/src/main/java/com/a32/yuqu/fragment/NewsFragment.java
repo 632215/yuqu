@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 import com.a32.yuqu.R;
 import com.a32.yuqu.activity.ChatActivity;
-import com.a32.yuqu.adapter.EaseConversationAdapater;
+import com.a32.yuqu.adapter.NewsAdapter;
 import com.a32.yuqu.applicaption.MyApplicaption;
 import com.a32.yuqu.base.BaseFragment;
 import com.a32.yuqu.bean.UserBean;
@@ -46,7 +46,7 @@ public class NewsFragment extends BaseFragment implements PullToRefreshBase.OnRe
     @Bind(R.id.listView)
     FillListView listView;
     private List<EMConversation> conversationList = new ArrayList<EMConversation>();
-    private EaseConversationAdapater adapter;
+    private NewsAdapter newsAdapter;
 
     @Override
     protected int getLayoutId() {
@@ -61,15 +61,13 @@ public class NewsFragment extends BaseFragment implements PullToRefreshBase.OnRe
     }
 
     private void initData() {
-        conversationList.addAll(loadConversationList());
-        adapter = new EaseConversationAdapater(getActivity(), 1, conversationList);
-        listView.setAdapter(adapter);
+        newsAdapter = new NewsAdapter(getActivity(), conversationList);
+        listView.setAdapter(newsAdapter);
         final String st2 = "不能和自己聊天";
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                EMConversation conversation = adapter.getItem(position);
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                EMConversation conversation = (EMConversation) newsAdapter.getItem(i);
                 //指定会话消息未读数清零
                 conversation.markAllMessagesAsRead();
                 String username = conversation.getLastMessage().getUserName();
@@ -78,7 +76,7 @@ public class NewsFragment extends BaseFragment implements PullToRefreshBase.OnRe
                 else {
                     // 进入聊天页面
                     Intent intent = new Intent(getActivity(), ChatActivity.class);
-                    getheadPath(username,intent);
+                    getheadPath(username, intent);
                 }
             }
         });
@@ -117,7 +115,7 @@ public class NewsFragment extends BaseFragment implements PullToRefreshBase.OnRe
      *
      * @return +
      */
-    protected List<EMConversation> loadConversationList() {
+    protected void loadConversationList() {
         // 获取所有会话，包括陌生人
         conversationList.clear();
         Map<String, EMConversation> conversations = EMClient.getInstance().chatManager().getAllConversations();
@@ -145,7 +143,8 @@ public class NewsFragment extends BaseFragment implements PullToRefreshBase.OnRe
         for (Pair<Long, EMConversation> sortItem : sortList) {
             list.add(sortItem.second);
         }
-        return list;
+        conversationList.addAll(list);
+        newsAdapter.setData(conversationList);
     }
 
     /**
@@ -173,20 +172,19 @@ public class NewsFragment extends BaseFragment implements PullToRefreshBase.OnRe
     @Override
     public void onResume() {
         super.onResume();
-        adapter.notifyDataSetChanged();
-        pullRefresh.onRefreshComplete();
+        loadConversationList();
     }
 
     @Override
     public void onPullDownToRefresh(PullToRefreshBase<ScrollView> refreshView) {
-        adapter.notifyDataSetChanged();
-        pullRefresh.onRefreshComplete();
+        loadConversationList();
+
     }
 
     @Override
     public void onPullUpToRefresh(PullToRefreshBase<ScrollView> refreshView) {
-        adapter.notifyDataSetChanged();
-        pullRefresh.onRefreshComplete();
+        loadConversationList();
+
     }
 
     @Override

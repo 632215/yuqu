@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.a32.yuqu.R;
@@ -16,6 +17,7 @@ import com.a32.yuqu.activity.ChatActivity;
 import com.a32.yuqu.activity.FriendApplyActivity;
 import com.a32.yuqu.activity.MainActivity;
 import com.a32.yuqu.adapter.ContactAdapter;
+import com.a32.yuqu.adapter.FriendAdapter;
 import com.a32.yuqu.applicaption.MyApplicaption;
 import com.a32.yuqu.base.BaseFragment;
 import com.a32.yuqu.bean.UserBean;
@@ -30,6 +32,8 @@ import com.a32.yuqu.http.progress.SubscriberOnNextListener;
 import com.a32.yuqu.utils.CommonUtils;
 import com.a32.yuqu.utils.CommonlyUtils;
 import com.a32.yuqu.view.FillListView;
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshScrollView;
 import com.hyphenate.EMValueCallBack;
 import com.hyphenate.chat.EMChatManager;
 import com.hyphenate.chat.EMClient;
@@ -51,11 +55,9 @@ import butterknife.Bind;
  * Created by 32 on 2016/12/30.
  */
 
-public class FriendFragment extends BaseFragment {
-    protected List<EaseUser> contactList = new ArrayList<EaseUser>();
-    private List<String> nameList;
-    protected Map<String, EaseUser> contactsMap;
-    private ContactAdapter adapter;
+public class FriendFragment extends BaseFragment implements PullToRefreshBase.OnRefreshListener2<ScrollView>{
+    @Bind(R.id.pullRefresh)
+    PullToRefreshScrollView pullRefresh;
     //联系人列表的listView
     @Bind(R.id.listView)
     FillListView listView;
@@ -64,6 +66,11 @@ public class FriendFragment extends BaseFragment {
     LinearLayout newContact;
     @Bind(R.id.tips)
     TextView tips;
+    protected List<EaseUser> contactList = new ArrayList<EaseUser>();
+    private List<String> nameList;
+    protected Map<String, EaseUser> contactsMap;
+    //    private ContactAdapter adapter;
+    private FriendAdapter adapter;
     @Override
     protected int getLayoutId() {
         return R.layout.fragment_friend;
@@ -72,6 +79,8 @@ public class FriendFragment extends BaseFragment {
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void initView(View view, Bundle savedInstanceState) {
+        pullRefresh.setMode(PullToRefreshBase.Mode.BOTH);
+        pullRefresh.setOnRefreshListener(this);
         initFriendData();
         initNewContactData();
     }
@@ -81,14 +90,14 @@ public class FriendFragment extends BaseFragment {
     private void initNewContactData() {
         InviteMessgeDao dao = new InviteMessgeDao(getActivity());
         List<InviteMessage> msgsList = dao.getMessagesList();
-        if (msgsList.size()!=0){
+        if (msgsList.size() != 0) {
             tips.setVisibility(View.VISIBLE);
         }
         newContact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //进入好友申请页面
-                startActivity(new Intent(getActivity(),FriendApplyActivity.class));
+                startActivity(new Intent(getActivity(), FriendApplyActivity.class));
             }
         });
     }
@@ -105,7 +114,7 @@ public class FriendFragment extends BaseFragment {
                     objectInfo.setUserHead(info.getHead());
                     objectInfo.setUserPhone(name);
                     CommonlyUtils.saveObjectUser(objectInfo);
-                    startActivity(new Intent(getActivity(),ChatActivity.class));
+                    startActivity(new Intent(getActivity(), ChatActivity.class));
 
                 }
             }
@@ -122,8 +131,8 @@ public class FriendFragment extends BaseFragment {
 
     //初始化好友列表
     private void initFriendData() {
-        getContactList();
-        adapter = new ContactAdapter(this.getActivity(), contactList);
+//        adapter = new ContactAdapter(this.getActivity(), contactList);
+        adapter = new FriendAdapter(getActivity(), contactList);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -142,9 +151,10 @@ public class FriendFragment extends BaseFragment {
         // 获取联系人列表
         contactsMap = MyApplicaption.getInstance().getContactList();
         if (contactsMap == null) {
-            System.out.println("contactList"+null);
             return;
         }
+        pullRefresh.onRefreshComplete();
+        //同步
         synchronized (this.contactsMap) {
             Iterator<Map.Entry<String, EaseUser>> iterator = contactsMap.entrySet().iterator();
             List<String> blackList = EMClient.getInstance().contactManager().getBlackListUsernames();
@@ -178,9 +188,28 @@ public class FriendFragment extends BaseFragment {
                     }
                     return lhs.getInitialLetter().compareTo(rhs.getInitialLetter());
                 }
-
             }
         });
+        if (contactList==null){
+            return;
+        }
+        adapter.setData(contactList);
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getContactList();
+    }
+
+    @Override
+    public void onPullDownToRefresh(PullToRefreshBase<ScrollView> refreshView) {
+        getContactList();
+    }
+
+    @Override
+    public void onPullUpToRefresh(PullToRefreshBase<ScrollView> refreshView) {
+        getContactList();
     }
 }
