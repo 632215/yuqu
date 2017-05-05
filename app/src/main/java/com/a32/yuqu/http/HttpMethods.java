@@ -37,7 +37,7 @@ public class HttpMethods {
 //    public static final String BASE_URL = "http://weis.tunnel.qydev.com/";
 
     public static final String BASE_URL = "http://192.168.0.107/";
-    private static final int DEFAULT_TIMEOUT = 520;
+    private static final int DEFAULT_TIMEOUT = 120;
     private RequestToast requestToast;
     private Retrofit retrofit;
     private AppService movieService;

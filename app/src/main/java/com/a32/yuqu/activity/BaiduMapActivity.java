@@ -1,12 +1,11 @@
 package com.a32.yuqu.activity;
 
 import android.content.Intent;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -14,7 +13,6 @@ import com.a32.yuqu.R;
 import com.a32.yuqu.applicaption.MyApplicaption;
 import com.a32.yuqu.base.BaseActivity;
 import com.a32.yuqu.bean.UserBean;
-import com.a32.yuqu.bean.UserInfo;
 import com.a32.yuqu.http.HttpMethods;
 import com.a32.yuqu.http.HttpResult;
 import com.a32.yuqu.http.progress.ProgressSubscriber;
@@ -26,24 +24,17 @@ import com.a32.yuqu.view.TopTitleBar;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.mapapi.map.BaiduMap;
-import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
-import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
+import com.baidu.mapapi.map.Overlay;
 import com.baidu.mapapi.model.LatLng;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import butterknife.Bind;
-
-import static com.a32.yuqu.R.id.etDescribe;
-import static com.a32.yuqu.R.id.etName;
-import static com.a32.yuqu.R.id.fromAlbum;
-import static com.a32.yuqu.R.id.fromCamera;
-import static com.a32.yuqu.R.string.location;
 
 /**
  * Created by pc on 2017/1/24.
@@ -66,9 +57,12 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
     private BaiduMap mBaiduMap;
     private boolean isFisrtLoc = true;
     private MyBDLocationListener myBDLocationListener = new MyBDLocationListener();
-    private  MyPopWindows addInfoPop;
+    private MyPopWindows addInfoPop;
     private EditText etName;
     private EditText etDescribe;
+    private TextView btnCancle;
+    private TextView btnSure;
+
     @Override
     protected int getContentViewId() {
         return R.layout.activity_baidumap;
@@ -105,25 +99,34 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
             case R.id.nearFishPlace://附近渔场
                 break;
             case R.id.markFishPlace://标记我的位置为渔场
-                addInfo();//添加渔场的描述
+//                addInfo();//添加渔场的描述
+                startActivity(new Intent(this, MarkPlaceActivity.class));
                 break;
-            case R.id.myLocation://定位我的位置
-                showMyLocation(myLatitude, myLongitude);
+            case R.id.btnCancle://取消
+                addInfoPop.dismiss();
+                break;
+            case R.id.btnSure://确定
+                markPlace(etName.getText().toString().trim(), etDescribe.getText().toString().trim());
+                addInfoPop.dismiss();
+                break;
+            case R.id.myLocation:
+                showMyLocation();
                 break;
         }
     }
 
     private void addInfo() {
         addInfoPop = new MyPopWindows(this);
-        addInfoPop.setAlpha(0.1f);
+        addInfoPop.setAlpha(0.5f);
         addInfoPop.setContentView(View.inflate(this, R.layout.addinfo_popuwindow, null));
         addInfoPop.showAtLocation(baiduLayout, Gravity.CENTER, 0, 0);
         View viewPopWindows = addInfoPop.getContentView();
         etName = (EditText) viewPopWindows.findViewById(R.id.etName);
         etDescribe = (EditText) viewPopWindows.findViewById(R.id.etDescribe);
-//        markPlace();
-//        fromAlbum.setOnClickListener(this);
-//        fromCamera.setOnClickListener(this);
+        btnCancle = (TextView) viewPopWindows.findViewById(R.id.btnCancle);
+        btnSure = (TextView) viewPopWindows.findViewById(R.id.btnSure);
+        btnCancle.setOnClickListener(this);
+        btnSure.setOnClickListener(this);
     }
 
     private Double latitude = 0.00;
@@ -165,7 +168,7 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
 
             @Override
             public void onNext(UserBean info) {
-
+                showToast("标记成功！");
             }
 
             @Override
@@ -182,7 +185,12 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
         HttpMethods.getInstance().markPlace(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, this, false), map);
     }
 
-    private void showMyLocation(Double myLatitude, Double myLongitude) {
+    //    private void showMyLocation(Double myLatitude, Double myLongitude) {
+//        LatLng latLng = new LatLng(myLatitude, myLongitude);
+//        MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newLatLngZoom(latLng, 16);
+//        mBaiduMap.animateMapStatus(mapStatusUpdate);
+//    }
+    private void showMyLocation() {
         LatLng latLng = new LatLng(myLatitude, myLongitude);
         MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newLatLngZoom(latLng, 16);
         mBaiduMap.animateMapStatus(mapStatusUpdate);

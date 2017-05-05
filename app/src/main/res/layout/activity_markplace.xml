@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.a32.yuqu.view.TopTitleBar
+        android:id="@+id/titleBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="20dp">
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="渔场名字"
+            android:textColor="@color/colorTextBlack"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/etName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="30dp"
+            android:background="@null"
+            android:gravity="center_vertical|left"
+            android:hint="请输入渔场名字"
+            android:inputType="phone"
+            android:lines="1"
+            android:maxLength="11"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="80dp"
+            android:paddingBottom="15dp"
+            android:paddingTop="15dp"
+            android:textColor="@color/colorTextBlack"
+            android:textColorHint="@color/colorTextGray"
+            android:textSize="14sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignBottom="@+id/etName"
+            android:background="@color/colorLineGray"></View>
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="20dp">
+
+        <TextView
+            android:id="@+id/tvRemarks"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="渔场描述"
+            android:textColor="@color/colorTextBlack"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/etRemarks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="30dp"
+            android:background="@null"
+            android:gravity="center_vertical|left"
+            android:hint="请输入相关描述"
+            android:inputType="phone"
+            android:layout_marginRight="10dp"
+            android:paddingBottom="15dp"
+            android:paddingTop="15dp"
+            android:layout_marginLeft="80dp"
+            android:textColor="@color/colorTextBlack"
+            android:textColorHint="@color/colorTextGray"
+            android:textSize="14sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignBottom="@+id/etRemarks"
+            android:background="@color/colorLineGray"></View>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="20dp">
+
+        <TextView
+            android:id="@+id/tvDescribe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="备注"
+            android:textColor="@color/colorTextBlack"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/etDescribe"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="30dp"
+            android:background="@null"
+            android:gravity="center_vertical|left"
+            android:hint="请输入备注信息"
+            android:inputType="phone"
+            android:layout_marginRight="10dp"
+            android:paddingBottom="15dp"
+            android:paddingTop="15dp"
+            android:layout_marginLeft="80dp"
+            android:textColor="@color/colorTextBlack"
+            android:textColorHint="@color/colorTextGray"
+            android:textSize="14sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignBottom="@+id/etDescribe"
+            android:background="@color/colorLineGray"></View>
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/addPicture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="15dp"
+        android:src="@mipmap/addpicture"
+        android:scaleType="fitXY"
+        android:adjustViewBounds="true"/>
+
+</LinearLayout>
