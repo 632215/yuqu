@@ -85,7 +85,7 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
     private Bitmap bitmapHead;// 头像Bitmap
     private String headPath = "";// 头像Bitmap
     private String tempPath = Environment.getExternalStorageDirectory() + "/head.jpg";
-    private String path =Environment.getExternalStorageDirectory() + "/yuqu/myHead/";// sd路径
+    private static String path = Environment.getExternalStorageDirectory() + "/yuqu/pic/";// sd路径
 
     @Override
     protected int getContentViewId() {
@@ -165,14 +165,29 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
                 errorTips.setVisibility(View.INVISIBLE);
                 break;
             case R.id.fromAlbum:
-                checkAlbumPermission();
-                morePopWindows.dismiss();
+                if (checkSd()) {
+                    checkAlbumPermission();
+                } else {
+                    showToast("sd卡不可用！");
+                }
                 break;
             case R.id.fromCamera:
-                checkCameraPermission();
-                morePopWindows.dismiss();
+                if (checkSd()) {
+                    checkCameraPermission();
+                } else {
+                    showToast("sd卡不可用！");
+                }
                 break;
 
+        }
+    }
+
+    private boolean checkSd() {
+        String state = Environment.getExternalStorageState(); //拿到sdcard是否可用的状态码
+        if (state.equals(Environment.MEDIA_MOUNTED)) {   //如果可用
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -215,6 +230,7 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
                 params, new RequestCallBack<String>() {
                     @Override
                     public void onSuccess(ResponseInfo<String> responseInfo) {
+                        Log.i(MyApplicaption.Tag,responseInfo.result);
                     }
 
                     @Override
@@ -324,17 +340,19 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
 
     //从相ce选取
     private void album() {
-        Intent intent1 = new Intent(Intent.ACTION_PICK, null);
-        intent1.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-        startActivityForResult(intent1, CODE_GALLERY_REQUEST);
+        Intent intentAlbum = new Intent(Intent.ACTION_PICK, null);
+        intentAlbum.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+        startActivityForResult(intentAlbum, CODE_GALLERY_REQUEST);
+        morePopWindows.dismiss();
     }
 
 
     //从相机拍照
     private void camera() {
-        Intent intent2 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        intent2.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(Environment.getExternalStorageDirectory(), "head.jpg")));
-        startActivityForResult(intent2, CODE_CAMERA_REQUEST);// 采用ForResult打开
+        Intent intentCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        intentCamera.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(Environment.getExternalStorageDirectory(), "head.jpg")));
+        startActivityForResult(intentCamera, CODE_CAMERA_REQUEST);// 采用ForResult打开
+        morePopWindows.dismiss();
     }
 
     private void startSelect() {

@@ -24,7 +24,7 @@ import java.util.Date;
  */
 
 public class FileUtil {
-    private static String path = Environment.getExternalStorageDirectory() + "/yuqu/myHead/";// sd路径
+    private static String path = Environment.getExternalStorageDirectory() + "/yuqu/pic/";// sd路径
     private static String fileName="";
 
     /*保存图片到本地*/
@@ -36,7 +36,7 @@ public class FileUtil {
         FileOutputStream b = null;
         File file = new File(path);
         file.mkdirs();// 创建文件夹
-        fileName = getNewFileName() + "head.jpg";// 图片名字
+        fileName = getNewFileName() + ".jpg";// 图片名字
         Log.i(MyApplicaption.Tag,fileName);
         try {
             b = new FileOutputStream(path+fileName);
@@ -56,6 +56,39 @@ public class FileUtil {
         deleteFile(tempPath);//删除图片
         return fileName;
     }
+
+    /*保存图片到本地*/
+    public static String savePic(Bitmap mBitmap) {
+        String sdStatus = Environment.getExternalStorageState();
+        if (!sdStatus.equals(Environment.MEDIA_MOUNTED)) { // 检测sd是否可用
+            return null;
+        }
+        FileOutputStream b = null;
+        File file = new File(path);
+        file.mkdirs();// 创建文件夹
+        fileName = getNewFileName() + ".jpg";// 图片名字
+        Log.i(MyApplicaption.Tag,fileName);
+        try {
+            b = new FileOutputStream(path+fileName);
+            mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, b);// 把数据写入文件
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                // 关闭流
+                b.flush();
+                b.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return fileName;
+    }
+
+    private static void checksdcard() {
+    }
+
 
     public static String getNewFileName() {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");

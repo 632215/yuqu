@@ -1,5 +1,6 @@
 package com.a32.yuqu.activity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Looper;
 import android.support.percent.PercentRelativeLayout;
@@ -29,6 +30,7 @@ import com.a32.yuqu.utils.CommonlyUtils;
 import com.a32.yuqu.utils.KeyBoardUtils;
 import com.a32.yuqu.utils.PhoneUtils;
 import com.a32.yuqu.utils.ToastUtils;
+import com.a32.yuqu.view.CustomProgressDialog;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.EMError;
 import com.hyphenate.chat.EMClient;
@@ -167,6 +169,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 //    }
 
     private void loginAccount(String mname, String mpassword) {
+        final CustomProgressDialog progressDialog = new CustomProgressDialog(this, "正在登录");
+        progressDialog.setCancleEnable(false);
+        progressDialog.show();
+
         //检测网络连通性
         if (!CommonUtils.isNetWorkConnected(this)) {
             Toast.makeText(this, R.string.network_isnot_available, Toast.LENGTH_SHORT).show();
@@ -185,6 +191,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             //回调
             @Override
             public void onSuccess() {
+                progressDialog.dismiss();
                 // 加载所有会话到内存
                 EMClient.getInstance().chatManager().loadAllConversations();
                 EMClient.getInstance().groupManager().loadAllGroups();

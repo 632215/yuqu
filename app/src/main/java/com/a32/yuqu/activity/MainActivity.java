@@ -125,7 +125,7 @@ public class MainActivity extends BaseActivity
                 Log.i(MyApplicaption.Tag,"onNext");
                 if (info!=null){
                     tvName.setText(info.getUserName());
-                    Bitmap head = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory() + "/yuqu/myHead/"+info.getUserHead());
+                    Bitmap head = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory() + "/yuqu/pic/"+info.getUserHead());
                     imgHead.setImageBitmap(head);
                     UserInfo userInfo=CommonlyUtils.getUserInfo(MainActivity.this);
                     userInfo.setUserHead(info.getUserHead());
