@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.a32.yuqu.R;
+import com.a32.yuqu.bean.LocationBean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,15 +21,15 @@ import java.util.List;
 public class MyReportAdapter extends BaseAdapter {
     private Context mContext;
     private LayoutInflater inflater;
-    List<String> nodeInfos = new ArrayList<>();
+    List<LocationBean.ListBean> nodeInfos = new ArrayList<>();
 
-    public MyReportAdapter(Context mContext, List<String> nodeInfos) {
+    public MyReportAdapter(Context mContext, List<LocationBean.ListBean> nodeInfos) {
         this.mContext = mContext;
         this.nodeInfos = nodeInfos;
         inflater = LayoutInflater.from(mContext);
     }
 
-    public void setData(List<String> nodeInfos){
+    public void setData(List<LocationBean.ListBean> nodeInfos){
         this.nodeInfos=nodeInfos;
         notifyDataSetChanged();
 
@@ -64,7 +65,7 @@ public class MyReportAdapter extends BaseAdapter {
         } else {
             holder = (viewHolder) view.getTag();
         }
-        String bean = nodeInfos.get(psiont);
+        LocationBean.ListBean bean = nodeInfos.get(psiont);
         if (bean!=null) {
             if (nodeInfos.size() == 1) {
                 holder.upLine.setVisibility(View.INVISIBLE);
@@ -83,6 +84,7 @@ public class MyReportAdapter extends BaseAdapter {
                     holder.devider.setVisibility(View.GONE);
                 }
             }
+            holder.placeName.setText(bean.getPlaceName());
         }
         return view;
     }

@@ -1,6 +1,7 @@
 package com.a32.yuqu.http;
 
 
+import com.a32.yuqu.bean.LocationBean;
 import com.a32.yuqu.bean.UserBean;
 import com.a32.yuqu.bean.UserInfo;
 import com.google.gson.Gson;
@@ -48,8 +49,13 @@ public interface AppService {
     @POST("getuserbyname.php")
     Observable<HttpResult<UserBean>> getUserByName(@FieldMap Map<String, String> mapgson);
 
-    //根据用户名获取头像
+    //得到渔场
     @FormUrlEncoded
-    @POST("markplace.php")
-    Observable<HttpResult<UserBean>> markPlace(@FieldMap Map<String, String> mapgson);
+    @POST("getnearpoint.php")
+    Observable<HttpResult<LocationBean>> getNearPoint(@FieldMap Map<String, String> mapgson);
+
+    //删除渔场记录
+    @FormUrlEncoded
+    @POST("deleteplace.php")
+    Observable<HttpResult<UserBean>> deletePlace(@FieldMap Map<String, String> mapgson);
 }

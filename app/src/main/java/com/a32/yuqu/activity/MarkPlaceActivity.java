@@ -30,6 +30,7 @@ import com.a32.yuqu.http.progress.ProgressSubscriber;
 import com.a32.yuqu.http.progress.SubscriberOnNextListener;
 import com.a32.yuqu.utils.CommonlyUtils;
 import com.a32.yuqu.utils.FileUtil;
+import com.a32.yuqu.view.CustomProgressDialog;
 import com.a32.yuqu.view.MyPopWindows;
 import com.a32.yuqu.view.TopTitleBar;
 import com.lidroid.xutils.HttpUtils;
@@ -251,35 +252,15 @@ public class MarkPlaceActivity extends BaseActivity implements TopTitleBar.OnTop
         addPicture.setVisibility(View.GONE);
     }
 
-//    private void markPlace(String placeName, String describe, String remark) {
-//        SubscriberOnNextListener onNextListener = new SubscriberOnNextListener<UserBean>() {
-//
-//            @Override
-//            public void onNext(UserBean info) {
-//
-//            }
-//
-//            @Override
-//            public void onError(String Msg) {
-//            }
-//        };
-//        Map<String, String> map = new HashMap<>();
-//        map.put("phone", CommonlyUtils.getUserInfo(this).getUserPhone());
-//        map.put("name", CommonlyUtils.getUserInfo(this).getUserName());
-//        map.put("placeName", placeName);
-//        map.put("describe", describe);
-//        map.put("remark", remark);
-//        map.put("longitude", String.valueOf(myLongitude));
-//        map.put("latitude", String.valueOf(myLatitude));
-//        HttpMethods.getInstance().markPlace(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, this, false), map);
-//    }
-
     private void uploadHead(String placeName, String describe, String remark) {
+        final CustomProgressDialog progressDialog = new CustomProgressDialog(this, "正在标记");
+        progressDialog.setCancleEnable(false);
+        progressDialog.show();
         RequestParams params = new RequestParams();
         params.addBodyParameter("uploadedfile", new File(path+filePath));
         params.addBodyParameter("filePath", filePath);
         params.addBodyParameter("phone", CommonlyUtils.getUserInfo(this).getUserPhone());
-        params.addBodyParameter("name", CommonlyUtils.getUserInfo(this).getUserName());
+        params.addBodyParameter("username", CommonlyUtils.getUserInfo(this).getUserName());
         params.addBodyParameter("placeName", placeName);
         params.addBodyParameter("describe", describe);
         params.addBodyParameter("remark", remark);
@@ -292,6 +273,7 @@ public class MarkPlaceActivity extends BaseActivity implements TopTitleBar.OnTop
                 params, new RequestCallBack<String>() {
                     @Override
                     public void onSuccess(ResponseInfo<String> responseInfo) {
+                        progressDialog.dismiss();
                         showToast("标记成功！");
                         Log.i(MyApplicaption.Tag,responseInfo.result.toString());
                         startActivity(new Intent(MarkPlaceActivity.this,MainActivity.class));

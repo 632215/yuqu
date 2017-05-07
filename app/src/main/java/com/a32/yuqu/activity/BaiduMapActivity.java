@@ -1,6 +1,8 @@
 package com.a32.yuqu.activity;
 
 import android.content.Intent;
+import android.location.Location;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
@@ -12,6 +14,7 @@ import android.widget.TextView;
 import com.a32.yuqu.R;
 import com.a32.yuqu.applicaption.MyApplicaption;
 import com.a32.yuqu.base.BaseActivity;
+import com.a32.yuqu.bean.LocationBean;
 import com.a32.yuqu.bean.UserBean;
 import com.a32.yuqu.http.HttpMethods;
 import com.a32.yuqu.http.HttpResult;
@@ -24,14 +27,20 @@ import com.a32.yuqu.view.TopTitleBar;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BitmapDescriptor;
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.Overlay;
+import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.model.LatLng;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import butterknife.Bind;
@@ -57,11 +66,7 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
     private BaiduMap mBaiduMap;
     private boolean isFisrtLoc = true;
     private MyBDLocationListener myBDLocationListener = new MyBDLocationListener();
-    private MyPopWindows addInfoPop;
-    private EditText etName;
-    private EditText etDescribe;
-    private TextView btnCancle;
-    private TextView btnSure;
+    private List<LocationBean.ListBean> mapPointList;//周围点的坐标
 
     @Override
     protected int getContentViewId() {
@@ -75,6 +80,7 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
         nearFishPlace.setOnClickListener(this);
         markFishPlace.setOnClickListener(this);
         myLocation.setOnClickListener(this);
+        mapPointList =new ArrayList<>();
         initMap();
     }
 
@@ -84,9 +90,7 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
         mBaiduMap = bmapView.getMap();
         mBaiduMap.setMyLocationEnabled(true);
         locationService.registerListener(myBDLocationListener);
-
     }
-
 
     @Override
     public void onBackClick() {
@@ -97,11 +101,13 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.nearFishPlace://附近渔场
+
+                getNearPoint();
                 break;
             case R.id.markFishPlace://标记我的位置为渔场
-                Intent intent=new Intent(this, MarkPlaceActivity.class);
-                intent.putExtra("myLatitude",myLatitude);
-                intent.putExtra("myLongitude",myLongitude);
+                Intent intent = new Intent(this, MarkPlaceActivity.class);
+                intent.putExtra("myLatitude", myLatitude);
+                intent.putExtra("myLongitude", myLongitude);
                 startActivity(intent);
                 break;
             case R.id.myLocation:
@@ -109,6 +115,45 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
                 break;
         }
     }
+
+    //    得到附近渔场
+    private void getNearPoint() {
+        SubscriberOnNextListener onNextListener = new SubscriberOnNextListener<LocationBean>() {
+
+            @Override
+            public void onNext(LocationBean info) {
+                if (info != null) {
+                    mapPointList.addAll(info.getList());
+                }
+                makeMarker(mapPointList);
+            }
+
+            @Override
+            public void onError(String Msg) {
+
+            }
+        };
+        Map<String, String> map = new HashMap<>();
+        HttpMethods.getInstance().getNearPoint(new ProgressSubscriber<HttpResult<LocationBean>>(onNextListener, this, false), map);
+
+    }
+
+    private void makeMarker(List<LocationBean.ListBean> mapPointList) {
+        for (LocationBean.ListBean bean : mapPointList) {
+            //定义Maker坐标点
+            LatLng point = new LatLng(Double.valueOf(bean.getLatitude()),Double.valueOf(bean.getLongitude()));
+            //构建Marker图标s
+            BitmapDescriptor bitmap = BitmapDescriptorFactory
+                    .fromResource(R.mipmap.xiaoyuan);
+            //构建MarkerOption，用于在地图上添加Marker
+            OverlayOptions option = new MarkerOptions()
+                    .position(point)
+                    .icon(bitmap);
+            //在地图上添加Marker，并显示
+            mBaiduMap.addOverlay(option);
+        }
+    }
+
 
     private Double latitude = 0.00;
     private Double longitude = 0.00;
@@ -171,7 +216,6 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //在activity执行onDestroy时执行mMapView.onDestroy()，实现地图生命周期管理
         if (bmapView != null) {
             bmapView.onDestroy();
         }

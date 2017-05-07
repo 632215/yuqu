@@ -135,133 +135,137 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
     }
 
-//    private void loginAccount(final String currentUsername, final String currentPassword) {
-//        SubscriberOnNextListener onNextListener = new SubscriberOnNextListener<UserBean>() {
-//
-//            @Override
-//            public void onNext(UserBean info) {
-//                Log.i(MyApplicaption.Tag, "getUserByName info--" + info.getName() + "----" + info.getHead());
-//                if (info != null) {
-//                    EMClient.getInstance().groupManager().loadAllGroups();
-//                    EMClient.getInstance().chatManager().loadAllConversations();
-//                    getFriends();
-//                    UserInfo userInfo = new UserInfo();
-//                    userInfo.setUserPhone(currentUsername);
-//                    userInfo.setUserPwd(currentPassword);
-//                    CommonlyUtils.saveUserInfo(LoginActivity.this, userInfo);
-//                    Intent intent = new Intent(LoginActivity.this,
-//                            MainActivity.class);
-//                    startActivity(intent);
-//                    finish();
-//                }
-//            }
-//
-//            @Override
-//            public void onError(String Msg) {
-//                errorTips.setText(Msg);
-//                errorTips.setVisibility(View.VISIBLE);
-//            }
-//        };
-//        Map<String, String> map = new HashMap<>();
-//        map.put("phone", currentUsername);
-//        map.put("password", currentPassword);
-//        HttpMethods.getInstance().loginAccount(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, this, false), map);
-//    }
-
-    private void loginAccount(String mname, String mpassword) {
+    private void loginAccount(final String currentUsername, final String currentPassword) {
         final CustomProgressDialog progressDialog = new CustomProgressDialog(this, "正在登录");
         progressDialog.setCancleEnable(false);
         progressDialog.show();
+        SubscriberOnNextListener onNextListener = new SubscriberOnNextListener<UserBean>() {
 
-        //检测网络连通性
-        if (!CommonUtils.isNetWorkConnected(this)) {
-            Toast.makeText(this, R.string.network_isnot_available, Toast.LENGTH_SHORT).show();
-            return;
-        }
-//DemoDB可能会依然在执行一些异步回调，所以DemoDB会再次重新打开，
-// 所以我们要在登陆之前确保DemoDB不会被Overlap。所以我们关闭一下数据库。
-        DemoDBManager.getInstance().closeDB();
-        MyApplicaption.getInstance().setCurrentUserName(mname);
-
-        Log.i(MyApplicaption.Tag,"mname"+mname);
-        Log.i(MyApplicaption.Tag,"getCurrentUserName"+MyApplicaption.getInstance().getCurrentUserName());
-        Log.i(MyApplicaption.Tag,"currentUsername"+currentUsername);
-
-        EMClient.getInstance().login(mname, mpassword, new EMCallBack() {
-            //回调
             @Override
-            public void onSuccess() {
-                progressDialog.dismiss();
-                // 加载所有会话到内存
-                EMClient.getInstance().chatManager().loadAllConversations();
-                EMClient.getInstance().groupManager().loadAllGroups();
-                getFriends();
-                UserInfo userInfo=new UserInfo();
-                userInfo.setUserPhone(currentUsername);
-                userInfo.setUserPwd(currentPassword);
-
-                CommonlyUtils.saveUserInfo(LoginActivity.this,userInfo);
-
-                Intent intent = new Intent(LoginActivity.this,
-                        MainActivity.class);
-                startActivity(intent);
-                finish();
+            public void onNext(UserBean info) {
+                Log.i(MyApplicaption.Tag, "getUserByName info--" + info.getName() + "----" + info.getHead());
+                if (info != null) {
+                    EMClient.getInstance().groupManager().loadAllGroups();
+                    EMClient.getInstance().chatManager().loadAllConversations();
+                    getFriends();
+                    UserInfo userInfo = new UserInfo();
+                    userInfo.setUserPhone(currentUsername);
+                    userInfo.setUserPwd(currentPassword);
+                    CommonlyUtils.saveUserInfo(LoginActivity.this, userInfo);
+                    Intent intent = new Intent(LoginActivity.this,
+                            MainActivity.class);
+                    progressDialog.dismiss();
+                    startActivity(intent);
+                    finish();
+                }
             }
 
             @Override
-            public void onProgress(int progress, String status) {
-
+            public void onError(String Msg) {
+                errorTips.setText(Msg);
+                errorTips.setVisibility(View.VISIBLE);
             }
-
-            @Override
-            public void onError(final int code, String message) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        switch (code) {
-                            // 网络异常 2
-                            case EMError.NETWORK_ERROR:
-                                ToastUtils.showLong(LoginActivity.this, "网络错误！");
-                                break;
-                            // 无效的用户名 101
-                            case EMError.INVALID_USER_NAME:
-                                ToastUtils.showLong(LoginActivity.this, "无效的用户名！");
-                                break;
-                            // 无效的密码 102
-                            case EMError.INVALID_PASSWORD:
-                                ToastUtils.showLong(LoginActivity.this, "无效的密码！");
-                                break;
-                            // 用户认证失败，用户名或密码错误 202
-                            case EMError.USER_AUTHENTICATION_FAILED:
-                                ToastUtils.showLong(LoginActivity.this, "用户认证失败，用户名或密码错误！");
-                                break;
-                            // 用户不存在 204
-                            case EMError.USER_NOT_FOUND:
-                                ToastUtils.showLong(LoginActivity.this, "用户不存在！");
-                                break;
-                            // 无法访问到服务器 300
-                            case EMError.SERVER_NOT_REACHABLE:
-                                ToastUtils.showLong(LoginActivity.this, "无法访问到服务器！");
-                                break;
-                            // 等待服务器响应超时 301
-                            case EMError.SERVER_TIMEOUT:
-                                ToastUtils.showLong(LoginActivity.this, "等待服务器响应超时！");
-                                break;
-                            // 服务器繁忙 302
-                            case EMError.SERVER_BUSY:
-                                ToastUtils.showLong(LoginActivity.this, "服务器繁忙！");
-                                break;
-                            // 未知 Server 异常 303 一般断网会出现这个错误
-                            case EMError.SERVER_UNKNOWN_ERROR:
-                            default:
-                                ToastUtils.showLong(LoginActivity.this, "服务器异常！");
-                                break;
-                        }
-                    }
-                });
-            }
-        });
+        };
+        Map<String, String> map = new HashMap<>();
+        map.put("phone", currentUsername);
+        map.put("password", currentPassword);
+        HttpMethods.getInstance().loginAccount(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, this, false), map);
     }
+
+//    private void loginAccount(String mname, String mpassword) {
+//        final CustomProgressDialog progressDialog = new CustomProgressDialog(this, "正在登录");
+//        progressDialog.setCancleEnable(false);
+//        progressDialog.show();
+//
+//        //检测网络连通性
+//        if (!CommonUtils.isNetWorkConnected(this)) {
+//            Toast.makeText(this, R.string.network_isnot_available, Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+////DemoDB可能会依然在执行一些异步回调，所以DemoDB会再次重新打开，
+//// 所以我们要在登陆之前确保DemoDB不会被Overlap。所以我们关闭一下数据库。
+//        DemoDBManager.getInstance().closeDB();
+//        MyApplicaption.getInstance().setCurrentUserName(mname);
+//
+//        Log.i(MyApplicaption.Tag, "mname" + mname);
+//        Log.i(MyApplicaption.Tag, "getCurrentUserName" + MyApplicaption.getInstance().getCurrentUserName());
+//        Log.i(MyApplicaption.Tag, "currentUsername" + currentUsername);
+//
+//        EMClient.getInstance().login(mname, mpassword, new EMCallBack() {
+//            //回调
+//            @Override
+//            public void onSuccess() {
+//                progressDialog.dismiss();
+//                // 加载所有会话到内存
+//                EMClient.getInstance().chatManager().loadAllConversations();
+//                EMClient.getInstance().groupManager().loadAllGroups();
+//                getFriends();
+//                UserInfo userInfo = new UserInfo();
+//                userInfo.setUserPhone(currentUsername);
+//                userInfo.setUserPwd(currentPassword);
+//
+//                CommonlyUtils.saveUserInfo(LoginActivity.this, userInfo);
+//
+//                Intent intent = new Intent(LoginActivity.this,
+//                        MainActivity.class);
+//                startActivity(intent);
+//                finish();
+//            }
+//
+//            @Override
+//            public void onProgress(int progress, String status) {
+//
+//            }
+//
+//            @Override
+//            public void onError(final int code, String message) {
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        switch (code) {
+//                            // 网络异常 2
+//                            case EMError.NETWORK_ERROR:
+//                                ToastUtils.showLong(LoginActivity.this, "网络错误！");
+//                                break;
+//                            // 无效的用户名 101
+//                            case EMError.INVALID_USER_NAME:
+//                                ToastUtils.showLong(LoginActivity.this, "无效的用户名！");
+//                                break;
+//                            // 无效的密码 102
+//                            case EMError.INVALID_PASSWORD:
+//                                ToastUtils.showLong(LoginActivity.this, "无效的密码！");
+//                                break;
+//                            // 用户认证失败，用户名或密码错误 202
+//                            case EMError.USER_AUTHENTICATION_FAILED:
+//                                ToastUtils.showLong(LoginActivity.this, "用户认证失败，用户名或密码错误！");
+//                                break;
+//                            // 用户不存在 204
+//                            case EMError.USER_NOT_FOUND:
+//                                ToastUtils.showLong(LoginActivity.this, "用户不存在！");
+//                                break;
+//                            // 无法访问到服务器 300
+//                            case EMError.SERVER_NOT_REACHABLE:
+//                                ToastUtils.showLong(LoginActivity.this, "无法访问到服务器！");
+//                                break;
+//                            // 等待服务器响应超时 301
+//                            case EMError.SERVER_TIMEOUT:
+//                                ToastUtils.showLong(LoginActivity.this, "等待服务器响应超时！");
+//                                break;
+//                            // 服务器繁忙 302
+//                            case EMError.SERVER_BUSY:
+//                                ToastUtils.showLong(LoginActivity.this, "服务器繁忙！");
+//                                break;
+//                            // 未知 Server 异常 303 一般断网会出现这个错误
+//                            case EMError.SERVER_UNKNOWN_ERROR:
+//                            default:
+//                                ToastUtils.showLong(LoginActivity.this, "服务器异常！");
+//                                break;
+//                        }
+//                    }
+//                });
+//            }
+//        });
+//    }
 
 
     private void getFriends() {

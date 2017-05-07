@@ -5,6 +5,7 @@ import android.os.Message;
 import android.util.Log;
 
 import com.a32.yuqu.applicaption.MyApplicaption;
+import com.a32.yuqu.bean.LocationBean;
 import com.a32.yuqu.bean.UserBean;
 import com.a32.yuqu.bean.UserInfo;
 import com.google.gson.Gson;
@@ -161,13 +162,24 @@ public class HttpMethods {
     }
 
     /**
-     * 标记的我的渔场
+     * 得到渔场
      *
      * @param subscriber
      * @param gson
      */
-    public void markPlace(Subscriber<HttpResult<UserBean>> subscriber, Map<String ,String > gson) {
-        Observable observable = movieService.markPlace(gson);
+    public void getNearPoint(Subscriber<HttpResult<LocationBean>> subscriber, Map<String ,String > gson) {
+        Observable observable = movieService.getNearPoint(gson);
+        toSubscribe(observable, subscriber);
+    }
+
+    /**
+     * 删除渔场记录
+     *
+     * @param subscriber
+     * @param gson
+     */
+    public void deletePlace(Subscriber<HttpResult<UserBean>> subscriber, Map<String ,String > gson) {
+        Observable observable = movieService.deletePlace(gson);
         toSubscribe(observable, subscriber);
     }
 }
