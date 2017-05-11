@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
@@ -32,6 +33,7 @@ import com.a32.yuqu.http.progress.SubscriberOnNextListener;
 import com.a32.yuqu.utils.CommonUtils;
 import com.a32.yuqu.utils.CommonlyUtils;
 import com.a32.yuqu.view.FillListView;
+import com.a32.yuqu.view.MyPopWindows;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshScrollView;
 import com.hyphenate.EMValueCallBack;
@@ -55,7 +57,7 @@ import butterknife.Bind;
  * Created by 32 on 2016/12/30.
  */
 
-public class FriendFragment extends BaseFragment implements PullToRefreshBase.OnRefreshListener2<ScrollView>{
+public class FriendFragment extends BaseFragment implements PullToRefreshBase.OnRefreshListener2<ScrollView>, View.OnClickListener {
     @Bind(R.id.pullRefresh)
     PullToRefreshScrollView pullRefresh;
     //联系人列表的listView
@@ -69,8 +71,10 @@ public class FriendFragment extends BaseFragment implements PullToRefreshBase.On
     protected List<EaseUser> contactList = new ArrayList<EaseUser>();
     private List<String> nameList;
     protected Map<String, EaseUser> contactsMap;
-    //    private ContactAdapter adapter;
     private FriendAdapter adapter;
+    private MyPopWindows popWindows;//右上角弹出框
+    private TextView btnCancle;
+    private TextView btnSure;
     @Override
     protected int getLayoutId() {
         return R.layout.fragment_friend;
@@ -82,7 +86,14 @@ public class FriendFragment extends BaseFragment implements PullToRefreshBase.On
         pullRefresh.setMode(PullToRefreshBase.Mode.BOTH);
         pullRefresh.setOnRefreshListener(this);
         initFriendData();
-        initNewContactData();
+//        initNewContactData();
+        newContact.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //进入好友申请页面
+                startActivity(new Intent(getActivity(), FriendApplyActivity.class));
+            }
+        });
     }
 
     //查看是否有好友请求
@@ -93,13 +104,7 @@ public class FriendFragment extends BaseFragment implements PullToRefreshBase.On
         if (msgsList.size() != 0) {
             tips.setVisibility(View.VISIBLE);
         }
-        newContact.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //进入好友申请页面
-                startActivity(new Intent(getActivity(), FriendApplyActivity.class));
-            }
-        });
+        tips.setVisibility(View.INVISIBLE);
     }
 
 
@@ -115,7 +120,6 @@ public class FriendFragment extends BaseFragment implements PullToRefreshBase.On
                     objectInfo.setUserPhone(name);
                     CommonlyUtils.saveObjectUser(objectInfo);
                     startActivity(new Intent(getActivity(), ChatActivity.class));
-
                 }
             }
 
@@ -131,7 +135,6 @@ public class FriendFragment extends BaseFragment implements PullToRefreshBase.On
 
     //初始化好友列表
     private void initFriendData() {
-//        adapter = new ContactAdapter(this.getActivity(), contactList);
         adapter = new FriendAdapter(getActivity(), contactList);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -141,6 +144,50 @@ public class FriendFragment extends BaseFragment implements PullToRefreshBase.On
                 getheadPath(adapter.getItem(arg2).getUsername());
             }
         });
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Log.i(MyApplicaption.Tag,listView.getItemAtPosition(i)+"长按");
+                getObjectInfo(adapter.getItem(i).getUsername());
+                showPopWindows();
+                return true;
+            }
+        });
+    }
+
+    private void getObjectInfo(final String username) {
+            SubscriberOnNextListener onNextListener = new SubscriberOnNextListener<UserBean>() {
+
+                @Override
+                public void onNext(UserBean info) {
+                    if (info != null) {
+                        UserInfo objectInfo = new UserInfo();
+                        objectInfo.setUserName(info.getName());
+                        objectInfo.setUserHead(info.getHead());
+                        objectInfo.setUserPhone(username);
+                        CommonlyUtils.saveObjectUser(objectInfo);
+                    }
+                }
+
+                @Override
+                public void onError(String Msg) {
+                }
+            };
+            Map<String, String> map = new HashMap<>();
+            map.put("phone", username);
+            HttpMethods.getInstance().getheadPath(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, this.getActivity(), false), map);
+    }
+
+    public void showPopWindows() {
+        popWindows = new MyPopWindows(getActivity());
+        popWindows.setContentView(View.inflate(getActivity(), R.layout.deletefriend,null));
+        popWindows.showAtLocation(getView(), Gravity.CENTER,0,0);
+
+        View views = popWindows.getContentView();
+        btnCancle= (TextView) views.findViewById(R.id.btnCancle);
+        btnSure= (TextView) views.findViewById(R.id.btnSure);
+        btnCancle.setOnClickListener(this);
+        btnSure.setOnClickListener(this);
     }
 
     /**
@@ -193,14 +240,17 @@ public class FriendFragment extends BaseFragment implements PullToRefreshBase.On
         if (contactList==null){
             return;
         }
+        Log.i(MyApplicaption.Tag,String.valueOf(contactList.size()));
         adapter.setData(contactList);
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onResume() {
         super.onResume();
         getContactList();
+        initNewContactData();
     }
 
     @Override
@@ -211,5 +261,23 @@ public class FriendFragment extends BaseFragment implements PullToRefreshBase.On
     @Override
     public void onPullUpToRefresh(PullToRefreshBase<ScrollView> refreshView) {
         getContactList();
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.btnCancle:
+                popWindows.dismiss();
+                break;
+            case R.id.btnSure:
+                popWindows.dismiss();
+                try {
+                    EMClient.getInstance().contactManager().deleteContact(CommonlyUtils.getObjectUser().getUserPhone());
+                    getContactList();
+                } catch (HyphenateException e) {
+                    e.printStackTrace();
+                }
+                break;
+        }
     }
 }

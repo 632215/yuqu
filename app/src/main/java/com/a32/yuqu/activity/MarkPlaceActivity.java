@@ -23,6 +23,7 @@ import android.widget.TextView;
 import com.a32.yuqu.R;
 import com.a32.yuqu.applicaption.MyApplicaption;
 import com.a32.yuqu.base.BaseActivity;
+import com.a32.yuqu.bean.DXWbean;
 import com.a32.yuqu.bean.UserBean;
 import com.a32.yuqu.http.HttpMethods;
 import com.a32.yuqu.http.HttpResult;
@@ -30,6 +31,7 @@ import com.a32.yuqu.http.progress.ProgressSubscriber;
 import com.a32.yuqu.http.progress.SubscriberOnNextListener;
 import com.a32.yuqu.utils.CommonlyUtils;
 import com.a32.yuqu.utils.FileUtil;
+import com.a32.yuqu.utils.PhoneUtils;
 import com.a32.yuqu.view.CustomProgressDialog;
 import com.a32.yuqu.view.MyPopWindows;
 import com.a32.yuqu.view.TopTitleBar;
@@ -85,7 +87,7 @@ public class MarkPlaceActivity extends BaseActivity implements TopTitleBar.OnTop
 
     private Double myLatitude = 0.00;
     private Double myLongitude = 0.00;
-
+    private CustomProgressDialog progressDialog;
     @Override
     protected int getContentViewId() {
         return R.layout.activity_markplace;
@@ -99,8 +101,8 @@ public class MarkPlaceActivity extends BaseActivity implements TopTitleBar.OnTop
         deletePicture.setOnClickListener(this);
         tvCommit.setOnClickListener(this);
         Intent intent = this.getIntent();
-        myLatitude = Double.valueOf(intent.getDoubleExtra("myLatitude",0.0));
-        myLongitude = Double.valueOf(intent.getDoubleExtra("myLongitude",0.0));
+        myLatitude = Double.valueOf(intent.getDoubleExtra("myLatitude", 0.0));
+        myLongitude = Double.valueOf(intent.getDoubleExtra("myLongitude", 0.0));
     }
 
     private void startSelect() {
@@ -150,12 +152,33 @@ public class MarkPlaceActivity extends BaseActivity implements TopTitleBar.OnTop
                 }
                 break;
             case R.id.tvCommit:
-                uploadHead(etName.getText().toString().trim()
+                if (etName.getText().toString().trim().isEmpty()) {
+                    showToast("请输入渔场名字！");
+                    return;
+                }
+                if (etDescribe.getText().toString().trim().isEmpty()) {
+                    showToast("请输入的相关描述！");
+                    return;
+                }
+                //是否有图片文件
+//                if (filePath.equals("")){
+//                    markPlace(etName.getText().toString().trim()
+//                            , etDescribe.getText().toString().trim()
+//                            , etRemark.getText().toString().trim());
+//                }else {
+//                    markPlaceFile(etName.getText().toString().trim()
+//                            , etDescribe.getText().toString().trim()
+//                            , etRemark.getText().toString().trim());
+//                }
+                markPlace(etName.getText().toString().trim()
                         , etDescribe.getText().toString().trim()
                         , etRemark.getText().toString().trim());
+
                 break;
         }
     }
+
+
 
     private boolean checkSd() {
         String state = Environment.getExternalStorageState(); //拿到sdcard是否可用的状态码
@@ -252,31 +275,20 @@ public class MarkPlaceActivity extends BaseActivity implements TopTitleBar.OnTop
         addPicture.setVisibility(View.GONE);
     }
 
-    private void uploadHead(String placeName, String describe, String remark) {
-        final CustomProgressDialog progressDialog = new CustomProgressDialog(this, "正在标记");
-        progressDialog.setCancleEnable(false);
-        progressDialog.show();
+    private void uploadHead(final String headPath) {
         RequestParams params = new RequestParams();
-        params.addBodyParameter("uploadedfile", new File(path+filePath));
-        params.addBodyParameter("filePath", filePath);
-        params.addBodyParameter("phone", CommonlyUtils.getUserInfo(this).getUserPhone());
-        params.addBodyParameter("username", CommonlyUtils.getUserInfo(this).getUserName());
-        params.addBodyParameter("placeName", placeName);
-        params.addBodyParameter("describe", describe);
-        params.addBodyParameter("remark", remark);
-        params.addBodyParameter("longitude", String.valueOf(myLongitude));
-        params.addBodyParameter("latitude",  String.valueOf(myLatitude));
-
+        params.addBodyParameter("uploadedfile", new File(path+headPath));
+        params.addBodyParameter("headPath", headPath);
+        Log.i(MyApplicaption.Tag,HttpMethods.BASE_URL + "uploadhead.php");
         HttpUtils http = new HttpUtils(200000);
         http.send(HttpRequest.HttpMethod.POST,
-                HttpMethods.BASE_URL + "markplace.php",
+                HttpMethods.BASE_URL + "uploadHead.php",
                 params, new RequestCallBack<String>() {
                     @Override
                     public void onSuccess(ResponseInfo<String> responseInfo) {
+                        Log.i(MyApplicaption.Tag,responseInfo.result);
                         progressDialog.dismiss();
-                        showToast("标记成功！");
-                        Log.i(MyApplicaption.Tag,responseInfo.result.toString());
-                        startActivity(new Intent(MarkPlaceActivity.this,MainActivity.class));
+                        startActivity(new Intent(MarkPlaceActivity.this, MainActivity.class));
                         finish();
                     }
 
@@ -286,4 +298,35 @@ public class MarkPlaceActivity extends BaseActivity implements TopTitleBar.OnTop
                 });
     }
 
+    private void markPlace(String placeName, String describe, String remark) {
+        progressDialog = new CustomProgressDialog(this, "正在标记");
+        progressDialog.setCancleEnable(false);
+        progressDialog.show();
+        SubscriberOnNextListener onNextListener = new SubscriberOnNextListener<UserBean>() {
+
+            @Override
+            public void onNext(UserBean info) {
+
+                if (!filePath.equals("")) {
+                    uploadHead(filePath);
+                } else {
+                    progressDialog.dismiss();
+                }
+            }
+
+            @Override
+            public void onError(String Msg) {
+            }
+        };
+        Map<String, String> map = new HashMap<>();
+        map.put("filePath", filePath);
+        map.put("phone", CommonlyUtils.getUserInfo(this).getUserPhone());
+        map.put("username", CommonlyUtils.getUserInfo(this).getUserName());
+        map.put("placeName", placeName);
+        map.put("describe", describe);
+        map.put("remark", remark);
+        map.put("longitude", String.valueOf(myLongitude));
+        map.put("latitude", String.valueOf(myLatitude));
+        HttpMethods.getInstance().markPlace(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener,this, false), map);
+    }
 }

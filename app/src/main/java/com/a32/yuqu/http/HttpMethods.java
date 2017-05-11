@@ -5,6 +5,8 @@ import android.os.Message;
 import android.util.Log;
 
 import com.a32.yuqu.applicaption.MyApplicaption;
+import com.a32.yuqu.bean.DDyBean;
+import com.a32.yuqu.bean.DXWbean;
 import com.a32.yuqu.bean.LocationBean;
 import com.a32.yuqu.bean.UserBean;
 import com.a32.yuqu.bean.UserInfo;
@@ -35,9 +37,11 @@ import rx.schedulers.Schedulers;
  * Created by liukun on 16/3/9.
  */
 public class HttpMethods {
-//    public static final String BASE_URL = "http://weis.tunnel.qydev.com/";
+    public static final String BASE_URL = "http://weis.tunnel.qydev.com/";
 
-    public static final String BASE_URL = "http://192.168.0.107/";
+//    public static final String BASE_URL = "http://192.168.0.107/";
+//public static final String BASE_URL = "http:// 172.19.60.32/";
+
     private static final int DEFAULT_TIMEOUT = 120;
     private RequestToast requestToast;
     private Retrofit retrofit;
@@ -180,6 +184,61 @@ public class HttpMethods {
      */
     public void deletePlace(Subscriber<HttpResult<UserBean>> subscriber, Map<String ,String > gson) {
         Observable observable = movieService.deletePlace(gson);
+        toSubscribe(observable, subscriber);
+    }
+
+    /**
+     * 新闻
+     *
+     * @param subscriber
+     * @param gson
+     */
+    public void getxinwen(Subscriber<HttpResult<DXWbean>> subscriber, Map<String ,String > gson) {
+        Observable observable = movieService.getxinwen(gson);
+        toSubscribe(observable, subscriber);
+    }
+
+    /**
+     * 标记渔场
+     *
+     * @param subscriber
+     * @param gson
+     */
+    public void markPlace(Subscriber<HttpResult<UserBean>> subscriber, Map<String ,String > gson) {
+        Observable observable = movieService.markPlace(gson);
+        toSubscribe(observable, subscriber);
+    }
+
+    /**
+     * 动态发布
+     *
+     * @param subscriber
+     * @param gson
+     */
+    public void publishDY(Subscriber<HttpResult<UserBean>> subscriber, Map<String ,String > gson) {
+        Observable observable = movieService.publishDY(gson);
+        toSubscribe(observable, subscriber);
+    }
+
+    /**
+     * 获取发布
+     *
+     * @param subscriber
+     * @param gson
+     */
+    public void getDDy(Subscriber<HttpResult<DDyBean>> subscriber, Map<String ,String > gson) {
+        Observable observable = movieService.getDDy(gson);
+        toSubscribe(observable, subscriber);
+    }
+
+    /**
+     * 修改用户信息
+     *
+     * @param subscriber
+     * @param gson
+     */
+    public void updataUserInfo(Subscriber<HttpResult<UserBean>> subscriber, Map<String ,String > gson) {
+        Observable observable = movieService.updataUserInfo(gson);
         toSubscribe(observable, subscriber);
     }
 }

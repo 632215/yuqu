@@ -32,6 +32,7 @@ import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.Marker;
 import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.Overlay;
@@ -134,17 +135,19 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
             }
         };
         Map<String, String> map = new HashMap<>();
+        map.put("phone", "");
+
         HttpMethods.getInstance().getNearPoint(new ProgressSubscriber<HttpResult<LocationBean>>(onNextListener, this, false), map);
 
     }
 
-    private void makeMarker(List<LocationBean.ListBean> mapPointList) {
+    private void makeMarker(final List<LocationBean.ListBean> mapPointList) {
         for (LocationBean.ListBean bean : mapPointList) {
             //定义Maker坐标点
             LatLng point = new LatLng(Double.valueOf(bean.getLatitude()),Double.valueOf(bean.getLongitude()));
             //构建Marker图标s
             BitmapDescriptor bitmap = BitmapDescriptorFactory
-                    .fromResource(R.mipmap.xiaoyuan);
+                    .fromResource(R.mipmap.location);
             //构建MarkerOption，用于在地图上添加Marker
             OverlayOptions option = new MarkerOptions()
                     .position(point)
@@ -152,6 +155,24 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
             //在地图上添加Marker，并显示
             mBaiduMap.addOverlay(option);
         }
+        mBaiduMap.setOnMarkerClickListener(new BaiduMap.OnMarkerClickListener() {
+
+            @Override
+            public boolean onMarkerClick(Marker arg0) {
+                // TODO Auto-generated method stub
+                String lat = String.valueOf(arg0.getPosition().latitude);
+                String lon = String.valueOf(arg0.getPosition().longitude);
+                for (LocationBean.ListBean bean: mapPointList )  {
+                    if (bean.getLatitude().equals(lat)&&bean.getLongitude().equals(lon)){
+                        Intent intent=new Intent(BaiduMapActivity.this,ReportDetailActivity.class);
+                        intent.putExtra("reportBean",bean);
+                        intent.putExtra("others","others");
+                        startActivity(intent);
+                    }
+                }
+                return false;
+            }
+        });
     }
 
 

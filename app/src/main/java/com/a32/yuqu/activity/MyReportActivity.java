@@ -15,6 +15,7 @@ import com.a32.yuqu.http.HttpMethods;
 import com.a32.yuqu.http.HttpResult;
 import com.a32.yuqu.http.progress.ProgressSubscriber;
 import com.a32.yuqu.http.progress.SubscriberOnNextListener;
+import com.a32.yuqu.utils.CommonlyUtils;
 import com.a32.yuqu.view.FillListView;
 import com.a32.yuqu.view.TopTitleBar;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
@@ -63,6 +64,7 @@ public class MyReportActivity extends BaseActivity  implements PullToRefreshBase
                 reportBean= (LocationBean.ListBean) myAdapter.getItem(i);
                 Intent intent=new Intent(MyReportActivity.this,ReportDetailActivity.class);
                 intent.putExtra("reportBean",reportBean);
+                intent.putExtra("others","");
                 startActivity(intent);
             }
         });
@@ -89,6 +91,7 @@ public class MyReportActivity extends BaseActivity  implements PullToRefreshBase
             }
         };
         Map<String, String> map = new HashMap<>();
+        map.put("phone", CommonlyUtils.getUserInfo(getApplication()).getUserPhone());
         HttpMethods.getInstance().getNearPoint(new ProgressSubscriber<HttpResult<LocationBean>>(onNextListener, this, false), map);
     }
 

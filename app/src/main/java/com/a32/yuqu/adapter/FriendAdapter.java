@@ -103,7 +103,7 @@ public class FriendAdapter extends BaseAdapter {
                 if (info != null) {
 //                        Picasso.with(mcontext).load(HttpMethods.BASE_URL + "upload/" + info.getHead())
                     if (FileUtil.fileIsExists(info.getHead())) {
-                        Picasso.with(mContext).load(new File(Environment.getExternalStorageDirectory() + "/yuqu/myHead/" + info.getHead()))
+                        Picasso.with(mContext).load(new File(Environment.getExternalStorageDirectory() + "/yuqu/pic/" + info.getHead()))
                                 .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)//加速内存的回收
                                 .placeholder(R.mipmap.head)//加载中
                                 .error(R.mipmap.head)//加载失败

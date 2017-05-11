@@ -67,7 +67,9 @@ public class TopTitleBar extends RelativeLayout implements View.OnClickListener{
     public void setSaveVisibility(){
         tvSave.setVisibility(VISIBLE);
     }
-
+    public void setSaveUnVisibility(){
+        tvSave.setVisibility(INVISIBLE);
+    }
 
     /**
      * 设置按钮点击回调接口

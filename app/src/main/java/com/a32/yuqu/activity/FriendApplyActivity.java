@@ -1,9 +1,11 @@
 package com.a32.yuqu.activity;
 
+import android.util.Log;
 import android.widget.ListView;
 
 import com.a32.yuqu.R;
 import com.a32.yuqu.adapter.ApplyListAdapter;
+import com.a32.yuqu.applicaption.MyApplicaption;
 import com.a32.yuqu.base.BaseActivity;
 import com.a32.yuqu.db.InviteMessage;
 import com.a32.yuqu.db.InviteMessgeDao;
@@ -42,6 +44,7 @@ public class FriendApplyActivity extends BaseActivity implements TopTitleBar.OnT
     private void initData() {
         InviteMessgeDao dao = new InviteMessgeDao(this);
         List<InviteMessage> msgs = dao.getMessagesList();
+        Log.i(MyApplicaption.Tag,"msgs.size"+msgs.size());
         ApplyListAdapter adapter = new ApplyListAdapter(this, 1, msgs);
         applyListView.setAdapter(adapter);
         dao.saveUnreadMessageCount(0);

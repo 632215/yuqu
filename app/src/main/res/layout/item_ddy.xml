@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <com.a32.yuqu.view.CircleImageView
+        android:id="@+id/head"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="20dp"
+        android:src="@mipmap/head" />
+
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_toRightOf="@+id/head"
+        android:layout_alignTop="@+id/head"
+        android:layout_alignBottom="@+id/head"
+        android:gravity="center_vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="名字"
+        android:textSize="14sp"
+        />
+
+    <TextView
+        android:id="@+id/tvContent"
+        android:layout_below="@+id/head"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="10dp"
+        android:gravity="center_vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="内容"
+        />
+
+    <ImageView
+        android:id="@+id/img"
+        android:layout_below="@+id/tvContent"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:adjustViewBounds="true"
+        android:paddingBottom="5dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="5dp"
+        android:scaleType="fitXY"
+        />
+</RelativeLayout>

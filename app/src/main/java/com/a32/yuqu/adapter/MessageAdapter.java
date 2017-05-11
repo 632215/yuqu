@@ -96,7 +96,6 @@ public class MessageAdapter extends BaseAdapter {
         EMTextMessageBody txtBody = (EMTextMessageBody) message.getBody();
         holder.tv.setText(txtBody.getMessage());
         if (viewType==0){
-//            getheadPath(obiectUserName,holder);
             setHeadImg(CommonlyUtils.getObjectUser(),holder);//设置自己的头像
         }else {
             setHeadImg(CommonlyUtils.getUserInfo(context),holder);//设置自己的头像
@@ -112,7 +111,7 @@ public class MessageAdapter extends BaseAdapter {
 
     private void setHeadImg(UserInfo objectUser,ViewHolder holder) {
         if (FileUtil.fileIsExists(objectUser.getUserHead())){
-            Picasso.with(context).load(new File(Environment.getExternalStorageDirectory() + "/yuqu/myHead/"+objectUser.getUserHead()))
+            Picasso.with(context).load(new File(Environment.getExternalStorageDirectory() + "/yuqu/pic/"+objectUser.getUserHead()))
                     .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)//加速内存的回收
                     .placeholder(R.mipmap.head)//加载中
                     .error(R.mipmap.head)//加载失败
@@ -125,36 +124,4 @@ public class MessageAdapter extends BaseAdapter {
                     .into(holder.head);
         }
     }
-
-//    private void getheadPath(String name, final ViewHolder holder) {
-//        SubscriberOnNextListener onNextListener = new SubscriberOnNextListener<UserBean>() {
-//
-//            @Override
-//            public void onNext(UserBean info) {
-//                Log.i(MyApplicaption.Tag,"info--"+info.getName()+"----"+info.getHead());
-//                if (info != null){
-//                    if (FileUtil.fileIsExists(info.getHead())){
-//                        Picasso.with(context).load(new File(Environment.getExternalStorageDirectory() + "/yuqu/myHead/"+info.getHead()))
-//                                .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)//加速内存的回收
-//                                .placeholder(R.mipmap.head)//加载中
-//                                .error(R.mipmap.head)//加载失败
-//                                .into(holder.head);
-//                    }else{
-//                        Picasso.with(context).load((HttpMethods.BASE_URL + "upload/" + info.getHead()))
-//                                .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)//加速内存的回收
-//                                .placeholder(R.mipmap.head)//加载中
-//                                .error(R.mipmap.head)//加载失败
-//                                .into(holder.head);
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onError(String Code, String Msg) {
-//            }
-//        };
-//        Map<String, String> map = new HashMap<>();
-//        map.put("name",name);
-//        HttpMethods.getInstance().getUserByName(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, context, false), map);
-//    }
 }

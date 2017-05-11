@@ -1,6 +1,8 @@
 package com.a32.yuqu.http;
 
 
+import com.a32.yuqu.bean.DDyBean;
+import com.a32.yuqu.bean.DXWbean;
 import com.a32.yuqu.bean.LocationBean;
 import com.a32.yuqu.bean.UserBean;
 import com.a32.yuqu.bean.UserInfo;
@@ -58,4 +60,29 @@ public interface AppService {
     @FormUrlEncoded
     @POST("deleteplace.php")
     Observable<HttpResult<UserBean>> deletePlace(@FieldMap Map<String, String> mapgson);
+
+    //新闻
+    @FormUrlEncoded
+    @POST("getxinwen.php")
+    Observable<HttpResult<DXWbean>> getxinwen(@FieldMap Map<String, String> mapgson);
+
+    //标记渔场
+    @FormUrlEncoded
+    @POST("markPlace.php")
+    Observable<HttpResult<UserBean>> markPlace(@FieldMap Map<String, String> mapgson);
+
+    //动态发布
+    @FormUrlEncoded
+    @POST("publishDY.php")
+    Observable<HttpResult<UserBean>> publishDY(@FieldMap Map<String, String> mapgson);
+
+    //获取发布
+    @FormUrlEncoded
+    @POST("getDDy.php")
+    Observable<HttpResult<DDyBean>> getDDy(@FieldMap Map<String, String> mapgson);
+
+    // 修改用户信息
+    @FormUrlEncoded
+    @POST("updataUserInfo.php")
+    Observable<HttpResult<UserBean>> updataUserInfo(@FieldMap Map<String, String> mapgson);
 }

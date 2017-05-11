@@ -78,6 +78,7 @@ public class MainActivity extends BaseActivity
     RadioGroup radioGroup;
     private  MyPopWindows morePopWindows;//右上角弹出框
     private boolean isOpenSiderBar=false;
+
 //    @Override
 //    protected void onCreate(Bundle savedInstanceState) {
 //        super.onCreate(savedInstanceState);
@@ -104,7 +105,7 @@ public class MainActivity extends BaseActivity
         toolbar.setOnMoreCallback(this);
         navigationView.setNavigationItemSelectedListener(this);
         initLeft();//初始化左侧控件
-        getUserInfo();//初始化左侧的基本信息
+//        getUserInfo();//初始化左侧的基本信息
         mfragmentManager = getFragmentManager();
         transaction = mfragmentManager.beginTransaction();
         setDefaultRadio();
@@ -129,6 +130,7 @@ public class MainActivity extends BaseActivity
                     imgHead.setImageBitmap(head);
                     UserInfo userInfo=CommonlyUtils.getUserInfo(MainActivity.this);
                     userInfo.setUserHead(info.getUserHead());
+                    userInfo.setUserName(info.getUserName());
                     CommonlyUtils.saveUserInfo(MainActivity.this,userInfo);
                 }
             }
@@ -207,9 +209,10 @@ public class MainActivity extends BaseActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
         if (id == R.id.nav_setting) {
-            startActivity(new Intent(this, PersonSetActivity.class));
+//            startActivity(new Intent(this, PersonSetActivity.class));
+            startActivity(new Intent(this, PersonInfoActivity.class));
+
         } else if (id == R.id.nav_exit) {
             accountExit();
         } else if (id == R.id.nav_about) {
@@ -452,5 +455,11 @@ public class MainActivity extends BaseActivity
         inviteMessgeDao.saveUnreadMessageCount(1);
         // 提示有新消息
         //响铃或其他操作
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getUserInfo();
     }
 }

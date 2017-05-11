@@ -2,7 +2,6 @@ package com.a32.yuqu.activity;
 
 import android.content.Intent;
 import android.os.Environment;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
@@ -10,7 +9,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.a32.yuqu.R;
-import com.a32.yuqu.applicaption.MyApplicaption;
 import com.a32.yuqu.base.BaseActivity;
 import com.a32.yuqu.bean.LocationBean;
 import com.a32.yuqu.bean.UserBean;
@@ -48,6 +46,7 @@ public class ReportDetailActivity extends BaseActivity implements TopTitleBar.On
     @Bind(R.id.titleBar)
     TopTitleBar titleBar;
     private LocationBean.ListBean reportBean;
+    private String others="";
     private MyPopWindows popWindows;//右上角弹出框
     private TextView btnCancle;
     private TextView btnSure;
@@ -65,11 +64,13 @@ public class ReportDetailActivity extends BaseActivity implements TopTitleBar.On
 
     private void setView() {
         if (reportBean!=null){
-            titleBar.setTitle("我发现的渔场");
+            titleBar.setTitle(others.equals("")?"我发现的渔场":"渔场信息");
             titleBar.setSaveText("删除");
             titleBar.setOnTopTitleBarCallback(this);
             titleBar.setOnSaveCallBack(this);
-            titleBar.setSaveVisibility();
+            if (others.equals("")){
+                titleBar.setSaveVisibility();
+            }
             tvShowName.setText(reportBean.getPlaceName());
             tvShowDescribe.setText(reportBean.getDescribes());
             tvShowRemark.setText(reportBean.getRemark());
@@ -88,6 +89,7 @@ public class ReportDetailActivity extends BaseActivity implements TopTitleBar.On
     private void initData() {
         Intent intent = getIntent();
         reportBean = (LocationBean.ListBean) intent.getSerializableExtra("reportBean");
+        others =intent.getStringExtra("others");
     }
 
     @Override
@@ -98,7 +100,7 @@ public class ReportDetailActivity extends BaseActivity implements TopTitleBar.On
     @Override
     public void onSaveClick() {
         popWindows = new MyPopWindows(this);
-        popWindows.setContentView(View.inflate(this,R.layout.popuwindow,null));
+        popWindows.setContentView(View.inflate(this,R.layout.deletepopuwindow,null));
         popWindows.showAtLocation(ReportLayout, Gravity.CENTER,0,0);
 
         View view = popWindows.getContentView();

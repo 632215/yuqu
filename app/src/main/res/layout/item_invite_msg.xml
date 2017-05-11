@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="50dp"
-    android:gravity="center_vertical">
+    android:layout_height="60dp"
+    android:orientation="vertical">
 
-    <ImageView
+    <com.a32.yuqu.view.CircleImageView
         android:id="@+id/head"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_margin="11dp"
+        android:layout_centerVertical="true"
         android:src="@mipmap/head" />
 
     <TextView
@@ -35,14 +34,29 @@
         android:textColor="#999999"
         android:textSize="12sp" />
 
-    <Button
-        android:id="@+id/btn_agree"
+    <TextView
+        android:id="@+id/btnAgree"
         android:layout_marginRight="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
         android:text="同意"
-        android:textColor="#999999"
+        android:padding="10dp"
+        android:background="@drawable/shape_login_button_background"
+        android:textColor="@color/colorWhite"
         android:textSize="14sp" />
 
+    <TextView
+        android:id="@+id/btnDisAgree"
+        android:layout_marginRight="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/btnAgree"
+        android:padding="10dp"
+        android:text="拒绝"
+        android:textColor="@color/colorErrTips"
+        android:background="@drawable/shape_disagree_background"
+        android:textSize="14sp" />
 </RelativeLayout>

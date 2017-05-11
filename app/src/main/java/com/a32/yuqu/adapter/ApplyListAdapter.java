@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -14,11 +16,25 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.a32.yuqu.R;
+import com.a32.yuqu.applicaption.MyApplicaption;
+import com.a32.yuqu.bean.UserBean;
 import com.a32.yuqu.db.InviteMessage;
 import com.a32.yuqu.db.InviteMessgeDao;
+import com.a32.yuqu.http.HttpMethods;
+import com.a32.yuqu.http.HttpResult;
+import com.a32.yuqu.http.progress.ProgressSubscriber;
+import com.a32.yuqu.http.progress.SubscriberOnNextListener;
+import com.a32.yuqu.utils.FileUtil;
+import com.a32.yuqu.view.CircleImageView;
 import com.hyphenate.chat.EMClient;
+import com.hyphenate.exceptions.HyphenateException;
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.Picasso;
 
+import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 本demo只提供好友的邀请通知，群相关的通知，已经拒绝申请的处理请参考官方demo
@@ -42,8 +58,9 @@ public class ApplyListAdapter extends ArrayAdapter<InviteMessage> {
             convertView = View.inflate(context, R.layout.item_invite_msg, null);
             holder.tv_reason = (TextView) convertView.findViewById(R.id.tv_reason);
             holder.tv_name = (TextView) convertView.findViewById(R.id.tv_name);
-            holder.btn_agree = (Button) convertView.findViewById(R.id.btn_agree);
-
+            holder.btnAgree = (TextView) convertView.findViewById(R.id.btnAgree);
+            holder.btnDisAgree = (TextView) convertView.findViewById(R.id.btnDisAgree);
+            holder.head = (CircleImageView) convertView.findViewById(R.id.head);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -56,29 +73,43 @@ public class ApplyListAdapter extends ArrayAdapter<InviteMessage> {
 
 
         final InviteMessage msg = getItem(position);
+        Log.i(MyApplicaption.Tag,"msg.getFrom()"+msg.getFrom());
+        getheadPath(msg.getFrom(), holder);
         if (msg != null) {
-
-            holder.btn_agree.setVisibility(View.INVISIBLE);
+            holder.btnAgree.setVisibility(View.INVISIBLE);
+            holder.btnDisAgree.setVisibility(View.INVISIBLE);
             holder.tv_reason.setText(msg.getReason());
-            holder.tv_name.setText(msg.getFrom());
+
             if (msg.getStatus() == InviteMessage.InviteMesageStatus.BEAGREED) {
                 holder.tv_reason.setText(str1);
             } else if (msg.getStatus() == InviteMessage.InviteMesageStatus.BEINVITEED || msg.getStatus() == InviteMessage.InviteMesageStatus.BEAPPLYED ||
                     msg.getStatus() == InviteMessage.InviteMesageStatus.GROUPINVITATION) {
-                holder.btn_agree.setVisibility(View.VISIBLE);
-                holder.btn_agree.setEnabled(true);
-                holder.btn_agree.setBackgroundResource(android.R.drawable.btn_default);
-                holder.btn_agree.setText(str2);
+                holder.btnAgree.setVisibility(View.VISIBLE);
+//                holder.btnAgree.setEnabled(true);
+//                holder.btnAgree.setBackgroundResource(android.R.drawable.btn_default);
+                holder.btnAgree.setText(str2);
+                holder.btnDisAgree.setVisibility(View.VISIBLE);
                 if (msg.getReason() == null) {
                     // 如果没写理由
                     holder.tv_reason.setText(str3);
                 }
                 // 设置点击事件
-                holder.btn_agree.setOnClickListener(new OnClickListener() {
+                holder.btnAgree.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         // 同意别人发的好友请求
-                        acceptInvitation(holder.btn_agree, msg);
+                        acceptInvitation(holder.btnAgree, msg);
+                    }
+                });
+                holder.btnDisAgree.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // 拒绝别人发的好友请求
+                        try {
+                            EMClient.getInstance().contactManager().declineInvitation(msg.getFrom());
+                        } catch (HyphenateException e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
 
@@ -93,15 +124,47 @@ public class ApplyListAdapter extends ArrayAdapter<InviteMessage> {
             }
 
         }
-
+        holder.tv_reason.setText("已处理");
         return convertView;
+    }
+
+    private void getheadPath(String phone, final ViewHolder holder) {
+        SubscriberOnNextListener onNextListener = new SubscriberOnNextListener<UserBean>() {
+
+            @Override
+            public void onNext(UserBean info) {
+                if (info != null) {
+                    if (FileUtil.fileIsExists(info.getHead())) {
+                        Picasso.with(context).load(new File(Environment.getExternalStorageDirectory() + "/yuqu/pic/" + info.getHead()))
+                                .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)//加速内存的回收
+                                .placeholder(R.mipmap.head)//加载中
+                                .error(R.mipmap.head)//加载失败
+                                .into(holder.head);
+                    } else {
+                        Picasso.with(context).load((HttpMethods.BASE_URL + "upload/" + info.getHead()))
+                                .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)//加速内存的回收
+                                .placeholder(R.mipmap.head)//加载中
+                                .error(R.mipmap.head)//加载失败
+                                .into(holder.head);
+                    }
+                    holder.tv_name.setText(info.getName());
+                }
+            }
+
+            @Override
+            public void onError(String Msg) {
+            }
+        };
+        Map<String, String> map = new HashMap<>();
+        map.put("phone", phone);
+        HttpMethods.getInstance().getheadPath(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, context, false), map);
     }
 
     /**
      * 同意好友请求或者群申请
      *
      */
-    private void acceptInvitation(final Button buttonAgree, final InviteMessage msg) {
+    private void acceptInvitation(final TextView buttonAgree, final InviteMessage msg) {
         final ProgressDialog pd = new ProgressDialog(context);
         String str1 = "正在同意...";
         final String str2 = "已同意";
@@ -159,8 +222,10 @@ public class ApplyListAdapter extends ArrayAdapter<InviteMessage> {
     private static class ViewHolder {
         TextView tv_name;
         TextView tv_reason;
-        Button btn_agree;
+        TextView btnAgree;
+        TextView btnDisAgree;
 
+        CircleImageView head;
     }
 
 }

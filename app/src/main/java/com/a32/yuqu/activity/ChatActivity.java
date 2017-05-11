@@ -35,7 +35,7 @@ import java.util.Map;
 
 import butterknife.Bind;
 
-public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitleBarCallback {
+public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitleBarCallback, TopTitleBar.OnSaveCallBack {
     @Bind(R.id.listView)
     ListView listView;
     @Bind(R.id.btn_send)
@@ -44,7 +44,7 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
     TopTitleBar titleBar;
     @Bind(R.id.et_content)
     EditText et_content;
-    private String toChatUsername="";//实际上是指用户电话号码
+    private String toChatUsername = "";//实际上是指用户电话号码
     private int chatType = 1;
     private List<EMMessage> msgList;
     private EMConversation conversation;
@@ -58,14 +58,15 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
 
     @Override
     protected void initView() {
-//        toChatUsername = this.getIntent().getStringExtra("username");
-//        getheadPath(toChatUsername);//根据用户手机号码获取用户其他信息
         toChatUsername = CommonlyUtils.getObjectUser().getUserPhone();
         getAllMessage();
-        titleBar.setTitle(CommonlyUtils.getObjectUser().getUserName());
+        titleBar.setTitle("与" + CommonlyUtils.getObjectUser().getUserName() + "的会话");
         titleBar.setOnTopTitleBarCallback(ChatActivity.this);
+//        titleBar.setSaveVisibility();
+        titleBar.setSaveText("清空消息");
+        titleBar.setOnSaveCallBack(this);
         msgList = conversation.getAllMessages();
-        messageAdapter = new MessageAdapter(msgList, ChatActivity.this,toChatUsername);
+        messageAdapter = new MessageAdapter(msgList, ChatActivity.this, toChatUsername);
         listView.setAdapter(messageAdapter);
         listView.setSelection(listView.getCount() - 1);
         btn_send.setOnClickListener(new OnClickListener() {
@@ -77,7 +78,7 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
                     return;
                 }
                 setMesaage(content);
-                KeyBoardUtils.closeKeybord(et_content,ChatActivity.this);
+                KeyBoardUtils.closeKeybord(et_content, ChatActivity.this);
             }
 
         });
@@ -121,7 +122,11 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
             }
             conversation.loadMoreMsgFromDB(msgId, pagesize - msgCount);
         }
-        Log.i(MyApplicaption.Tag,"msgs"+msgs.size());
+        if (msgs.size()>0){
+            titleBar.setSaveVisibility();
+        }else {
+            titleBar.setSaveUnVisibility();
+        }
     }
 
     private void setMesaage(String content) {
@@ -138,6 +143,9 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
         messageAdapter.notifyDataSetChanged();
         if (msgList.size() > 0) {
             listView.setSelection(listView.getCount() - 1);
+            titleBar.setSaveVisibility();
+        }else {
+            titleBar.setSaveUnVisibility();
         }
         et_content.setText("");
         et_content.clearFocus();
@@ -163,9 +171,10 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
                     messageAdapter.notifyDataSetChanged();
                     if (msgList.size() > 0) {
                         et_content.setSelection(listView.getCount() - 1);
-
+                        titleBar.setSaveVisibility();
+                    }else {
+                        titleBar.setSaveUnVisibility();
                     }
-
                 }
             }
 
@@ -203,5 +212,14 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
     @Override
     public void onBackClick() {
         finish();
+    }
+
+    //清楚聊天记录
+    @Override
+    public void onSaveClick() {
+        EMClient.getInstance().chatManager().deleteConversation(CommonlyUtils.getObjectUser().getUserPhone(), true);
+        getAllMessage();
+        msgList.clear();
+        messageAdapter.notifyDataSetChanged();
     }
 }
