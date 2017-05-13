@@ -61,6 +61,8 @@ public class MarkPlaceActivity extends BaseActivity implements TopTitleBar.OnTop
     LinearLayout markLayout;
     @Bind(R.id.etName)
     EditText etName;
+    @Bind(R.id.etNum)
+    EditText etNum;
     @Bind(R.id.etDescribe)
     EditText etDescribe;
     @Bind(R.id.etRemark)
@@ -160,16 +162,6 @@ public class MarkPlaceActivity extends BaseActivity implements TopTitleBar.OnTop
                     showToast("请输入的相关描述！");
                     return;
                 }
-                //是否有图片文件
-//                if (filePath.equals("")){
-//                    markPlace(etName.getText().toString().trim()
-//                            , etDescribe.getText().toString().trim()
-//                            , etRemark.getText().toString().trim());
-//                }else {
-//                    markPlaceFile(etName.getText().toString().trim()
-//                            , etDescribe.getText().toString().trim()
-//                            , etRemark.getText().toString().trim());
-//                }
                 markPlace(etName.getText().toString().trim()
                         , etDescribe.getText().toString().trim()
                         , etRemark.getText().toString().trim());
@@ -311,6 +303,8 @@ public class MarkPlaceActivity extends BaseActivity implements TopTitleBar.OnTop
                     uploadHead(filePath);
                 } else {
                     progressDialog.dismiss();
+                    startActivity(new Intent(MarkPlaceActivity.this, MainActivity.class));
+                    finish();
                 }
             }
 
@@ -325,6 +319,8 @@ public class MarkPlaceActivity extends BaseActivity implements TopTitleBar.OnTop
         map.put("placeName", placeName);
         map.put("describe", describe);
         map.put("remark", remark);
+        map.put("max", etNum.getText().toString().trim().equals("")?"0":etNum.getText().toString().trim());
+        map.put("booked", "0");
         map.put("longitude", String.valueOf(myLongitude));
         map.put("latitude", String.valueOf(myLatitude));
         HttpMethods.getInstance().markPlace(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener,this, false), map);

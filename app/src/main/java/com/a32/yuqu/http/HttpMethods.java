@@ -241,4 +241,37 @@ public class HttpMethods {
         Observable observable = movieService.updataUserInfo(gson);
         toSubscribe(observable, subscriber);
     }
+
+    /**
+     * 预定钓位
+     *
+     * @param subscriber
+     * @param gson
+     */
+    public void bookPlace(Subscriber<HttpResult<UserBean>> subscriber, Map<String ,String > gson) {
+        Observable observable = movieService.bookPlace(gson);
+        toSubscribe(observable, subscriber);
+    }
+
+    /**
+     * 查看预约信息
+     *
+     * @param subscriber
+     * @param gson
+     */
+    public void getBookInfo(Subscriber<HttpResult<LocationBean>> subscriber, Map<String ,String > gson) {
+        Observable observable = movieService.getBookInfo(gson);
+        toSubscribe(observable, subscriber);
+    }
+
+    /**
+     * 取消或完成预约
+     *
+     * @param subscriber
+     * @param gson
+     */
+    public void operateBook(Subscriber<HttpResult<LocationBean>> subscriber, Map<String ,String > gson) {
+        Observable observable = movieService.operateBook(gson);
+        toSubscribe(observable, subscriber);
+    }
 }

@@ -161,5 +161,6 @@
     <string name="video_call">[视频通话]</string>
     <string name="newcontact">新的朋友</string>
     <string name="updataPwd">修改密码</string>
+    <string name="remained">剩余钓位</string>
 
 </resources>

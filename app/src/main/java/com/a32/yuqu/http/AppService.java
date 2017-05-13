@@ -85,4 +85,20 @@ public interface AppService {
     @FormUrlEncoded
     @POST("updataUserInfo.php")
     Observable<HttpResult<UserBean>> updataUserInfo(@FieldMap Map<String, String> mapgson);
+
+    // 预定钓位
+    @FormUrlEncoded
+    @POST("bookPlace.php")
+    Observable<HttpResult<UserBean>> bookPlace(@FieldMap Map<String, String> mapgson);
+
+    // 查看预约信息
+    @FormUrlEncoded
+    @POST("getBookInfo.php")
+    Observable<HttpResult<LocationBean>> getBookInfo(@FieldMap Map<String, String> mapgson);
+
+    // 取消或完成预约
+    @FormUrlEncoded
+    @POST("dealBook.php")
+    Observable<HttpResult<LocationBean>> operateBook(@FieldMap Map<String, String> mapgson);
+
 }

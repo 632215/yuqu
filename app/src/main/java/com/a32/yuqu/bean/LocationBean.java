@@ -20,20 +20,34 @@ public class LocationBean {
 
     public static class ListBean implements Serializable{
         /**
-         * placeName : 渔场1
-         * longitude : 106.461248
-         * latitude : 29.567252
-         * describes : 鲫鱼
-         * remark : 自带渔场
-         * filePath : 20170506222504.jpg
+         * phone : 15223084076
+         * placeName : 沙坪坝桥下钓鱼场
+         * longitude : 106.45981
+         * latitude : 29.559806
+         * describes : 环境比较幽静，鱼的种类较多
+         * remark : 自带鱼竿
+         * filePath : 20170507085915.jpg
+         * max : 20
+         * booked : 0
          */
 
+        private String phone;
         private String placeName;
         private String longitude;
         private String latitude;
         private String describes;
         private String remark;
         private String filePath;
+        private String max;
+        private String booked;
+
+        public String getPhone() {
+            return phone;
+        }
+
+        public void setPhone(String phone) {
+            this.phone = phone;
+        }
 
         public String getPlaceName() {
             return placeName;
@@ -81,6 +95,22 @@ public class LocationBean {
 
         public void setFilePath(String filePath) {
             this.filePath = filePath;
+        }
+
+        public String getMax() {
+            return max;
+        }
+
+        public void setMax(String max) {
+            this.max = max;
+        }
+
+        public String getBooked() {
+            return booked;
+        }
+
+        public void setBooked(String booked) {
+            this.booked = booked;
         }
     }
 }

@@ -45,6 +45,15 @@ public class ReportDetailActivity extends BaseActivity implements TopTitleBar.On
     ImageView img;
     @Bind(R.id.titleBar)
     TopTitleBar titleBar;
+    @Bind(R.id.bookLayout)
+    LinearLayout bookLayout;
+    @Bind(R.id.tvMax)
+    TextView tvMax;
+    @Bind(R.id.tvLeft)
+    TextView tvLeft;
+    @Bind(R.id.tvBook)
+    TextView tvBook;
+
     private LocationBean.ListBean reportBean;
     private String others="";
     private MyPopWindows popWindows;//右上角弹出框
@@ -70,10 +79,30 @@ public class ReportDetailActivity extends BaseActivity implements TopTitleBar.On
             titleBar.setOnSaveCallBack(this);
             if (others.equals("")){
                 titleBar.setSaveVisibility();
+            }else {
+                titleBar.setSaveVisibility();
+                titleBar.setSaveText("其他渔场");
+                bookLayout.setVisibility(View.VISIBLE);
+                if(reportBean.getMax().equals("")){
+                    tvMax.setText("暂无钓位限制");
+                    tvLeft.setVisibility(View.GONE);
+                    tvBook.setVisibility(View.GONE);
+                }else {
+                    tvMax.setText(tvMax.getText().toString().trim()+reportBean.getMax());
+                    int remainder=Integer.parseInt(reportBean.getMax())-Integer.parseInt(reportBean.getBooked());
+                    tvLeft.setText(tvLeft.getText().toString().trim() + remainder);
+                    if (remainder==0){
+                        tvBook.setVisibility(View.GONE);
+                    }
+                }
+            }
+
+            if (reportBean==null){
+                return;
             }
             tvShowName.setText(reportBean.getPlaceName());
-            tvShowDescribe.setText(reportBean.getDescribes());
-            tvShowRemark.setText(reportBean.getRemark());
+            tvShowDescribe.setText(reportBean.getDescribes().equals("")?"暂无":reportBean.getDescribes());
+            tvShowRemark.setText(reportBean.getRemark().equals("")?"暂无":reportBean.getRemark());
             if (FileUtil.fileIsExists(reportBean.getFilePath())) {
                 Picasso.with(this).load(new File(Environment.getExternalStorageDirectory() + "/yuqu/pic/" + reportBean.getFilePath()))
                         .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)//加速内存的回收
@@ -90,6 +119,7 @@ public class ReportDetailActivity extends BaseActivity implements TopTitleBar.On
         Intent intent = getIntent();
         reportBean = (LocationBean.ListBean) intent.getSerializableExtra("reportBean");
         others =intent.getStringExtra("others");
+        tvBook.setOnClickListener(this);
     }
 
     @Override
@@ -99,16 +129,21 @@ public class ReportDetailActivity extends BaseActivity implements TopTitleBar.On
 
     @Override
     public void onSaveClick() {
-        popWindows = new MyPopWindows(this);
-        popWindows.setContentView(View.inflate(this,R.layout.deletepopuwindow,null));
-        popWindows.showAtLocation(ReportLayout, Gravity.CENTER,0,0);
 
-        View view = popWindows.getContentView();
-        btnCancle= (TextView) view.findViewById(R.id.btnCancle);
-        btnSure= (TextView) view.findViewById(R.id.btnSure);
-        btnCancle.setOnClickListener(this);
-        btnSure.setOnClickListener(this);
-  
+        if (!others.equals("")){
+            Intent intent=new Intent(this,BookActivity.class);
+            startActivity(intent);
+        }else {
+            popWindows = new MyPopWindows(this);
+            popWindows.setContentView(View.inflate(this,R.layout.deletepopuwindow,null));
+            popWindows.showAtLocation(ReportLayout, Gravity.CENTER,0,0);
+
+            View view = popWindows.getContentView();
+            btnCancle= (TextView) view.findViewById(R.id.btnCancle);
+            btnSure= (TextView) view.findViewById(R.id.btnSure);
+            btnCancle.setOnClickListener(this);
+            btnSure.setOnClickListener(this);
+        }
     }
 
     @Override
@@ -122,7 +157,35 @@ public class ReportDetailActivity extends BaseActivity implements TopTitleBar.On
                 deletePlace();
                 popWindows.dismiss();
                 break;
+            case R.id.tvBook:
+                bookPlace();//预约位子
+                break;
         }
+    }
+
+    private void bookPlace() {
+        SubscriberOnNextListener onNextListener = new SubscriberOnNextListener<UserBean>() {
+
+            @Override
+            public void onNext(UserBean info) {
+                showToast("预定成功");
+
+                ReportDetailActivity.this.finish();
+            }
+
+            @Override
+            public void onError(String Msg) {
+
+            }
+        };
+        Map<String, String> map = new HashMap<>();
+        map.put("phone", reportBean.getPhone());
+        map.put("username", CommonlyUtils.getUserInfo(this).getUserName());
+        map.put("bookphone", CommonlyUtils.getUserInfo(this).getUserPhone());
+        map.put("longitude", reportBean.getLongitude());
+        map.put("latitude", reportBean.getLatitude());
+        map.put("placeName", reportBean.getPlaceName());
+        HttpMethods.getInstance().bookPlace(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, this, false), map);
     }
 
     private void deletePlace() {

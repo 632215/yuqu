@@ -12,7 +12,7 @@
         android:layout_margin="3dp"
         android:gravity="center"
         android:padding="10dp"
-        android:text="是否确定删除本个记录"
+        android:text="已完成本次预约？"
         android:textColor="@color/colorBlack"
         android:textSize="14sp" />
 

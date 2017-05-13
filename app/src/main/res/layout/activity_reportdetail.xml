@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ReportLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/ReportLayout"
     android:orientation="vertical">
+
     <com.a32.yuqu.view.TopTitleBar
         android:id="@+id/titleBar"
         android:layout_width="match_parent"
@@ -75,12 +76,12 @@
             android:id="@+id/tvDescribe"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="渔场描述"
-            android:textColor="@color/colorTextBlack"
-            android:textSize="14sp"
             android:layout_alignBaseline="@+id/tvShowDescribe"
             android:layout_alignBottom="@+id/tvShowDescribe"
-            android:layout_alignParentStart="true" />
+            android:layout_alignParentStart="true"
+            android:text="渔场描述"
+            android:textColor="@color/colorTextBlack"
+            android:textSize="14sp" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -117,12 +118,72 @@
             android:background="@color/colorLineGray" />
     </RelativeLayout>
 
+    <LinearLayout
+        android:id="@+id/bookLayout"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="15dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="15dp">
+
+            <TextView
+                android:id="@+id/tvMax"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_weight="1"
+                android:text="总钓位："
+                android:layout_gravity="left|center_vertical"
+                android:textColor="@color/colorTextBlack"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvLeft"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="剩余钓位："
+                android:layout_gravity="center_vertical|left"
+                android:textColor="@color/colorTextGray"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvBook"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="马上预定"
+                android:padding="5dp"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/shape_login_button_background"
+                android:textColor="@color/colorTextGray"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignBottom="@+id/tvShowRemark"
+            android:background="@color/colorLineGray" />
+
+    </LinearLayout>
+
+
     <ImageView
         android:id="@+id/img"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:adjustViewBounds="true"
         android:padding="15dp"
-        android:scaleType="fitXY"
-        android:layout_gravity="center_horizontal"/>
+        android:scaleType="fitXY" />
 </LinearLayout>

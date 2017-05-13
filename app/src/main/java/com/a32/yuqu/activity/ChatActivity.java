@@ -86,25 +86,6 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
 
     }
 
-//    private void getheadPath(String phone) {
-//        SubscriberOnNextListener onNextListener = new SubscriberOnNextListener<UserBean>() {
-//            @Override
-//            public void onNext(UserBean info) {
-//                Log.i(MyApplicaption.Tag,"info--"+info.getName()+"----"+info.getHead());
-//                if (info != null){
-//
-//                }
-//            }
-//
-//            @Override
-//            public void onError( String Msg) {
-//            }
-//        };
-//        Map<String, String> map = new HashMap<>();
-//        map.put("phone",phone);
-//        HttpMethods.getInstance().getheadPath(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, this, false), map);
-//    }
-
     protected void getAllMessage() {
         // 获取当前conversation对象
         conversation = EMClient.getInstance().chatManager().getConversation(toChatUsername,

@@ -1,13 +1,9 @@
 package com.a32.yuqu.activity;
 
 import android.content.Intent;
-import android.location.Location;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -15,14 +11,11 @@ import com.a32.yuqu.R;
 import com.a32.yuqu.applicaption.MyApplicaption;
 import com.a32.yuqu.base.BaseActivity;
 import com.a32.yuqu.bean.LocationBean;
-import com.a32.yuqu.bean.UserBean;
 import com.a32.yuqu.http.HttpMethods;
 import com.a32.yuqu.http.HttpResult;
 import com.a32.yuqu.http.progress.ProgressSubscriber;
 import com.a32.yuqu.http.progress.SubscriberOnNextListener;
 import com.a32.yuqu.service.LocationService;
-import com.a32.yuqu.utils.CommonlyUtils;
-import com.a32.yuqu.view.MyPopWindows;
 import com.a32.yuqu.view.TopTitleBar;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -35,7 +28,6 @@ import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.Marker;
 import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationData;
-import com.baidu.mapapi.map.Overlay;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.model.LatLng;
 
@@ -90,6 +82,7 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
         locationService.start();
         mBaiduMap = bmapView.getMap();
         mBaiduMap.setMyLocationEnabled(true);
+
         locationService.registerListener(myBDLocationListener);
     }
 
@@ -102,8 +95,7 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.nearFishPlace://附近渔场
-
-                getNearPoint();
+                getNearPoint(true);
                 break;
             case R.id.markFishPlace://标记我的位置为渔场
                 Intent intent = new Intent(this, MarkPlaceActivity.class);
@@ -118,15 +110,18 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
     }
 
     //    得到附近渔场
-    private void getNearPoint() {
+    private void getNearPoint(final boolean isMarker) {
         SubscriberOnNextListener onNextListener = new SubscriberOnNextListener<LocationBean>() {
 
             @Override
             public void onNext(LocationBean info) {
+                mapPointList.clear();
                 if (info != null) {
                     mapPointList.addAll(info.getList());
                 }
-                makeMarker(mapPointList);
+                if (isMarker==true){
+                    makeMarker(mapPointList);
+                }
             }
 
             @Override
@@ -136,12 +131,12 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
         };
         Map<String, String> map = new HashMap<>();
         map.put("phone", "");
-
         HttpMethods.getInstance().getNearPoint(new ProgressSubscriber<HttpResult<LocationBean>>(onNextListener, this, false), map);
 
     }
 
     private void makeMarker(final List<LocationBean.ListBean> mapPointList) {
+        mBaiduMap.clear();
         for (LocationBean.ListBean bean : mapPointList) {
             //定义Maker坐标点
             LatLng point = new LatLng(Double.valueOf(bean.getLatitude()),Double.valueOf(bean.getLongitude()));
@@ -155,6 +150,7 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
             //在地图上添加Marker，并显示
             mBaiduMap.addOverlay(option);
         }
+
         mBaiduMap.setOnMarkerClickListener(new BaiduMap.OnMarkerClickListener() {
 
             @Override
@@ -164,6 +160,7 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
                 String lon = String.valueOf(arg0.getPosition().longitude);
                 for (LocationBean.ListBean bean: mapPointList )  {
                     if (bean.getLatitude().equals(lat)&&bean.getLongitude().equals(lon)){
+                        Log.i(MyApplicaption.Tag,arg0.getPosition()+"备点击了");
                         Intent intent=new Intent(BaiduMapActivity.this,ReportDetailActivity.class);
                         intent.putExtra("reportBean",bean);
                         intent.putExtra("others","others");
@@ -245,6 +242,7 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
     @Override
     protected void onResume() {
         super.onResume();
+        getNearPoint(false);
         //在activity执行onResume时执行mMapView. onResume ()，实现地图生命周期管理
         if (bmapView != null) {
             bmapView.onResume();

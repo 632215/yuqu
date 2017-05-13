@@ -28,7 +28,7 @@ public class XinWenActivity extends BaseActivity implements TopTitleBar.OnTopTit
 
     @Override
     protected void initView() {
-        titleBar.setTitle("添加渔场信息");
+        titleBar.setTitle("新闻在线");
         titleBar.setOnTopTitleBarCallback(this);
         Intent intent = getIntent();
         herf = intent.getStringExtra("herf");
