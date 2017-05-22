@@ -75,8 +75,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         btnLogin.setOnClickListener(this);
         btnRegister.setOnClickListener(this);
         percentRelativeLayout.setOnClickListener(this);
-        userName.setText("15223084076");
-        pwd.setText("123456");
+//        userName.setText("15223084076");
+//        pwd.setText("123456");
         //如果用户名改变，清空密码
         userName.addTextChangedListener(new TextWatcher() {
             @Override
@@ -86,7 +86,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//                pwd.setText("");
+                pwd.setText("");
                 errorTips.setText("");
                 errorTips.setVisibility(View.INVISIBLE);
             }
@@ -186,11 +186,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 // 所以我们要在登陆之前确保DemoDB不会被Overlap。所以我们关闭一下数据库。
         DemoDBManager.getInstance().closeDB();
         MyApplicaption.getInstance().setCurrentUserName(mname);
-
-        Log.i(MyApplicaption.Tag, "mname" + mname);
-        Log.i(MyApplicaption.Tag, "getCurrentUserName" + MyApplicaption.getInstance().getCurrentUserName());
-        Log.i(MyApplicaption.Tag, "currentUsername" + currentUsername);
-
         EMClient.getInstance().login(mname, mpassword, new EMCallBack() {
             //回调
             @Override

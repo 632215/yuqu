@@ -43,7 +43,8 @@ public class ApplyListAdapter extends ArrayAdapter<InviteMessage> {
 
     private Context context;
     private InviteMessgeDao messgeDao;
-
+    private InviteMessgeDao inviteMessgeDao;
+    private String name="";
     public ApplyListAdapter(Context context, int textViewResourceId, List<InviteMessage> objects) {
         super(context, textViewResourceId, objects);
         this.context = context;
@@ -70,16 +71,15 @@ public class ApplyListAdapter extends ArrayAdapter<InviteMessage> {
         String str2 = "同意";
 
         String str3 = "请求加你为好友";
-
+        inviteMessgeDao = new InviteMessgeDao(context);
 
         final InviteMessage msg = getItem(position);
-        Log.i(MyApplicaption.Tag,"msg.getFrom()"+msg.getFrom());
+        Log.i(MyApplicaption.Tag, "msg.getFrom()" + msg.getFrom());
         getheadPath(msg.getFrom(), holder);
         if (msg != null) {
             holder.btnAgree.setVisibility(View.INVISIBLE);
             holder.btnDisAgree.setVisibility(View.INVISIBLE);
-            holder.tv_reason.setText(msg.getReason());
-
+//            holder.tv_reason.setText(msg.getReason());
             if (msg.getStatus() == InviteMessage.InviteMesageStatus.BEAGREED) {
                 holder.tv_reason.setText(str1);
             } else if (msg.getStatus() == InviteMessage.InviteMesageStatus.BEINVITEED || msg.getStatus() == InviteMessage.InviteMesageStatus.BEAPPLYED ||
@@ -87,18 +87,19 @@ public class ApplyListAdapter extends ArrayAdapter<InviteMessage> {
                 holder.btnAgree.setVisibility(View.VISIBLE);
 //                holder.btnAgree.setEnabled(true);
 //                holder.btnAgree.setBackgroundResource(android.R.drawable.btn_default);
-                holder.btnAgree.setText(str2);
                 holder.btnDisAgree.setVisibility(View.VISIBLE);
-                if (msg.getReason() == null) {
+                if (msg.getReason() == null||msg.getReason() == "") {
                     // 如果没写理由
                     holder.tv_reason.setText(str3);
+                }else {
+                    holder.tv_reason.setText(msg.getReason());
                 }
                 // 设置点击事件
                 holder.btnAgree.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         // 同意别人发的好友请求
-                        acceptInvitation(holder.btnAgree, msg);
+                        acceptInvitation(holder.btnAgree, holder.btnDisAgree, msg);
                     }
                 });
                 holder.btnDisAgree.setOnClickListener(new OnClickListener() {
@@ -106,7 +107,12 @@ public class ApplyListAdapter extends ArrayAdapter<InviteMessage> {
                     public void onClick(View v) {
                         // 拒绝别人发的好友请求
                         try {
+                            holder.btnDisAgree.setVisibility(View.INVISIBLE);
+                            holder.btnAgree.setVisibility(View.INVISIBLE);
                             EMClient.getInstance().contactManager().declineInvitation(msg.getFrom());
+                            inviteMessgeDao.deleteMessage(msg.getFrom());
+                            Toast.makeText(context,"已拒绝"+name+"用户的申请", Toast.LENGTH_SHORT).show();
+                            holder.tv_reason.setText("已拒绝");
                         } catch (HyphenateException e) {
                             e.printStackTrace();
                         }
@@ -123,8 +129,9 @@ public class ApplyListAdapter extends ArrayAdapter<InviteMessage> {
 
             }
 
+        } else {
+            holder.tv_reason.setText("已处理");
         }
-        holder.tv_reason.setText("已处理");
         return convertView;
     }
 
@@ -147,6 +154,7 @@ public class ApplyListAdapter extends ArrayAdapter<InviteMessage> {
                                 .error(R.mipmap.head)//加载失败
                                 .into(holder.head);
                     }
+                    name=info.getName();
                     holder.tv_name.setText(info.getName());
                 }
             }
@@ -162,9 +170,8 @@ public class ApplyListAdapter extends ArrayAdapter<InviteMessage> {
 
     /**
      * 同意好友请求或者群申请
-     *
      */
-    private void acceptInvitation(final TextView buttonAgree, final InviteMessage msg) {
+    private void acceptInvitation(final TextView buttonAgree, final TextView btnDisAgree, final InviteMessage msg) {
         final ProgressDialog pd = new ProgressDialog(context);
         String str1 = "正在同意...";
         final String str2 = "已同意";
@@ -199,7 +206,9 @@ public class ApplyListAdapter extends ArrayAdapter<InviteMessage> {
                             buttonAgree.setBackgroundDrawable(null);
                             buttonAgree.setEnabled(false);
 
-
+                            buttonAgree.setVisibility(View.INVISIBLE);
+                            btnDisAgree.setVisibility(View.INVISIBLE);
+                            inviteMessgeDao.deleteMessage(msg.getFrom());
                         }
                     });
                 } catch (final Exception e) {

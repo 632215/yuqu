@@ -403,8 +403,6 @@ public class MainActivity extends BaseActivity
                 public void run() {
                     Toast.makeText(getApplicationContext(), "收到好友申请：+" + username, Toast.LENGTH_SHORT).show();
                 }
-
-
             });
 
         }

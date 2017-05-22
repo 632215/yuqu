@@ -75,6 +75,8 @@ public class FriendFragment extends BaseFragment implements PullToRefreshBase.On
     private MyPopWindows popWindows;//右上角弹出框
     private TextView btnCancle;
     private TextView btnSure;
+    private InviteMessgeDao inviteMessgeDao;
+    private boolean flag = false;//是否含有未处理的邀请，false为没有，true为有
 
     @Override
     protected int getLayoutId() {
@@ -91,6 +93,7 @@ public class FriendFragment extends BaseFragment implements PullToRefreshBase.On
             @Override
             public void onClick(View view) {
                 //进入好友申请页面
+//                inviteMessgeDao.deleteMessage();
                 startActivity(new Intent(getActivity(), FriendApplyActivity.class));
             }
         });
@@ -99,9 +102,19 @@ public class FriendFragment extends BaseFragment implements PullToRefreshBase.On
     //查看是否有好友请求
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void initNewContactData() {
-        InviteMessgeDao dao = new InviteMessgeDao(getActivity());
-        List<InviteMessage> msgsList = dao.getMessagesList();
-        if (msgsList.size() != 0) {
+        inviteMessgeDao = new InviteMessgeDao(getActivity());
+//        List<InviteMessage> msgsList = inviteMessgeDao.getMessagesList();
+//        for(InviteMessage msg:msgsList){
+//            if (msg.getStatus().equals(InviteMessage.InviteMesageStatus.BEINVITEED)){
+//                flag=true;
+//            }
+//        }
+//        if (flag==false) {
+//            tips.setVisibility(View.INVISIBLE);
+//        } else {
+//            tips.setVisibility(View.VISIBLE);
+//        }
+        if (inviteMessgeDao.getUnreadMessagesCount() >0) {
             tips.setVisibility(View.VISIBLE);
         } else {
             tips.setVisibility(View.INVISIBLE);
@@ -250,8 +263,8 @@ public class FriendFragment extends BaseFragment implements PullToRefreshBase.On
     @Override
     public void onResume() {
         super.onResume();
-        getContactList();
         initNewContactData();
+        getContactList();
     }
 
     @Override
