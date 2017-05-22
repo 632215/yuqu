@@ -74,7 +74,6 @@ public class ProgressSubscriber<T> extends Subscriber<T> implements ProgressCanc
     public void onError(Throwable e) {
         Log.i(MyApplicaption.Tag,"创建onError");
         Log.i(MyApplicaption.Tag+"ProgressSubs :",e.getMessage());
-
         if (e instanceof SocketTimeoutException) {
             Toast.makeText(context, "网络中断，请检查您的网络状态", Toast.LENGTH_SHORT).show();
         } else if (e instanceof ConnectException) {
@@ -97,7 +96,6 @@ public class ProgressSubscriber<T> extends Subscriber<T> implements ProgressCanc
         if (mSubscriberOnNextListener != null) {
             if (httpResult.getStatus().equals("true")) {
                 Log.i(MyApplicaption.Tag,"创建onNext-----true");
-
                 mSubscriberOnNextListener.onNext(httpResult.getData());
             } else {
                 mSubscriberOnNextListener.onError(httpResult.getMsg());

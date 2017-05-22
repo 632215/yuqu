@@ -142,9 +142,9 @@ public class PersonInfoActivity extends BaseActivity implements TopTitleBar.OnTo
 
     public void saveUser() {
         if (!filePath.equals(userInfo.getUserHead())) {
+            userInfo.setUserHead(filePath);
             userInfo.setUserName(etName.getText().toString().trim());
         } else {
-            userInfo.setUserHead(filePath);
             userInfo.setUserName(etName.getText().toString().trim());
         }
         CommonlyUtils.saveUserInfo(this, userInfo);
@@ -162,9 +162,9 @@ public class PersonInfoActivity extends BaseActivity implements TopTitleBar.OnTo
                  */
                 if (!filePath.equals(userInfo.getUserHead())) {
                     uploadHead(filePath);
+                }else {
+                    saveUser();
                 }
-                saveUser();
-
             }
 
             @Override

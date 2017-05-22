@@ -150,7 +150,6 @@ public class BaiduMapActivity extends BaseActivity implements TopTitleBar.OnTopT
             //在地图上添加Marker，并显示
             mBaiduMap.addOverlay(option);
         }
-
         mBaiduMap.setOnMarkerClickListener(new BaiduMap.OnMarkerClickListener() {
 
             @Override

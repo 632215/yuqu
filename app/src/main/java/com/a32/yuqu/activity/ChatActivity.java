@@ -146,10 +146,12 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
                     // 单聊消息
                     username = message.getFrom();
                 }
+                Log.i(MyApplicaption.Tag,"username,toChatUsername"+username+"-------"+toChatUsername);
                 // 如果是当前会话的消息，刷新聊天页面
                 if (username.equals(toChatUsername)) {
                     msgList.addAll(messages);
                     messageAdapter.notifyDataSetChanged();
+                    Log.i(MyApplicaption.Tag,"数据该刷新了");
                     if (msgList.size() > 0) {
                         et_content.setSelection(listView.getCount() - 1);
                         titleBar.setSaveVisibility();
@@ -202,5 +204,6 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
         getAllMessage();
         msgList.clear();
         messageAdapter.notifyDataSetChanged();
+        titleBar.setSaveUnVisibility();
     }
 }

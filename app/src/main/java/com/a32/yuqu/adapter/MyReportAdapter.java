@@ -58,7 +58,6 @@ public class MyReportAdapter extends BaseAdapter {
             holder.upLine =  view.findViewById(R.id.upline);
             holder.downLine =  view.findViewById(R.id.downline);
             holder.placeName = (TextView) view.findViewById(R.id.processNode);
-//            holder.processTime = (TextView) view.findViewById(R.id.processTime);
             holder.devider = (TextView) view.findViewById(R.id.devider);
             holder.image= (ImageView) view.findViewById(R.id.image);
             view.setTag(holder);
@@ -95,7 +94,6 @@ public class MyReportAdapter extends BaseAdapter {
         View upLine;
         View downLine;
         TextView placeName;
-//        TextView processTime;
         TextView devider;
         ImageView image;
     }

@@ -68,19 +68,16 @@ public class MyReportActivity extends BaseActivity  implements PullToRefreshBase
                 startActivity(intent);
             }
         });
-//        getMyReport();
     }
 
     private void getMyReport() {
         SubscriberOnNextListener onNextListener = new SubscriberOnNextListener<LocationBean>() {
-
             @Override
             public void onNext(LocationBean info) {
                 mapPointList.clear();
                 if (info != null) {
                     mapPointList.addAll(info.getList());
                 }
-                Log.i(MyApplicaption.Tag,String.valueOf(mapPointList.size()));
                 pullRefresh.onRefreshComplete();
                 myAdapter.setData(mapPointList);
             }

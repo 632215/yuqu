@@ -15,6 +15,7 @@ import com.a32.yuqu.activity.MainActivity;
 import com.a32.yuqu.activity.MyReportActivity;
 import com.a32.yuqu.base.BaseFragment;
 import com.a32.yuqu.bean.LocationBean;
+import com.a32.yuqu.bean.UserBean;
 import com.a32.yuqu.http.HttpMethods;
 import com.a32.yuqu.http.HttpResult;
 import com.a32.yuqu.http.progress.ProgressSubscriber;
@@ -68,7 +69,6 @@ public class WhereFragment extends BaseFragment implements View.OnClickListener 
         book.setOnClickListener(this);
         tvFinish.setOnClickListener(this);
         tvCancle.setOnClickListener(this);
-        getBookInfo();
     }
 
     @Override
@@ -105,10 +105,12 @@ public class WhereFragment extends BaseFragment implements View.OnClickListener 
     }
 
     private void operateBook() {
-        SubscriberOnNextListener onNextListener = new SubscriberOnNextListener<LocationBean>() {
-
+        SubscriberOnNextListener onNextListener = new SubscriberOnNextListener<UserBean>() {
             @Override
-            public void onNext(LocationBean info) {
+            public void onNext(UserBean info) {
+                tvPlaceName.setText("暂无预约信息");
+                tvFinish.setVisibility(View.GONE);
+                tvCancle.setVisibility(View.GONE);
             }
 
             @Override
@@ -118,11 +120,12 @@ public class WhereFragment extends BaseFragment implements View.OnClickListener 
         };
         Map<String, String> map = new HashMap<>();
         map.put("phone", CommonlyUtils.getUserInfo(getActivity()).getUserPhone());
+        map.put("discoveryphone", locationBean.getList().get(0).getPhone());
         map.put("placeName", locationBean.getList().get(0).getPlaceName());
         map.put("longitude",locationBean.getList().get(0).getLongitude());
         map.put("latitude",locationBean.getList().get(0).getLatitude());
         map.put("dealWay",dealWay);
-        HttpMethods.getInstance().operateBook(new ProgressSubscriber<HttpResult<LocationBean>>(onNextListener, getActivity(), false), map);
+        HttpMethods.getInstance().operateBook(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, getActivity(), false), map);
     }
 
     public void showFinishPop(int layout) {
@@ -151,6 +154,8 @@ public class WhereFragment extends BaseFragment implements View.OnClickListener 
                     if (!info.getList().isEmpty()) {
                         locationBean = info;
                         bookInfoLayout.setVisibility(View.VISIBLE);
+                        tvFinish.setVisibility(View.VISIBLE);
+                        tvCancle.setVisibility(View.VISIBLE);
                         tvPlaceName.setText(locationBean.getList().get(0).getPlaceName());
                     }else {
                         tvPlaceName.setText("暂无预约信息");
@@ -159,10 +164,8 @@ public class WhereFragment extends BaseFragment implements View.OnClickListener 
                     }
                 }
             }
-
             @Override
             public void onError(String Msg) {
-
             }
         };
         Map<String, String> map = new HashMap<>();

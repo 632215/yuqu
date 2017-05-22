@@ -232,7 +232,6 @@ public class RegisterActivity extends BaseActivity implements TopTitleBar.OnTopT
                     public void onSuccess(ResponseInfo<String> responseInfo) {
                         Log.i(MyApplicaption.Tag,responseInfo.result);
                     }
-
                     @Override
                     public void onFailure(com.lidroid.xutils.exception.HttpException e, String s) {
                     }

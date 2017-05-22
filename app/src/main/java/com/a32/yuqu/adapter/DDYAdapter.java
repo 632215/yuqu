@@ -117,11 +117,13 @@ public class DDYAdapter extends BaseAdapter {
         } else {
             holder.img.setVisibility(View.VISIBLE);
             if (FileUtil.fileIsExists(bean.getImg())) {
-                Picasso.with(mContext).load(new File(Environment.getExternalStorageDirectory() + "/yuqu/pic/" + bean.getImg()))
+                Picasso.with(mContext)
+                        .load(new File(Environment.getExternalStorageDirectory() + "/yuqu/pic/" + bean.getImg()))
                         .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)//加速内存的回收
                         .into(holder.img);
             } else {
-                Picasso.with(mContext).load((HttpMethods.BASE_URL + "upload/" + bean.getImg()))
+                Picasso.with(mContext)
+                        .load((HttpMethods.BASE_URL + "upload/" + bean.getImg()))
                         .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)//加速内存的回收
                         .into(holder.img);
             }

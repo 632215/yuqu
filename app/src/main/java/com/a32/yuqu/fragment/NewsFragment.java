@@ -131,8 +131,8 @@ public class NewsFragment extends BaseFragment implements PullToRefreshBase.OnRe
                     sortList.add(
                             new Pair<Long, EMConversation>(conversation.getLastMessage().getMsgTime(), conversation));
                 }
-                pullRefresh.onRefreshComplete();
             }
+            pullRefresh.onRefreshComplete();
         }
         try {
             sortConversationByLastChatTime(sortList);

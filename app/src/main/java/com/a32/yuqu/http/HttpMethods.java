@@ -270,7 +270,7 @@ public class HttpMethods {
      * @param subscriber
      * @param gson
      */
-    public void operateBook(Subscriber<HttpResult<LocationBean>> subscriber, Map<String ,String > gson) {
+    public void operateBook(Subscriber<HttpResult<UserBean>> subscriber, Map<String ,String > gson) {
         Observable observable = movieService.operateBook(gson);
         toSubscribe(observable, subscriber);
     }

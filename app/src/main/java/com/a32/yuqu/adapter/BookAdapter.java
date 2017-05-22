@@ -74,7 +74,8 @@ public class BookAdapter extends BaseAdapter {
                 }
             }
             holder.placeName.setText(bean.getPlaceName());
-            holder.tvRemain.setText(mContext.getResources().getString(R.string.remained)+" "+(Integer.parseInt(bean.getMax())-Integer.parseInt(bean.getBooked())));
+            holder.tvRemain.setText(mContext.getResources().getString(R.string.remained)+" "
+                    +(Integer.parseInt(bean.getMax())-Integer.parseInt(bean.getBooked())));
         }
         return view;
     }

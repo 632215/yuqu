@@ -75,6 +75,7 @@ public class FriendFragment extends BaseFragment implements PullToRefreshBase.On
     private MyPopWindows popWindows;//右上角弹出框
     private TextView btnCancle;
     private TextView btnSure;
+
     @Override
     protected int getLayoutId() {
         return R.layout.fragment_friend;
@@ -86,7 +87,6 @@ public class FriendFragment extends BaseFragment implements PullToRefreshBase.On
         pullRefresh.setMode(PullToRefreshBase.Mode.BOTH);
         pullRefresh.setOnRefreshListener(this);
         initFriendData();
-//        initNewContactData();
         newContact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -103,8 +103,9 @@ public class FriendFragment extends BaseFragment implements PullToRefreshBase.On
         List<InviteMessage> msgsList = dao.getMessagesList();
         if (msgsList.size() != 0) {
             tips.setVisibility(View.VISIBLE);
+        } else {
+            tips.setVisibility(View.INVISIBLE);
         }
-        tips.setVisibility(View.INVISIBLE);
     }
 
 
@@ -147,7 +148,7 @@ public class FriendFragment extends BaseFragment implements PullToRefreshBase.On
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Log.i(MyApplicaption.Tag,listView.getItemAtPosition(i)+"长按");
+                Log.i(MyApplicaption.Tag, listView.getItemAtPosition(i) + "长按");
                 getObjectInfo(adapter.getItem(i).getUsername());
                 showPopWindows();
                 return true;
@@ -156,36 +157,36 @@ public class FriendFragment extends BaseFragment implements PullToRefreshBase.On
     }
 
     private void getObjectInfo(final String username) {
-            SubscriberOnNextListener onNextListener = new SubscriberOnNextListener<UserBean>() {
+        SubscriberOnNextListener onNextListener = new SubscriberOnNextListener<UserBean>() {
 
-                @Override
-                public void onNext(UserBean info) {
-                    if (info != null) {
-                        UserInfo objectInfo = new UserInfo();
-                        objectInfo.setUserName(info.getName());
-                        objectInfo.setUserHead(info.getHead());
-                        objectInfo.setUserPhone(username);
-                        CommonlyUtils.saveObjectUser(objectInfo);
-                    }
+            @Override
+            public void onNext(UserBean info) {
+                if (info != null) {
+                    UserInfo objectInfo = new UserInfo();
+                    objectInfo.setUserName(info.getName());
+                    objectInfo.setUserHead(info.getHead());
+                    objectInfo.setUserPhone(username);
+                    CommonlyUtils.saveObjectUser(objectInfo);
                 }
+            }
 
-                @Override
-                public void onError(String Msg) {
-                }
-            };
-            Map<String, String> map = new HashMap<>();
-            map.put("phone", username);
-            HttpMethods.getInstance().getheadPath(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, this.getActivity(), false), map);
+            @Override
+            public void onError(String Msg) {
+            }
+        };
+        Map<String, String> map = new HashMap<>();
+        map.put("phone", username);
+        HttpMethods.getInstance().getheadPath(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, this.getActivity(), false), map);
     }
 
     public void showPopWindows() {
         popWindows = new MyPopWindows(getActivity());
-        popWindows.setContentView(View.inflate(getActivity(), R.layout.deletefriend,null));
-        popWindows.showAtLocation(getView(), Gravity.CENTER,0,0);
+        popWindows.setContentView(View.inflate(getActivity(), R.layout.deletefriend, null));
+        popWindows.showAtLocation(getView(), Gravity.CENTER, 0, 0);
 
         View views = popWindows.getContentView();
-        btnCancle= (TextView) views.findViewById(R.id.btnCancle);
-        btnSure= (TextView) views.findViewById(R.id.btnSure);
+        btnCancle = (TextView) views.findViewById(R.id.btnCancle);
+        btnSure = (TextView) views.findViewById(R.id.btnSure);
         btnCancle.setOnClickListener(this);
         btnSure.setOnClickListener(this);
     }
@@ -237,10 +238,10 @@ public class FriendFragment extends BaseFragment implements PullToRefreshBase.On
                 }
             }
         });
-        if (contactList==null){
+        if (contactList == null) {
             return;
         }
-        Log.i(MyApplicaption.Tag,String.valueOf(contactList.size()));
+        Log.i(MyApplicaption.Tag, String.valueOf(contactList.size()));
         adapter.setData(contactList);
 
     }
@@ -265,7 +266,7 @@ public class FriendFragment extends BaseFragment implements PullToRefreshBase.On
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.btnCancle:
                 popWindows.dismiss();
                 break;

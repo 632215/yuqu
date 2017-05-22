@@ -99,6 +99,6 @@ public interface AppService {
     // 取消或完成预约
     @FormUrlEncoded
     @POST("dealBook.php")
-    Observable<HttpResult<LocationBean>> operateBook(@FieldMap Map<String, String> mapgson);
+    Observable<HttpResult<UserBean>> operateBook(@FieldMap Map<String, String> mapgson);
 
 }

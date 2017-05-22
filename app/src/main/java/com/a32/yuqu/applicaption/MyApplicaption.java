@@ -41,6 +41,7 @@ public class MyApplicaption extends Application {
         // 初始化环信SDK
         init(applicationContext);
         locationService=new LocationService(this);
+
         SDKInitializer.initialize(getApplicationContext());
         Log.i(Tag,"MyApplicaption"+username);
     }

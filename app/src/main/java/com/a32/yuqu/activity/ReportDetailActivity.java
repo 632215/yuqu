@@ -93,6 +93,8 @@ public class ReportDetailActivity extends BaseActivity implements TopTitleBar.On
                     tvLeft.setText(tvLeft.getText().toString().trim() + remainder);
                     if (remainder==0){
                         tvBook.setVisibility(View.GONE);
+                    }else{
+                        tvBook.setVisibility(View.VISIBLE);
                     }
                 }
             }
