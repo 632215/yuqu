@@ -1,5 +1,7 @@
 package com.a32.yuqu.activity;
 
+import android.app.Service;
+import android.os.Vibrator;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -50,7 +52,7 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
     private EMConversation conversation;
     protected int pagesize = 20;
     private MessageAdapter messageAdapter;
-
+    private Vibrator myVibrator;
     @Override
     protected int getContentViewId() {
         return R.layout.activity_chat;
@@ -58,11 +60,11 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
 
     @Override
     protected void initView() {
+        myVibrator = (Vibrator) getSystemService(Service.VIBRATOR_SERVICE);
         toChatUsername = CommonlyUtils.getObjectUser().getUserPhone();
         getAllMessage();
         titleBar.setTitle("与" + CommonlyUtils.getObjectUser().getUserName() + "的会话");
         titleBar.setOnTopTitleBarCallback(ChatActivity.this);
-//        titleBar.setSaveVisibility();
         titleBar.setSaveText("清空消息");
         titleBar.setOnSaveCallBack(this);
         msgList = conversation.getAllMessages();
@@ -111,7 +113,6 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
     }
 
     private void setMesaage(String content) {
-
         // 创建一条文本消息，content为消息文字内容，toChatUsername为对方用户或者群聊的id，后文皆是如此
         EMMessage message = EMMessage.createTxtSendMessage(content, toChatUsername);
         // 如果是群聊，设置chattype，默认是单聊
@@ -136,8 +137,13 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
 
         @Override
         public void onMessageReceived(List<EMMessage> messages) {
-
+            if (myVibrator.hasVibrator()){
+                myVibrator.vibrate(1000);
+            }
+            Log.i(MyApplicaption.Tag,"收到消息了");
             for (EMMessage message : messages) {
+                Log.i(MyApplicaption.Tag,"处理消息中");
+
                 String username = null;
                 // 群组消息
                 if (message.getChatType() == ChatType.GroupChat || message.getChatType() == ChatType.ChatRoom) {

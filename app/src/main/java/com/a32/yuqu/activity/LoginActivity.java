@@ -72,6 +72,12 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
     @Override
     protected void initView() {
+        UserInfo userInfo=CommonlyUtils.getUserInfo(this);
+        if (!userInfo.getUserPwd().equals("") && !userInfo.getUserPhone().equals("")) {
+            userName.setText(userInfo.getUserPhone());
+            pwd.setText(userInfo.getUserPwd());
+        }
+
         btnLogin.setOnClickListener(this);
         btnRegister.setOnClickListener(this);
         percentRelativeLayout.setOnClickListener(this);
@@ -135,43 +141,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
     }
 
-//    private void loginAccount(final String currentUsername, final String currentPassword) {
-//        final CustomProgressDialog progressDialog = new CustomProgressDialog(this, "正在登录");
-//        progressDialog.setCancleEnable(false);
-//        progressDialog.show();
-//        SubscriberOnNextListener onNextListener = new SubscriberOnNextListener<UserBean>() {
-//
-//            @Override
-//            public void onNext(UserBean info) {
-//                Log.i(MyApplicaption.Tag, "getUserByName info--" + info.getName() + "----" + info.getHead());
-//                if (info != null) {
-//                    EMClient.getInstance().groupManager().loadAllGroups();
-//                    EMClient.getInstance().chatManager().loadAllConversations();
-//                    getFriends();
-//                    UserInfo userInfo = new UserInfo();
-//                    userInfo.setUserPhone(currentUsername);
-//                    userInfo.setUserPwd(currentPassword);
-//                    CommonlyUtils.saveUserInfo(LoginActivity.this, userInfo);
-//                    Intent intent = new Intent(LoginActivity.this,
-//                            MainActivity.class);
-//                    progressDialog.dismiss();
-//                    startActivity(intent);
-//                    finish();
-//                }
-//            }
-//
-//            @Override
-//            public void onError(String Msg) {
-//                errorTips.setText(Msg);
-//                errorTips.setVisibility(View.VISIBLE);
-//            }
-//        };
-//        Map<String, String> map = new HashMap<>();
-//        map.put("phone", currentUsername);
-//        map.put("password", currentPassword);
-//        HttpMethods.getInstance().loginAccount(new ProgressSubscriber<HttpResult<UserBean>>(onNextListener, this, false), map);
-//    }
-
     private void loginAccount(String mname, String mpassword) {
         final CustomProgressDialog progressDialog = new CustomProgressDialog(this, "正在登录");
         progressDialog.setCancleEnable(false);
@@ -216,6 +185,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
             @Override
             public void onError(final int code, final String message) {
+                progressDialog.dismiss();
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

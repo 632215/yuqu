@@ -1,7 +1,9 @@
 package com.a32.yuqu.fragment;
 
+import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.util.Log;
 import android.util.Pair;
 import android.view.View;
@@ -24,8 +26,10 @@ import com.a32.yuqu.utils.CommonlyUtils;
 import com.a32.yuqu.view.FillListView;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshScrollView;
+import com.hyphenate.EMMessageListener;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMConversation;
+import com.hyphenate.chat.EMMessage;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,7 +51,7 @@ public class NewsFragment extends BaseFragment implements PullToRefreshBase.OnRe
     FillListView listView;
     private List<EMConversation> conversationList = new ArrayList<EMConversation>();
     private NewsAdapter newsAdapter;
-
+    private Vibrator myVibrator;
     @Override
     protected int getLayoutId() {
         return R.layout.fragment_news;
@@ -57,6 +61,8 @@ public class NewsFragment extends BaseFragment implements PullToRefreshBase.OnRe
     protected void initView(View view, Bundle savedInstanceState) {
         pullRefresh.setMode(PullToRefreshBase.Mode.BOTH);
         pullRefresh.setOnRefreshListener(this);
+        myVibrator = (Vibrator) getActivity().getSystemService(Service.VIBRATOR_SERVICE);
+        EMClient.getInstance().chatManager().addMessageListener(msgListener);
         initData();
     }
 
@@ -191,4 +197,34 @@ public class NewsFragment extends BaseFragment implements PullToRefreshBase.OnRe
     public void onClick(View view) {
 
     }
+
+    EMMessageListener msgListener = new EMMessageListener(){
+
+        @Override
+        public void onMessageReceived(List<EMMessage> list) {
+            if (myVibrator.hasVibrator()){
+                myVibrator.vibrate(1000);
+            }
+        }
+
+        @Override
+        public void onCmdMessageReceived(List<EMMessage> list) {
+
+        }
+
+        @Override
+        public void onMessageRead(List<EMMessage> list) {
+
+        }
+
+        @Override
+        public void onMessageDelivered(List<EMMessage> list) {
+
+        }
+
+        @Override
+        public void onMessageChanged(EMMessage emMessage, Object o) {
+
+        }
+    };
 }

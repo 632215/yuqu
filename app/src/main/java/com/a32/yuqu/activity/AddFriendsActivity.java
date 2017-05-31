@@ -86,9 +86,9 @@ public class AddFriendsActivity extends BaseActivity implements View.OnClickList
         IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if (intentResult != null) {
             if (intentResult.getContents() == null) {
-                Toast.makeText(this, "内容为空", Toast.LENGTH_LONG).show();
+//                Toast.makeText(this, "内容为空", Toast.LENGTH_LONG).show();
             } else {
-                Toast.makeText(this, "扫描成功"+intentResult.getContents(), Toast.LENGTH_LONG).show();
+//                Toast.makeText(this, "扫描成功"+intentResult.getContents(), Toast.LENGTH_LONG).show();
                 // ScanResult 为 获取到的字符串
                 String scanResult = intentResult.getContents();
                 addContact(scanResult);

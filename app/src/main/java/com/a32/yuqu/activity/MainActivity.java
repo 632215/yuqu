@@ -2,10 +2,12 @@ package com.a32.yuqu.activity;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
+import android.os.Vibrator;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -63,7 +65,7 @@ public class MainActivity extends BaseActivity
     private LinearLayout headerLayout;//侧边栏控件赋值
     private ImageView imgHead;
     private TextView tvName;
-
+    private Vibrator myVibrator;
     //两次点击退出程序
     private long exitTime = 0;
     //底部的切换栏
@@ -104,6 +106,7 @@ public class MainActivity extends BaseActivity
         toolbar.setOnSiderbarCallback(this);
         toolbar.setOnMoreCallback(this);
         navigationView.setNavigationItemSelectedListener(this);
+        myVibrator = (Vibrator) getSystemService(Service.VIBRATOR_SERVICE);
         initLeft();//初始化左侧控件
 //        getUserInfo();//初始化左侧的基本信息
         mfragmentManager = getFragmentManager();
@@ -291,6 +294,7 @@ public class MainActivity extends BaseActivity
                     @Override
                     public void onSuccess() {
                         CommonlyUtils.clearUserInfo(MainActivity.this);
+                        Log.i(MyApplicaption.Tag,"退出成功，清除数据");
                         startActivity(new Intent(MainActivity.this, LoginActivity.class));
                         finish();
                     }
@@ -380,6 +384,10 @@ public class MainActivity extends BaseActivity
 
         @Override
         public void onContactInvited(final String username, String reason) {
+            if (myVibrator.hasVibrator()){
+                myVibrator.vibrate(1000);
+            }
+
             // 接到邀请的消息，如果不处理(同意或拒绝)，掉线后，服务器会自动再发过来，所以客户端不需要重复提醒
             List<InviteMessage> msgs = inviteMessgeDao.getMessagesList();
 

@@ -36,7 +36,7 @@
     <uses-permission android:name="android.permission.REORDER_TASKS" />
 
 
-
+    <uses-permission android:name="android.permission.VIBRATE"/>
 
     <!--Android 6.0版本可去除，用于选举信息（通道复用）的同步-->
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
