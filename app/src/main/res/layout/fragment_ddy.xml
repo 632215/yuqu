@@ -81,6 +81,7 @@
             android:background="@drawable/shape_login_button_background"
             android:padding="10dp"
             android:text="发布"
+            android:textColor="@color/colorWhite"
             android:textSize="14sp" />
     </RelativeLayout>
 
