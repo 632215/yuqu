@@ -51,6 +51,7 @@ import butterknife.Bind;
 
 import static com.a32.yuqu.R.string.phone;
 import static com.a32.yuqu.R.string.pwd;
+import static com.a32.yuqu.utils.Utils.context;
 
 /**
  * Created by 32 on 2017/5/10.
@@ -98,9 +99,22 @@ public class PersonInfoActivity extends BaseActivity implements TopTitleBar.OnTo
         userInfo = CommonlyUtils.getUserInfo(this);
         etName.setText(userInfo.getUserName());
         etPhone.setText(userInfo.getUserPhone());
-        Picasso.with(this).load(new File(path + userInfo.getUserHead()))
-                .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)//加速内存的回收
-                .into(head);
+//        Picasso.with(this).load(new File(path + userInfo.getUserHead()))
+//                .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)//加速内存的回收
+//                .into(head);
+        if (FileUtil.fileIsExists(userInfo.getUserHead())){
+            Picasso.with(context).load(new File(Environment.getExternalStorageDirectory() + "/yuqu/pic/"+userInfo.getUserHead()))
+                    .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)//加速内存的回收
+                    .placeholder(R.mipmap.head)//加载中
+                    .error(R.mipmap.head)//加载失败
+                    .into(head);
+        }else{
+            Picasso.with(context).load((HttpMethods.BASE_URL + "upload/" + userInfo.getUserHead()))
+                    .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)//加速内存的回收
+                    .placeholder(R.mipmap.head)//加载中
+                    .error(R.mipmap.head)//加载失败
+                    .into(head);
+        }
         filePath = CommonlyUtils.getUserInfo(this).getUserHead();
         head.setOnClickListener(this);
     }

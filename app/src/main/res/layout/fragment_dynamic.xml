@@ -8,15 +8,16 @@
         android:id="@+id/radiogroup"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
         android:layout_marginTop="5dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp">
 
         <RadioButton
             android:id="@+id/radioNews"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_margin="3dp"
             android:layout_weight="1"
             android:background="@drawable/radio_news_bg"
             android:button="@null"
@@ -28,6 +29,7 @@
             android:id="@+id/radioDynamic"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_margin="3dp"
             android:layout_weight="1"
             android:background="@drawable/radio_news_bg"
             android:button="@null"
@@ -35,13 +37,6 @@
             android:text="动态"
             android:textColor="@drawable/color_radiobutton" />
     </RadioGroup>
-
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="5dp"
-        android:background="@color/colorLineGray" />
 
     <FrameLayout
         android:id="@+id/frameLayout"

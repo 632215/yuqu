@@ -40,6 +40,8 @@ import com.a32.yuqu.http.progress.ProgressSubscriber;
 import com.a32.yuqu.http.progress.SubscriberOnNextListener;
 import com.a32.yuqu.utils.CommonUtils;
 import com.a32.yuqu.utils.CommonlyUtils;
+import com.a32.yuqu.utils.FileUtil;
+import com.a32.yuqu.utils.ToastUtils;
 import com.a32.yuqu.view.CircleImageView;
 import com.a32.yuqu.view.MaterialDialog;
 import com.a32.yuqu.view.MyPopWindows;
@@ -47,7 +49,10 @@ import com.a32.yuqu.view.MyToolbar;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.EMContactListener;
 import com.hyphenate.chat.EMClient;
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -129,8 +134,9 @@ public class MainActivity extends BaseActivity
                 Log.i(MyApplicaption.Tag,"onNext");
                 if (info!=null){
                     tvName.setText(info.getUserName());
-                    Bitmap head = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory() + "/yuqu/pic/"+info.getUserHead());
-                    imgHead.setImageBitmap(head);
+//                    Bitmap head = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory() + "/yuqu/pic/"+info.getUserHead());
+//                    imgHead.setImageBitmap(head);
+                    setHead(info.getUserHead());
                     UserInfo userInfo=CommonlyUtils.getUserInfo(MainActivity.this);
                     userInfo.setUserHead(info.getUserHead());
                     userInfo.setUserName(info.getUserName());
@@ -146,6 +152,22 @@ public class MainActivity extends BaseActivity
         Map<String, String> map = new HashMap<>();
         map.put("phone", CommonlyUtils.getUserInfo(this).getUserPhone());
         HttpMethods.getInstance().getUserInfo(new ProgressSubscriber<HttpResult<UserInfo>>(onNextListener, this, false), map);
+    }
+
+    private void setHead(String head) {
+        if (FileUtil.fileIsExists(head)){
+            Picasso.with(this).load(new File(Environment.getExternalStorageDirectory() + "/yuqu/pic/"+head))
+                    .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)//加速内存的回收
+                    .placeholder(R.mipmap.head)//加载中
+                    .error(R.mipmap.head)//加载失败
+                    .into(imgHead);
+        }else{
+            Picasso.with(this).load((HttpMethods.BASE_URL + "upload/" + head))
+                    .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)//加速内存的回收
+                    .placeholder(R.mipmap.head)//加载中
+                    .error(R.mipmap.head)//加载失败
+                    .into(imgHead);
+        }
     }
 
     private TextView addFriend;
@@ -277,8 +299,8 @@ public class MainActivity extends BaseActivity
                     Toast.LENGTH_SHORT).show();
             exitTime = System.currentTimeMillis();
         } else {
-            accountExit();
-//            System.exit(0);
+//            accountExit();
+            System.exit(0);
         }
     }
 
@@ -293,10 +315,7 @@ public class MainActivity extends BaseActivity
                 MyApplicaption.getInstance().logout(true, new EMCallBack() {
                     @Override
                     public void onSuccess() {
-                        CommonlyUtils.clearUserInfo(MainActivity.this);
-                        Log.i(MyApplicaption.Tag,"退出成功，清除数据");
-                        startActivity(new Intent(MainActivity.this, LoginActivity.class));
-                        finish();
+                        loginout();
                     }
 
                     @Override
@@ -318,6 +337,28 @@ public class MainActivity extends BaseActivity
             }
         });
         materialDialog.show();
+    }
+
+
+    public void loginout() {
+        MyApplicaption.getInstance().logout(false, new EMCallBack() {
+            @Override
+            public void onSuccess() {
+                CommonlyUtils.clearUserInfo(MainActivity.this);
+                startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                finish();
+            }
+
+            @Override
+            public void onError(int i, String s) {
+                showToast("退出登录失败");
+            }
+
+            @Override
+            public void onProgress(int i, String s) {
+
+            }
+        });
     }
 
     private void initUser() {

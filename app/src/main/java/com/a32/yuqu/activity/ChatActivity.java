@@ -8,22 +8,16 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 
 import com.a32.yuqu.R;
-import com.a32.yuqu.adapter.MessageAdapter;
+import com.a32.yuqu.adapter.MsgAdapter;
 import com.a32.yuqu.applicaption.MyApplicaption;
 import com.a32.yuqu.base.BaseActivity;
-import com.a32.yuqu.bean.UserBean;
-import com.a32.yuqu.bean.UserInfo;
-import com.a32.yuqu.http.HttpMethods;
-import com.a32.yuqu.http.HttpResult;
-import com.a32.yuqu.http.progress.ProgressSubscriber;
-import com.a32.yuqu.http.progress.SubscriberOnNextListener;
 import com.a32.yuqu.utils.CommonUtils;
 import com.a32.yuqu.utils.CommonlyUtils;
 import com.a32.yuqu.utils.Constant;
 import com.a32.yuqu.utils.KeyBoardUtils;
+import com.a32.yuqu.view.FillListView;
 import com.a32.yuqu.view.TopTitleBar;
 import com.hyphenate.EMMessageListener;
 import com.hyphenate.chat.EMClient;
@@ -31,15 +25,16 @@ import com.hyphenate.chat.EMConversation;
 import com.hyphenate.chat.EMMessage;
 import com.hyphenate.chat.EMMessage.ChatType;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.Bind;
 
 public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitleBarCallback, TopTitleBar.OnSaveCallBack {
+    //    @Bind(R.id.listView)
+//    ListView listView;
     @Bind(R.id.listView)
-    ListView listView;
+    FillListView listView;
     @Bind(R.id.btn_send)
     Button btn_send;
     @Bind(R.id.titleBar)
@@ -48,11 +43,13 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
     EditText et_content;
     private String toChatUsername = "";//实际上是指用户电话号码
     private int chatType = 1;
-    private List<EMMessage> msgList;
+    private List<EMMessage> msgList = new ArrayList<>();
     private EMConversation conversation;
     protected int pagesize = 20;
-    private MessageAdapter messageAdapter;
+//    private MessageAdapter messageAdapter;
+    private MsgAdapter messageAdapter;
     private Vibrator myVibrator;
+
     @Override
     protected int getContentViewId() {
         return R.layout.activity_chat;
@@ -60,15 +57,16 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
 
     @Override
     protected void initView() {
+        EMClient.getInstance().chatManager().addMessageListener(msgListener);
         myVibrator = (Vibrator) getSystemService(Service.VIBRATOR_SERVICE);
         toChatUsername = CommonlyUtils.getObjectUser().getUserPhone();
-        getAllMessage();
+        getAllMessage();//得到会话对象
         titleBar.setTitle("与" + CommonlyUtils.getObjectUser().getUserName() + "的会话");
         titleBar.setOnTopTitleBarCallback(ChatActivity.this);
         titleBar.setSaveText("清空消息");
         titleBar.setOnSaveCallBack(this);
         msgList = conversation.getAllMessages();
-        messageAdapter = new MessageAdapter(msgList, ChatActivity.this, toChatUsername);
+        messageAdapter = new MsgAdapter(msgList, ChatActivity.this, toChatUsername);
         listView.setAdapter(messageAdapter);
         listView.setSelection(listView.getCount() - 1);
         btn_send.setOnClickListener(new OnClickListener() {
@@ -84,8 +82,6 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
             }
 
         });
-        EMClient.getInstance().chatManager().addMessageListener(msgListener);
-
     }
 
     protected void getAllMessage() {
@@ -105,9 +101,9 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
             }
             conversation.loadMoreMsgFromDB(msgId, pagesize - msgCount);
         }
-        if (msgs.size()>0){
+        if (msgs.size() > 0) {
             titleBar.setSaveVisibility();
-        }else {
+        } else {
             titleBar.setSaveUnVisibility();
         }
     }
@@ -121,12 +117,12 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
         // 发送消息
         EMClient.getInstance().chatManager().sendMessage(message);
         msgList.add(message);
-
-        messageAdapter.notifyDataSetChanged();
+        messageAdapter.setData(msgList);
+//        messageAdapter.notifyDataSetChanged();
         if (msgList.size() > 0) {
             listView.setSelection(listView.getCount() - 1);
             titleBar.setSaveVisibility();
-        }else {
+        } else {
             titleBar.setSaveUnVisibility();
         }
         et_content.setText("");
@@ -137,13 +133,12 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
 
         @Override
         public void onMessageReceived(List<EMMessage> messages) {
-            if (myVibrator.hasVibrator()){
+            if (myVibrator.hasVibrator()) {
                 myVibrator.vibrate(1000);
             }
-            Log.i(MyApplicaption.Tag,"收到消息了");
+            Log.i(MyApplicaption.Tag, "收到消息了");
             for (EMMessage message : messages) {
-                Log.i(MyApplicaption.Tag,"处理消息中");
-
+                Log.i(MyApplicaption.Tag, "处理消息中");
                 String username = null;
                 // 群组消息
                 if (message.getChatType() == ChatType.GroupChat || message.getChatType() == ChatType.ChatRoom) {
@@ -152,22 +147,16 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
                     // 单聊消息
                     username = message.getFrom();
                 }
-                Log.i(MyApplicaption.Tag,"username,toChatUsername"+username+"-------"+toChatUsername);
                 // 如果是当前会话的消息，刷新聊天页面
                 if (username.equals(toChatUsername)) {
-                    msgList.addAll(messages);
-                    messageAdapter.notifyDataSetChanged();
-                    Log.i(MyApplicaption.Tag,"数据该刷新了");
-                    if (msgList.size() > 0) {
-                        et_content.setSelection(listView.getCount() - 1);
-                        titleBar.setSaveVisibility();
-                    }else {
-                        titleBar.setSaveUnVisibility();
-                    }
+                    msgList.add(message);
+                    Log.i(MyApplicaption.Tag, "数据该刷新了");
                 }
             }
+            Log.i(MyApplicaption.Tag, "准备进入updateUI");
+            updateUI();
+            Log.i(MyApplicaption.Tag, "进入updateUI");
 
-            // 收到消息
         }
 
         @Override
@@ -192,6 +181,32 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
         }
     };
 
+    private void updateUI() {
+        new Thread() {
+            public void run() {
+                //这儿是耗时操作，完成之后更新UI；
+                runOnUiThread(new Runnable(){
+                    @Override
+                    public void run() {
+                        //更新UI
+                        if (msgList.size() > 0) {
+                            et_content.setSelection(listView.getCount() - 1);
+                            titleBar.setSaveVisibility();
+                        } else {
+                            titleBar.setSaveUnVisibility();
+                        }
+                        Log.i(MyApplicaption.Tag,"进入updateUI");
+                        msgList=conversation.getAllMessages();
+                        Log.i(MyApplicaption.Tag,"size："+ String.valueOf(msgList.size()));
+                        messageAdapter.setData(msgList);
+                    }
+
+                });
+            }
+        }.start();
+    }
+
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -209,7 +224,8 @@ public class ChatActivity extends BaseActivity implements TopTitleBar.OnTopTitle
         EMClient.getInstance().chatManager().deleteConversation(CommonlyUtils.getObjectUser().getUserPhone(), true);
         getAllMessage();
         msgList.clear();
-        messageAdapter.notifyDataSetChanged();
+        messageAdapter.setData(msgList);
+//        messageAdapter.notifyDataSetChanged();
         titleBar.setSaveUnVisibility();
     }
 }
